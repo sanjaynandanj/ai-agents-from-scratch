@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluation & Benchmarks — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 14</div>
+  <h1><span class="pnum">14</span> 📊 Evaluation &amp; Benchmarks</h1>
+  <div class="tagline">If you can&#x27;t measure your agent, you&#x27;re shipping a mood.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Evals from scratch: task, rubric, grader</a>
+<a href="#lesson-02"><span class="lnum">02</span>Trajectory evaluation: grading the journey</a>
+<a href="#lesson-03"><span class="lnum">03</span>LLM-as-judge: powers and pitfalls</a>
+<a href="#lesson-04"><span class="lnum">04</span>Benchmarks: SWE-bench, GAIA, WebArena, tau-bench</a>
+<a href="#lesson-05"><span class="lnum">05</span>Building a regression suite for agents</a>
+<a href="#lesson-06"><span class="lnum">06</span>Non-determinism: pass@k and variance</a>
+<a href="#lesson-07"><span class="lnum">07</span>Online evals: A/B tests and user signals</a>
+<a href="#lesson-08"><span class="lnum">08</span>Error analysis: reading failed trajectories</a>
+<a href="#lesson-09"><span class="lnum">09</span>Capability vs reliability: the nines problem</a>
+<a href="#lesson-10"><span class="lnum">10</span>Build an eval harness from scratch</a>
+  </div>
+  <article>
+<blockquote>If you can't measure your agent, you're shipping a mood.</blockquote>
+<p>You've built agents that plan, code, browse, and swarm. Now the uncomfortable question: are they any good, and how would you know? "It worked when I tried it" is not evidence — it's a mood with a sample size of one. This phase builds the measurement stack: evals, trajectory grading, LLM judges, benchmarks, regression suites, and the statistics of non-deterministic systems, ending with an eval harness you write yourself.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> Evals from Scratch: Task, Rubric, Grader</h2>
+<p><b>MOTTO:</b> An eval is a unit test that tolerates a thousand right answers.</p>
+<h3>The Problem</h3>
+<p>Traditional tests assert <code>f(x) == y</code>. Agents don't have one right output: "summarize this ticket" has many good answers and infinitely many bad ones. So teams eyeball outputs, feel vaguely positive, and ship — then discover in production which of the thousand answers their agent actually gives.</p>
+<h3>The Concept</h3>
+<p>Every eval, however fancy, is three parts:</p>
+<pre><code>  TASK    what the agent is asked, with fixed inputs and environment
+  RUBRIC  what &quot;good&quot; means, written down, before you look at outputs
+  GRADER  the thing that applies the rubric: code, model, or human</code></pre>
+<p>Graders form a ladder: <i>code-based</i> (exact match, contains, tests pass — cheap, objective, narrow), <i>model-based</i> (LLM applies the rubric — flexible, imperfect), <i>human</i> (gold standard, expensive). The craft is pushing as much as possible down the ladder: extract the checkable facts ("did it name the refund amount? is the JSON valid?") and reserve judgment calls for judges.</p>
+<h3>Build It</h3>
+<p>Start with 20 tasks from real usage — including the ugly ones that made you wince — each as <code>{id, input, rubric, grader}</code>. Write the rubric before running the agent; rubrics written after looking at outputs mysteriously match the outputs. Run, grade, and store every result with a timestamp and config hash. Twenty graded tasks beat zero perfect ones; you'll grow the set in Lesson 05.</p>
+<h3>Use It</h3>
+<p>Harness options: OpenAI Evals, Braintrust, LangSmith, Promptfoo, Inspect (UK AI Safety Institute's open-source framework), or the ~100 lines of Python you'll write in Lesson 10. The harness is the easy part; the task set and rubrics are the asset.</p>
+<h3>War Story</h3>
+<p>The GAIA benchmark (2023) was built on exactly this discipline: real-world assistant questions with unambiguous, code-checkable final answers, so grading needs no judge at all. Humans scored 92%; GPT-4 with plugins scored about 15%. A well-designed rubric made a wide capability gap undeniable — and un-arguable — with simple string matching.</p>
+<h3>Checkpoint</h3>
+<ol><li>What are the three components of any eval?</li><li>Why must rubrics be written before inspecting agent outputs?</li><li>When do you use a code grader versus a model grader?</li></ol>
+<h2 id="lesson-02"><span class="lnum">02</span> Trajectory Evaluation: Grading the Journey</h2>
+<p><b>MOTTO:</b> The right answer by the wrong road is a wrong answer on a delay.</p>
+<h3>The Problem</h3>
+<p>Outcome-only grading is blind to <i>how</i> the agent got there. An agent can reach the right answer by luck, by ignoring your tools and guessing from priors, or by doing something appalling along the way — deleting a file and recreating it, calling a paid API forty times, exfiltrating data before answering correctly. Outcome: pass. Reality: time bomb.</p>
+<h3>The Concept</h3>
+<p>A trajectory is the full sequence of steps; trajectory evaluation applies rubrics to it:</p>
+<pre><code>  outcome eval:     [........................] -&gt; answer  ✓/✗
+  trajectory eval:  [tool? args? order? loops? cost? recovery?] -&gt; answer</code></pre>
+<p>Useful trajectory checks: <i>did it use the required tool</i> (vs guessing), <i>step efficiency</i> (steps vs a reference solution), <i>no forbidden actions</i>, <i>loop detection</i> (same call, same args, repeatedly), <i>recovery behavior</i> (what it did after the first error). These predict production reliability far better than outcome alone, because luck doesn't repeat but process does.</p>
+<h3>Build It</h3>
+<p>First, make trajectories machine-readable: log every step as <code>{step, type, name, args_hash, result_summary, tokens, latency}</code>. Then write trajectory graders as plain functions over that list — <code>assert_tool_used("search")</code>, <code>assert_no_tool("delete_file")</code>, <code>steps &lt;= 2 * reference_steps</code>, <code>no_repeated_call(window=3)</code>. Score outcome and trajectory separately and report both; a pass with a red trajectory is a different signal than a clean pass, and averaging them hides exactly the thing you built this to see.</p>
+<h3>Use It</h3>
+<p>LangSmith, Langfuse, and Arize Phoenix capture trajectories (often as OpenTelemetry traces) and support custom evaluators over them; Inspect and DeepEval ship trajectory-aware metrics. Agent benchmarks increasingly grade process too — WebArena checks <i>state</i> changes, tau-bench checks database state after the conversation, not just the words.</p>
+<h3>War Story</h3>
+<p>The tau-bench paper (2024) evaluated customer-service agents by checking the final database state against policy — not just reply text — and found models frequently produced plausible conversations while violating the airline's rules underneath, such as making changes the policy forbade. Outcome-looking-fine with process-gone-wrong is precisely the failure class trajectory evaluation exists to catch.</p>
+<h3>Checkpoint</h3>
+<ol><li>Give two ways an agent can pass an outcome eval while being unshippable.</li><li>Why should outcome and trajectory scores be reported separately?</li><li>What log fields must a trajectory contain to be gradeable by code?</li></ol>
+<h2 id="lesson-03"><span class="lnum">03</span> LLM-as-Judge: Powers and Pitfalls</h2>
+<p><b>MOTTO:</b> The judge is a witness with opinions. Calibrate before you trust the verdict.</p>
+<h3>The Problem</h3>
+<p>Most interesting rubrics — "is this summary faithful?", "was the tone appropriate?" — can't be checked by string matching, and humans don't scale to grading 500 outputs per commit. The obvious move is using an LLM as the grader. The obvious move has documented failure modes.</p>
+<h3>The Concept</h3>
+<p>An LLM judge receives the task, the rubric, and the output, and returns a grade. Its known biases:</p>
+<pre><code>  position bias   in A-vs-B comparisons, favors one slot (often the first)
+  verbosity bias  longer answers score higher at equal quality
+  self-preference judges rate their own model family&#x27;s style higher
+  sycophancy      confident, polished wrongness outscores hesitant rightness</code></pre>
+<p>Mitigations, in order of value: judge against an explicit rubric, never "rate 1-10" bare; for pairwise comparisons, swap positions and only count consistent verdicts; require the judge to quote evidence before scoring; use a judge from a different model family than the agent; prefer binary per-criterion checks over scalar vibes.</p>
+<h3>Build It</h3>
+<p>Build the judge as <code>judge(task, rubric, output) -&gt; {criterion: pass/fail, evidence}</code> with structured output, temperature 0. Then — this is the step everyone skips — <i>evaluate the judge</i>: hand-label 50 outputs yourself, run the judge on them, and measure agreement. Below ~85% agreement, fix the rubric or the judge prompt before trusting it at scale. Re-check whenever you change judge model or rubric; judge drift is silent and poisons every downstream number.</p>
+<h3>Use It</h3>
+<p>Pairwise judging with position-swap is standard in Arena-style rankings; Braintrust, LangSmith, and Promptfoo all support rubric-based judge evaluators; DeepEval ships judge metrics with bias mitigations. Whatever the tool, the human-agreement audit is on you.</p>
+<h3>War Story</h3>
+<p>The MT-Bench / Chatbot Arena paper (Zheng et al., 2023) put numbers on judge bias: GPT-4-as-judge showed measurable position bias in pairwise comparisons and favored longer answers, yet after mitigations (position swapping among them) reached over 80% agreement with human preferences — comparable to human-human agreement. Both halves matter: the biases are real, and so is the usefulness once you engineer around them.</p>
+<h3>Checkpoint</h3>
+<ol><li>Name three documented biases of LLM judges and one mitigation for each.</li><li>Why must you measure judge-human agreement before scaling a judge?</li><li>Why do binary per-criterion checks beat 1-10 scalar scores?</li></ol>
+<h2 id="lesson-04"><span class="lnum">04</span> Benchmarks: SWE-bench, GAIA, WebArena, tau-bench</h2>
+<p><b>MOTTO:</b> A benchmark measures exactly what it measures — read the fine print before you believe the leaderboard.</p>
+<h3>The Problem</h3>
+<p>"Agent X scores 70% on SWE-bench" — should you care? Only if you know what the benchmark actually tests, what it ignores, and whether the number still means anything or the benchmark has been saturated, gamed, or memorized into irrelevance.</p>
+<h3>The Concept</h3>
+<p>The four benchmarks every agent builder should be able to explain:</p>
+<table><thead><tr><th>Benchmark</th><th>Task</th><th>Grader</th><th>Measures / caveat</th></tr></thead><tbody><tr><td>SWE-bench (2024)</td><td>Patch real GitHub issues (12 Python repos)</td><td>Held-out tests</td><td>Repo-scale coding; contamination concerns → Verified subset (2024)</td></tr><tr><td>GAIA (2023)</td><td>Real-world assistant Qs, tool use required</td><td>Exact-match answer</td><td>Grounded multi-step reasoning; humans 92% vs GPT-4+plugins ~15% at release</td></tr><tr><td>WebArena (2023)</td><td>Tasks on self-hosted realistic websites</td><td>Programmatic state/answer checks</td><td>Web operation; humans ~78%, first agents ~14%</td></tr><tr><td>tau-bench (2024)</td><td>Customer-service dialogs under policy, simulated user</td><td>Final DB state + pass^k</td><td>Policy compliance and <i>reliability across retries</i></td></tr></tbody></table>
+<p>Benchmark lifecycle: release (huge human-agent gap) → climb → saturation (top models cluster near ceiling, or test-set leakage into training data inflates scores) → replacement. A saturated benchmark stops discriminating; a contaminated one measures memory.</p>
+<h3>Build It</h3>
+<p>Reading a leaderboard defensively: check the <i>scaffold</i> (numbers combine model + harness — SWE-bench scores vary wildly across scaffolds for the same model), check the subset (Lite vs Verified vs full are different tests), check the date against model training cutoffs, and check pass@1 vs pass@k reporting. Then remember the only benchmark that predicts <i>your</i> product is the one built from your tasks — public benchmarks tell you about models, not about your agent.</p>
+<h3>Use It</h3>
+<p>Run them yourself rather than quoting them: SWE-bench and WebArena publish full harnesses and environments; GAIA and tau-bench are on GitHub/HuggingFace. Running 20 tasks locally teaches more than any leaderboard screenshot.</p>
+<h3>War Story</h3>
+<p>SWE-bench's own arc is the lifecycle lesson: at release (2024 paper), the best assisted model resolved under 2% of issues. Within roughly two years, top agents reported 70%+ on the Verified subset — while OpenAI's Verified audit had already removed a large share of the original tasks as unfair or broken, and researchers raised contamination and overfitting concerns. Same name, radically different meaning over time.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why do SWE-bench numbers for the same model differ across scaffolds?</li><li>What does tau-bench's pass^k metric capture that pass@1 misses?</li><li>What are two reasons a benchmark's scores can inflate without real capability gains?</li></ol>
+<h2 id="lesson-05"><span class="lnum">05</span> Building a Regression Suite for Agents</h2>
+<p><b>MOTTO:</b> Every prompt tweak is a code change. Ship it through a test gate like one.</p>
+<h3>The Problem</h3>
+<p>You improve the prompt for refund cases; three weeks later someone notices shipping-status questions broke. Agent behavior is a web of couplings — prompts, tools, model versions — and any edit can silently regress a distant behavior. Without a regression suite, you find out from users.</p>
+<h3>The Concept</h3>
+<p>Same discipline as software CI, adapted for non-determinism:</p>
+<pre><code>  golden set (frozen tasks + rubrics)
+       |            versioned config: prompts, tools, model, harness
+       v
+  run on every change --&gt; compare to baseline --&gt; gate the merge</code></pre>
+<p>Two suites in practice: a <i>smoke suite</i> (10–30 tasks, minutes, every PR) and a <i>full suite</i> (hundreds, nightly). Every production failure becomes a new case — the suite is your institutional memory of every way the agent has embarrassed you. Statistical care is mandatory: with sampling variance, one run of 25 tasks can't distinguish 80% from 88%; Lesson 06 covers how many runs you actually need.</p>
+<h3>Build It</h3>
+<p>Freeze a golden set with pinned model versions and a config hash in every result row. On each change: run smoke suite k times, compare per-task pass rates against baseline, fail the gate on statistically meaningful drops — and <i>review</i> per-task diffs, not just the aggregate (an aggregate can hold steady while refunds break and shipping improves). Curate deliberately: retire tasks that have passed 100% for months to a nightly archive, promote every new production incident into the smoke set.</p>
+<h3>Use It</h3>
+<p>Braintrust, LangSmith, and Promptfoo all support baseline-vs-candidate comparison in CI; Promptfoo is particularly natural in a GitHub Actions gate. Storage can be as simple as JSONL per run — what matters is that results are diffable across configs.</p>
+<h3>War Story</h3>
+<p>In April 2025, OpenAI rolled back a GPT-4o update after users found it excessively sycophantic — agreeing with and flattering almost anything. OpenAI's own postmortem said evaluations and A/B tests had looked good, offline checks "generally looked good," while some expert testers had felt something was off — and there was no specific sycophancy eval in the gate. The regression you don't have a test for is the one that ships.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why must both config (prompt/model/tools) and results be versioned together?</li><li>Why can an unchanged aggregate score hide a real regression?</li><li>Where should new regression cases come from as the suite matures?</li></ol>
+<h2 id="lesson-06"><span class="lnum">06</span> Non-Determinism: pass@k and Variance</h2>
+<p><b>MOTTO:</b> Your agent's score is a distribution. One run is an anecdote with a decimal point.</p>
+<h3>The Problem</h3>
+<p>Same agent, same task, ten runs: seven passes. Is the agent "70% good"? Is a teammate's 8/10 on their branch an improvement? LLM sampling, tool flakiness, and environment timing make every run a coin flip with an unknown bias — and people routinely ship decisions based on one flip.</p>
+<h3>The Concept</h3>
+<p>Two different questions, two different metrics:</p>
+<pre><code>  pass@k     P(at least one of k attempts succeeds)   -&gt; capability ceiling
+  pass^k     P(all k attempts succeed)                -&gt; reliability floor</code></pre>
+<p>pass@k (formalized in the HumanEval/Codex paper, 2021) suits problems where you can verify and pick the winner among k tries. pass^k (popularized by tau-bench) suits production, where every single run faces a real user. A model can look great on pass@8 and dismal on pass^8 — same underlying per-run rate, opposite conclusions. And per-task pass rates need error bars: at p=0.7, ten runs give you a 95% confidence interval roughly ±0.28 wide. Ten runs is a vibe.</p>
+<h3>Build It</h3>
+<p>Harness rules: run every task k times (k≥5 for anything decision-relevant) and store <i>all</i> attempts, never just the best. Report per-task pass rate with a confidence interval (Wilson interval is fine at small n). When comparing configs A and B, use paired comparisons on the same tasks and a significance test — at minimum, refuse to conclude anything from overlapping intervals. Temperature 0 does <i>not</i> buy determinism for agents: tool results, timing, and even batched inference vary. Measure the variance; don't wish it away.</p>
+<h3>Use It</h3>
+<p>Inspect, Braintrust, and LangSmith support repeated runs per task; scipy gives you the tests. tau-bench's harness reports pass^k natively — worth reading as reference code for reliability-first evaluation.</p>
+<h3>War Story</h3>
+<p>The Codex paper (2021) that introduced pass@k also showed why the naive estimator misleads: computing it from a single batch of k samples biases the estimate, so the authors derived an unbiased estimator from n &gt; k samples — a detail that exists precisely because early results were flattered by lucky batches. The field's very first agent-adjacent metric came with a variance warning attached. It still applies.</p>
+<h3>Checkpoint</h3>
+<ol><li>Explain pass@k vs pass^k and which one production cares about.</li><li>Why doesn't temperature 0 make an agent deterministic?</li><li>Your candidate scored 82% vs baseline 78% on one run of 50 tasks. What do you do before celebrating?</li></ol>
+<h2 id="lesson-07"><span class="lnum">07</span> Online Evals: A/B Tests and User Signals</h2>
+<p><b>MOTTO:</b> Offline evals grade the rehearsal. Production grades the show.</p>
+<h3>The Problem</h3>
+<p>Your golden set is a frozen photograph of past traffic. Real usage drifts — new topics, new phrasing, adversarial users — and offline pass rates can stay green while production satisfaction quietly rots. Some qualities (was the user actually helped?) only exist in production at all.</p>
+<h3>The Concept</h3>
+<p>Online evaluation instruments the live system:</p>
+<pre><code>  explicit signals   thumbs, ratings, surveys       (sparse, biased, loud)
+  implicit signals   retry, rephrase, abandon, escalate-to-human,
+                     edit-the-agent&#x27;s-output, task completion   (dense, honest)
+  experiments        A/B: route x% of traffic to candidate, compare signals
+  shadow mode        candidate runs on real inputs, output logged not shown</code></pre>
+<p>Implicit signals beat explicit ones: few users click thumbs, and the ones who do are angry or delighted, not representative. A user immediately rephrasing is a failure vote; a user copying the agent's code verbatim is a success vote. Shadow mode is the underrated middle step — production inputs, zero user risk.</p>
+<h3>Build It</h3>
+<p>Instrument first: log session outcomes (completed / abandoned / escalated), retries-per-task, and edits to agent output, all joined to config version. Then gate rollouts: shadow → 5% canary with auto-rollback thresholds → 50/50 A/B with significance testing → full. Feed the loop back: sample sessions with bad implicit signals into Lesson 08's error analysis and Lesson 05's regression suite. And mind Goodhart — optimize thumbs-up hard enough and you'll breed a flatterer (see Lesson 05's war story; that mechanism was part of OpenAI's own sycophancy postmortem).</p>
+<h3>Use It</h3>
+<p>Standard experimentation stacks (Statsig, GrowthBook, LaunchDarkly) handle assignment and stats; LLM observability tools (LangSmith, Langfuse, Arize) join traces to feedback. The agent-specific part — defining honest success signals for <i>your</i> task — no vendor sells.</p>
+<h3>War Story</h3>
+<p>The Air Canada case (2024) is what un-evaluated production looks like: the airline's website chatbot invented a bereavement-fare refund policy, a customer relied on it, and a Canadian tribunal ordered the airline to honor the hallucinated policy, rejecting the argument that the chatbot was "a separate legal entity responsible for its own actions." Production is an eval where the graders include judges — the courtroom kind.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why are implicit signals generally more trustworthy than thumbs ratings?</li><li>What does shadow mode test that offline evals can't, and what risk does it avoid?</li><li>How does Goodhart's law bite an agent optimized on user approval signals?</li></ol>
+<h2 id="lesson-08"><span class="lnum">08</span> Error Analysis: Reading Failed Trajectories</h2>
+<p><b>MOTTO:</b> Your failures are already sorted into piles. Reading them is how you find out which piles.</p>
+<h3>The Problem</h3>
+<p>The suite says 68%. That number tells you that you have a problem and nothing about what it is. Teams respond by tweaking prompts at random and re-rolling the dice — eval-driven superstition. The information you need is sitting in the failed trajectories nobody reads.</p>
+<h3>The Concept</h3>
+<p>Error analysis is qualitative, then quantitative: read failures one by one, label each with <i>the first step where the trajectory went irrecoverably wrong</i> and a failure category, then count the piles.</p>
+<pre><code>  read N failures -&gt; label first-wrong-step + category -&gt; count
+  categories that recur: wrong tool / bad args / misread tool output /
+    hallucinated fact / gave up early / loop / never-checked-work /
+    task ambiguous (eval&#x27;s fault, not agent&#x27;s)</code></pre>
+<p>Two findings recur across nearly every team that does this: failures follow a power law (two or three categories dominate), and a surprising share of "agent failures" are eval bugs — ambiguous tasks, broken fixtures, wrong rubrics. Both findings redirect weeks of effort.</p>
+<h3>Build It</h3>
+<p>Make it a ritual: after every full run, sample 20–30 failures, read each trajectory start to finish, and record <code>{task_id, first_wrong_step, category, evals_fault?}</code> in a shared sheet. Derive the taxonomy from the data — start with an empty list and add categories as you read; pre-baked taxonomies make you see what you expect. Fix the top pile, re-run, re-read. Once a category is stable and crisply defined, automate a detector for it (a trajectory grader from Lesson 02) — but the manual reading never fully retires, because new failure modes don't announce themselves.</p>
+<h3>Use It</h3>
+<p>Trace viewers (LangSmith, Langfuse, Phoenix) make reading trajectories humane; a spreadsheet holds the labels. An LLM can pre-cluster failures to save time — treat its clusters as suggestions and audit them like any judge (Lesson 03).</p>
+<h3>War Story</h3>
+<p>OpenAI's SWE-bench Verified effort (2024) was error analysis performed on the benchmark itself: annotators reviewing failures found many weren't model failures at all — issues too underspecified to solve, tests that rejected valid patches — and filtered the task set accordingly. Reading the failures changed the denominator. Do the same audit on your own eval before concluding your agent is the broken part.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why label the <i>first</i> wrong step rather than the final error?</li><li>Why derive failure categories from reading rather than defining them upfront?</li><li>What fraction of failures turning out to be eval bugs would surprise you — and what do you do about them?</li></ol>
+<h2 id="lesson-09"><span class="lnum">09</span> Capability vs Reliability: The Nines Problem</h2>
+<p><b>MOTTO:</b> A demo needs one success. A product needs the same success every time anyone asks.</p>
+<h3>The Problem</h3>
+<p>Your agent can do the task — you've seen it. It just doesn't do it <i>every</i> time. That gap between "can do" (capability) and "does do, dependably" (reliability) is where agent products die: a 90%-reliable step feels magical in a demo and generates a support ticket per ten real uses — and per-step 90% collapses catastrophically when steps chain.</p>
+<h3>The Concept</h3>
+<p>Reliability compounds multiplicatively:</p>
+<pre><code>  per-step:   99%      95%      90%
+  10 steps:   90%      60%      35%
+  50 steps:   61%       8%      0.5%</code></pre>
+<p>Software infrastructure talks in nines (99.9%); agents today often deliver <i>zero</i> nines per complex task. The two honest levers: raise per-step reliability (better tools, tighter environments — Phase 13's material), or restructure so failures don't compound — verify-and-retry at each step (turning pass@1 problems into pass@k problems), checkpoint boundaries that localize damage, and human gates at the irreversible points. Marketing quotes capability numbers; engineering plans on reliability numbers; the honest scorecard shows both.</p>
+<h3>Build It</h3>
+<p>Measure the gap explicitly: for each golden task, report pass@5 (capability: can it, ever?) alongside pass^5 (reliability: can it, always?). The spread between them is your engineering roadmap — a wide spread means the skill exists and the <i>system</i> around it is failing, which retries, verification, and environment fixes can close; a narrow spread at a low level means the capability itself is missing, and no amount of retry engineering will save you. Different diagnoses, different quarters of work.</p>
+<h3>Use It</h3>
+<p>tau-bench made this distinction mainstream by reporting pass^k; METR's horizon metric bakes in a reliability threshold (50%) precisely because "can complete" is meaningless without one. When you read any agent claim, first ask: at how many nines?</p>
+<h3>War Story</h3>
+<p>The tau-bench paper (2024) reported that even the strongest model tested succeeded on under half of airline-domain tasks at pass^1 — and consistency degraded sharply as k grew, with pass^8 falling far below the single-attempt rate. Same model, same tasks: the capability headline and the reliability floor were different numbers with different product implications. Every agent you ship has both numbers, whether or not you've measured them.</p>
+<h3>Checkpoint</h3>
+<ol><li>Compute end-to-end success for a 20-step task at 95% per-step reliability.</li><li>Wide pass@5-vs-pass^5 spread vs narrow-and-low: what does each diagnosis prescribe?</li><li>Name three structural techniques that stop per-step failures from compounding.</li></ol>
+<h2 id="lesson-10"><span class="lnum">10</span> Build an Eval Harness from Scratch</h2>
+<p><b>MOTTO:</b> A hundred lines of Python is the difference between "seems better" and "is better."</p>
+<h3>The Problem</h3>
+<p>Everything in this phase becomes real the moment it's executable. We'll build a harness that runs tasks against an agent k times, grades outcome and trajectory, aggregates pass@k and pass^k, and diffs against a baseline — the skeleton every commercial platform wraps in a UI.</p>
+<h3>The Concept</h3>
+<p>A harness is a pipeline: task set → repeated runs → graders → aggregate → compare. Keep each stage a plain function and the whole thing stays inspectable, versionable, and extendable.</p>
+<h3>Build It</h3>
+<pre><code>import json, random, statistics
+
+TASKS = [  # golden set: task + code-graded rubric (Lesson 01)
+    {&quot;id&quot;: &quot;t1&quot;, &quot;input&quot;: &quot;2+2&quot;, &quot;expect&quot;: &quot;4&quot;, &quot;must_use&quot;: &quot;calc&quot;},
+    {&quot;id&quot;: &quot;t2&quot;, &quot;input&quot;: &quot;capital of France&quot;, &quot;expect&quot;: &quot;paris&quot;, &quot;must_use&quot;: None},
+    {&quot;id&quot;: &quot;t3&quot;, &quot;input&quot;: &quot;17*23&quot;, &quot;expect&quot;: &quot;391&quot;, &quot;must_use&quot;: &quot;calc&quot;},
+]
+
+def agent(task, flaky=0.25):          # stand-in: swap for your real agent
+    traj = []
+    if &quot;+&quot; in task[&quot;input&quot;] or &quot;*&quot; in task[&quot;input&quot;]:
+        traj.append({&quot;tool&quot;: &quot;calc&quot;, &quot;args&quot;: task[&quot;input&quot;]})
+    ok = random.random() &gt; flaky      # simulated non-determinism (Lesson 06)
+    return (task[&quot;expect&quot;] if ok else &quot;unsure&quot;), traj
+
+def grade(task, answer, traj):        # outcome + trajectory (Lesson 02)
+    outcome = task[&quot;expect&quot;].lower() in answer.lower()
+    used = {s[&quot;tool&quot;] for s in traj}
+    process = task[&quot;must_use&quot;] is None or task[&quot;must_use&quot;] in used
+    return {&quot;outcome&quot;: outcome, &quot;process&quot;: process, &quot;pass&quot;: outcome and process}
+
+def evaluate(k=5, seed=0):
+    random.seed(seed); results = {}
+    for t in TASKS:
+        runs = [grade(t, *agent(t)) for _ in range(k)]
+        p = [r[&quot;pass&quot;] for r in runs]
+        results[t[&quot;id&quot;]] = {&quot;rate&quot;: statistics.mean(p),
+                            &quot;pass@k&quot;: any(p), &quot;pass^k&quot;: all(p)}
+    return results
+
+baseline = evaluate(seed=0)
+candidate = evaluate(seed=1)          # in real life: new prompt/model/config
+for tid in baseline:
+    b, c = baseline[tid], candidate[tid]
+    flag = &quot;REGRESSION?&quot; if c[&quot;rate&quot;] &lt; b[&quot;rate&quot;] else &quot;&quot;
+    print(f&quot;{tid}: base={b[&#x27;rate&#x27;]:.1f} cand={c[&#x27;rate&#x27;]:.1f} &quot;
+          f&quot;pass@k={c[&#x27;pass@k&#x27;]} pass^k={c[&#x27;pass^k&#x27;]} {flag}&quot;)
+print(json.dumps(candidate, indent=1))  # persist with a config hash (Lesson 05)</code></pre>
+<p>Every concept in this phase appears in miniature: rubric-as-data, trajectory grading, k repeats, pass@k vs pass^k, baseline diffing. Extensions in rough priority order: Wilson confidence intervals on <code>rate</code>, an LLM judge grader with a human-agreement audit, JSONL persistence keyed by config hash, and a <code>--gate</code> mode that exits nonzero for CI.</p>
+<h3>Use It</h3>
+<p>Swap <code>agent()</code> for a call into your real agent (subprocess or SDK), grow <code>TASKS</code> from production incidents, wire the gate into CI, and you have a genuine regression suite. When you outgrow it, Inspect / Braintrust / LangSmith are this pipeline with persistence, UI, and collaboration attached — you'll now be able to read their docs and see the skeleton underneath.</p>
+<h3>War Story</h3>
+<p>When Anthropic, OpenAI, and others publish model cards, the headline tables are outputs of harnesses structurally identical to this one — task sets, repeated sampling, pass@k aggregation, baseline comparison. The pass@k machinery traces straight back to the Codex paper (2021). There is no magic upstream of the leaderboards; there is a for-loop, graders, and statistics. Now you own one.</p>
+<h3>Checkpoint</h3>
+<ol><li>Where in the code do outcome and trajectory grading combine, and why keep both fields?</li><li>Why does <code>evaluate</code> reseed, and what would identical seeds across baseline and candidate actually compare?</li><li>What are the first three extensions you'd add before trusting this harness for a ship/no-ship call?</li></ol>
+  </article>
+  <div class="pager">
+    <a href="13-autonomous-agents.html">← 🖥️ Phase 13</a>
+    <span class="spacer"></span>
+    <a href="15-safety-and-security.html">Phase 15 🛡️ →</a>
+  </div>
+</div>
+</body>
+</html>

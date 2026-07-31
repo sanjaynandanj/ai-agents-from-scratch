@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production Agents — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 16</div>
+  <h1><span class="pnum">16</span> 🏭 Production Agents</h1>
+  <div class="tagline">The demo took a day. The last 20% takes the quarter.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Agent observability: traces, spans, replays</a>
+<a href="#lesson-02"><span class="lnum">02</span>Cost controls: budgets, caps, and alerts</a>
+<a href="#lesson-03"><span class="lnum">03</span>Latency engineering: streaming, parallelism, caching</a>
+<a href="#lesson-04"><span class="lnum">04</span>Retries and idempotent tool design</a>
+<a href="#lesson-05"><span class="lnum">05</span>State persistence and session management</a>
+<a href="#lesson-06"><span class="lnum">06</span>Prompt versioning and regression gates</a>
+<a href="#lesson-07"><span class="lnum">07</span>Deployment patterns: sync, async, background</a>
+<a href="#lesson-08"><span class="lnum">08</span>Rate limits and provider failover</a>
+<a href="#lesson-09"><span class="lnum">09</span>The agent ops runbook</a>
+<a href="#lesson-10"><span class="lnum">10</span>Multi-tenancy and isolation</a>
+<a href="#lesson-11"><span class="lnum">11</span>Feedback loops: learning from production</a>
+<a href="#lesson-12"><span class="lnum">12</span>The production readiness checklist</a>
+  </div>
+  <article>
+<blockquote>The demo took a day. The last 20% takes the quarter.</blockquote>
+<p>Your agent works on your laptop, on your test cases, while you watch it. Production is a different sport: thousands of users, adversarial inputs, provider outages at 2 a.m., and a finance team asking why the API bill tripled. This phase is the unglamorous engineering that separates a demo from a product. Every lesson here was learned by someone, somewhere, the expensive way.</p>
+<hr>
+<h2 id="lesson-01"><span class="lnum">01</span> Agent Observability: Traces, Spans, Replays</h2>
+<p><b>MOTTO:</b> If you can't replay it, you can't debug it.</p>
+<h3>The Problem</h3>
+<p>A user reports "the agent gave a wrong answer yesterday." Which of the 14 model calls went sideways? What was in the context? Which tool returned garbage? With plain logging you have a wall of JSON. With nothing, you have vibes.</p>
+<h3>The Concept</h3>
+<p>Borrow from distributed tracing: a <b>trace</b> is one full agent run, a <b>span</b> is one unit inside it (a model call, a tool call, a retrieval). Spans nest — the plan span contains three tool spans. Add <b>replays</b>: store every span's exact inputs and outputs so you can re-run a failed trajectory step by step, like a flight recorder.</p>
+<pre><code>trace: &quot;refund request #8812&quot;
+├── span: llm.call (plan)          1.2s   1,842 tok
+├── span: tool.lookup_order        0.3s
+├── span: llm.call (decide)        0.9s   2,105 tok   ← wrong here
+└── span: tool.issue_refund        0.4s</code></pre>
+<h3>Build It</h3>
+<ul><li>Wrap your agent loop so every model call and tool call emits a span: <code>{trace_id, parent_id, name, start, end, input, output, tokens, cost}</code>.</li><li>Write spans to a JSONL file first; a database later. Emit OpenTelemetry-compatible attributes (<code>gen_ai.usage.input_tokens</code>, etc.) so you're not locked in.</li><li>Build <code>replay(trace_id, up_to_span)</code> — reconstructs the exact context and re-runs the model call so you can test a fix against the real failure.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>What it gives you</th></tr></thead><tbody><tr><td>LangSmith</td><td>Traces, datasets, run comparison, tightly integrated with LangChain</td></tr><tr><td>Langfuse</td><td>Open-source tracing + scores; self-hostable</td></tr><tr><td>Braintrust</td><td>Logs that convert directly into evals</td></tr><tr><td>Arize Phoenix</td><td>OSS traces + embeddings drift analysis</td></tr><tr><td>OpenTelemetry</td><td>Vendor-neutral wire format; GenAI semantic conventions</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>When Anthropic built the multi-agent system behind Claude's Research feature (described in their June 2025 engineering post), they found agents fail nondeterministically and mid-flight — so they invested in full production tracing of agent decision patterns to diagnose failures they could never reproduce locally. Their conclusion: with agents, observability isn't an add-on, it's how you debug at all.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is a span-tree more useful than sequential logs for a multi-step agent?</li><li>What must you store to make a trace replayable, and what does that imply for PII handling?</li><li>How would you find "all traces where the agent called the same tool 3+ times in a row"?</li></ol>
+<hr>
+<h2 id="lesson-02"><span class="lnum">02</span> Cost Controls: Budgets, Caps, and Alerts</h2>
+<p><b>MOTTO:</b> An agent without a budget is a while-loop with your credit card.</p>
+<h3>The Problem</h3>
+<p>A single user pastes a 200-page PDF into a loop-happy agent. Forty iterations later you've spent $30 on one request. Multiply by a few curious users and your unit economics are fiction.</p>
+<h3>The Concept</h3>
+<p>Treat tokens like a metered utility. Three layers: <b>per-request caps</b> (max tokens, max turns), <b>per-user/tenant budgets</b> (daily dollar ceilings), and <b>global alerts</b> (spend-rate anomaly detection). Like a hotel minibar: track every item, bill the right room, and call the manager if someone orders 400 cokes.</p>
+<h3>Build It</h3>
+<ul><li>Compute cost per model call from the usage block: <code>input_tok <i> in_price + output_tok </i> out_price</code>; accumulate onto the trace.</li><li>Enforce a turn cap (e.g., 25) and a per-run dollar cap; when hit, the agent must summarize progress and stop gracefully — not just die.</li><li>Add a per-tenant daily budget table; check before each run, decrement after. Alert at 80%, hard-stop at 100%.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Role</th></tr></thead><tbody><tr><td>LiteLLM proxy</td><td>Per-key budgets, spend caps, model routing</td></tr><tr><td>Helicone</td><td>Per-user cost dashboards via header tagging</td></tr><tr><td>Langfuse / LangSmith</td><td>Cost attached to traces</td></tr><tr><td>Provider dashboards</td><td>Ground truth for reconciliation</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>When OpenAI's o3 was evaluated on ARC-AGI in December 2024, the ARC Prize team reported the low-compute configuration cost roughly $20 per task — and the high-compute configuration used about 172× more compute, pushing per-task cost into the thousands of dollars. Same model, same benchmark, ~3-order-of-magnitude cost spread purely from inference-time settings. Your agent's cost is a dial, not a constant, and somebody has to own that dial.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why should a budget-exceeded agent summarize-and-stop rather than hard-fail?</li><li>Where do you enforce caps if users can trigger agents from three different entry points?</li><li>Your daily spend doubled but request count didn't. Name three hypotheses and how traces confirm each.</li></ol>
+<hr>
+<h2 id="lesson-03"><span class="lnum">03</span> Latency Engineering: Streaming, Parallelism, Caching</h2>
+<p><b>MOTTO:</b> Users forgive wrong-ish; they don't forgive slow.</p>
+<h3>The Problem</h3>
+<p>Your agent takes 40 seconds: plan, search, read, synthesize — all sequential, all silent. The user has refreshed the page twice and filed a bug titled "broken."</p>
+<h3>The Concept</h3>
+<p>Three levers, in order of cheapness: <b>stream</b> (perceived latency — show tokens and tool progress immediately), <b>parallelize</b> (independent tool calls run concurrently; fan out, gather), <b>cache</b> (prompt caching for the static prefix — system prompt, tool schemas — and result caching for repeated tool calls). The restaurant analogy: bring bread now (stream), fire all the mains at once (parallelism), don't re-make the sauce base per order (cache).</p>
+<pre><code>sequential:  [plan]→[search A]→[search B]→[read]→[write]   38s
+parallel:    [plan]→[search A ∥ search B ∥ read]→[write]   16s
++ streaming: first token visible at                        1.5s</code></pre>
+<h3>Build It</h3>
+<ul><li>Stream model output token-by-token and emit tool-status events ("searching docs…") between spans.</li><li>When the model returns multiple independent tool calls, execute them with <code>asyncio.gather</code> / <code>Promise.all</code>.</li><li>Structure prompts cache-first: static system prompt + tool schemas up top, volatile context last. Measure cache-hit rate; it should exceed 80% mid-conversation.</li></ul>
+<h3>Use It</h3>
+<p>Anthropic and OpenAI prompt caching (cached input at ~10% of list price), provider streaming APIs, Groq/Cerebras for low-latency small-model steps, vLLM for self-hosted serving, CDN/Redis for tool-result caching.</p>
+<h3>War Story</h3>
+<p>Before GPT-4o, ChatGPT's Voice Mode was a three-model pipeline (speech-to-text → LLM → text-to-speech) with average response latency OpenAI reported as 2.8 seconds with GPT-3.5 and 5.4 seconds with GPT-4. GPT-4o (May 2024) collapsed the pipeline into one natively multimodal model and cut average voice response to ~320 ms — around human conversational speed. The capability barely changed; the latency engineering changed everything about how it felt.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does streaming improve perceived latency even when total latency is unchanged?</li><li>What ordering rule makes prompts cache-friendly, and what breaks the cache?</li><li>Two tool calls are parallelizable but share a rate-limited API. What do you do?</li></ol>
+<hr>
+<h2 id="lesson-04"><span class="lnum">04</span> Retries and Idempotent Tool Design</h2>
+<p><b>MOTTO:</b> Retry the read; never blindly retry the write.</p>
+<h3>The Problem</h3>
+<p>A tool call times out. Did the payment go through? The email send? You don't know — and your retry logic just sent it again. Now the customer has two refunds and you have one incident channel.</p>
+<h3>The Concept</h3>
+<p>Split tools into <b>safe</b> (reads: retry freely with exponential backoff + jitter) and <b>effectful</b> (writes: must be idempotent). Idempotency means running twice equals running once — achieved with an <b>idempotency key</b>: the caller generates a unique key per intended action; the server dedupes. Like handing a numbered claim ticket at coat check: presenting it twice gets you one coat, not two.</p>
+<h3>Build It</h3>
+<ul><li>Tag every tool with <code>readonly: bool</code>. Your executor retries readonly tools automatically (3 attempts, backoff 1s/2s/4s + jitter) and never auto-retries effectful ones without a key.</li><li>Effectful tools take an <code>idempotency_key</code> the agent framework generates per planned action (hash of trace_id + step + args). Server stores executed keys; duplicates return the original result.</li><li>On ambiguous timeout of an effectful call: query state first ("did order 8812 refund?"), then decide.</li></ul>
+<h3>Use It</h3>
+<p>Stripe-style idempotency keys (the canonical API design), Tenacity/backoff libraries, Temporal or Inngest for durable execution with exactly-once activity semantics.</p>
+<h3>War Story</h3>
+<p>Knight Capital, August 1, 2012. A deploy of new order-routing code reached only 7 of 8 servers; the 8th still had a dead legacy feature ("Power Peg") wired to a reused feature flag. When the flag activated, that server fired continuous child orders with no completion check — effectful actions, unbounded, unsupervised. In about 45 minutes Knight lost ~$440 million and nearly the company. Not an AI system — but the exact failure mode of an autonomous loop executing non-idempotent writes with no kill switch. Design like this story is about you, because eventually it is.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is "retry on timeout" dangerous for a write but fine for a read?</li><li>How does an idempotency key make an unreliable network safe for effectful tools?</li><li>What should an agent do when an effectful call's outcome is unknown?</li></ol>
+<hr>
+<h2 id="lesson-05"><span class="lnum">05</span> State Persistence and Session Management</h2>
+<p><b>MOTTO:</b> The process will die. The conversation shouldn't.</p>
+<h3>The Problem</h3>
+<p>Your agent holds everything — messages, tool results, scratchpad — in a Python list. The pod restarts, the user returns, and the agent greets them like a stranger. Worse: a 30-minute background run crashes at minute 29 and restarts from zero.</p>
+<h3>The Concept</h3>
+<p>Separate <b>session state</b> (the durable record: messages, tool outputs, agent scratch) from the <b>process</b> (stateless, replaceable). Persist a checkpoint after every step so any worker can resume any session — the same trick as a saved game: die anywhere, respawn at the last checkpoint, not the title screen.</p>
+<pre><code>[client] → [stateless worker N] → load(session_id) → step → save() → respond
+                                        ↕
+                                 [Postgres / Redis]</code></pre>
+<h3>Build It</h3>
+<ul><li>Define a serializable <code>AgentState</code> (messages, pending tool calls, step count, cost so far). Ban unpicklable stuff (open handles, lambdas).</li><li>Write-after-every-step to Postgres keyed by <code>session_id</code>, with a version column for optimistic locking (two workers must not run the same session).</li><li>Add TTL + summarization: sessions idle &gt;30 days compress to a summary; context beyond the window compacts (Phase 5 techniques, now load-bearing).</li></ul>
+<h3>Use It</h3>
+<p>LangGraph checkpointers (Postgres/SQLite/Redis), Temporal workflows (state machine as durable execution), Cloudflare Durable Objects, plain Postgres JSONB — the boring option that usually wins.</p>
+<h3>War Story</h3>
+<p>The MemGPT paper (Packer et al., October 2023) framed this exact problem as an operating-systems one: treat the context window like RAM and external storage like disk, with the LLM paging memories in and out via function calls. It's the paper that made "the conversation outlives the context window" a mainstream design goal, and its descendants (the Letta framework) turned checkpointed agent state into the core product primitive rather than an afterthought.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why checkpoint after every step instead of at session end?</li><li>How does optimistic locking prevent two workers from double-running a session?</li><li>What belongs in durable state vs. what should be recomputed on resume?</li></ol>
+<hr>
+<h2 id="lesson-06"><span class="lnum">06</span> Prompt Versioning and Regression Gates</h2>
+<p><b>MOTTO:</b> A prompt edit is a deploy. Gate it like one.</p>
+<h3>The Problem</h3>
+<p>Someone "improves" the system prompt on Friday. Refund approvals quietly jump 3×. Nobody diffed anything, nothing failed loudly, and git blame points at a commit message that says "tweak tone."</p>
+<h3>The Concept</h3>
+<p>Prompts are code: version them, review them, and put a <b>regression gate</b> in CI — a frozen eval suite (Phase 9) that every prompt/model change must pass before shipping. Like a chef changing a recipe: taste-test against the reference dish before it hits the menu, don't find out from Yelp.</p>
+<h3>Build It</h3>
+<ul><li>Store prompts in the repo (or a prompt registry) with semantic versions; log <code>prompt_version</code> on every trace so incidents map to versions.</li><li>Build a golden set from production traces: 50–200 real cases with graded expected behavior, including your worst historical failures.</li><li>CI job: run the suite on any prompt/model/tool-schema change; block merge if pass rate drops or cost/latency regress beyond thresholds. Canary new versions to 5% of traffic before 100%.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Role</th></tr></thead><tbody><tr><td>Promptfoo</td><td>CI-friendly prompt eval runner</td></tr><tr><td>Braintrust</td><td>Eval-gated deploys, experiments, diffs</td></tr><tr><td>LangSmith / Langfuse</td><td>Prompt registry + dataset runs</td></tr><tr><td>Git</td><td>The version control you already trust</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>In late April 2025, OpenAI shipped a GPT-4o update that made ChatGPT conspicuously sycophantic — agreeing with and flattering users to the point of endorsing bad ideas — and rolled it back within days. Their own postmortem said the update over-weighted short-term user feedback signals, and that offline evals and A/B tests looked fine while some expert "vibe checks" had flagged the behavior — a check that wasn't a launch blocker. If the best-resourced lab in the world can ship a regression its gates didn't catch, your Friday prompt tweak definitely can.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why must <code>prompt_version</code> appear on every production trace?</li><li>What belongs in a golden set besides happy-path cases?</li><li>Your new prompt scores +4% on the eval but costs 2× more. Ship it? What else do you ask?</li></ol>
+<hr>
+<h2 id="lesson-07"><span class="lnum">07</span> Deployment Patterns: Sync, Async, Background</h2>
+<p><b>MOTTO:</b> Match the interaction pattern to the wait, not the other way around.</p>
+<h3>The Problem</h3>
+<p>You put a 6-minute research agent behind a synchronous HTTP endpoint. The load balancer kills it at 60 seconds, the client retries, and now three copies of the same research job are burning tokens.</p>
+<h3>The Concept</h3>
+<p>Three patterns by duration: <b>sync</b> (&lt;~30s: request/response with streaming — chat turns), <b>async job</b> (30s–30min: enqueue, return a <code>job_id</code>, client polls or gets webhooks/SSE progress), <b>background/scheduled</b> (agent runs on triggers — cron, new email, PR opened — no one waiting at all). Restaurant again: counter service, a buzzing pager, and a standing weekly delivery.</p>
+<pre><code>sync:        POST /chat ──stream──▶ done            (seconds)
+async:       POST /jobs → 202 {job_id} … GET /jobs/id → running → done
+background:  [trigger] → queue → worker → notify    (nobody waiting)</code></pre>
+<h3>Build It</h3>
+<ul><li>Sync path: FastAPI + SSE streaming, hard 30s ceiling, graceful "this needs a job" handoff.</li><li>Async path: queue (SQS/Celery/Inngest) + the checkpointing from lesson 05, so a killed worker resumes instead of restarting; idempotent job creation so client retries don't duplicate.</li><li>Emit progress events from inside the agent loop ("step 4/12: reading sources") — silence is the top cause of cancelled jobs.</li></ul>
+<h3>Use It</h3>
+<p>Temporal / Inngest (durable async), Celery + Redis (classic), Modal / Cloud Run jobs (serverless burst), SSE or webhooks for progress.</p>
+<h3>War Story</h3>
+<p>OpenAI's Deep Research (February 2025) made the async pattern mainstream for agents: you submit a question, it explicitly tells you the run takes roughly 5–30 minutes, works in the background, and notifies you when the report is ready. The product decision to <i>not</i> pretend it's a chat — visible progress, a completion notification, no held connection — is as much of the design as the agent itself.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is a bare synchronous endpoint wrong for a multi-minute agent even if timeouts were infinite?</li><li>How do checkpointing (lesson 05) and async jobs compose?</li><li>A background agent triggers on every new support ticket. What guards does it need that a chat agent doesn't?</li></ol>
+<hr>
+<h2 id="lesson-08"><span class="lnum">08</span> Rate Limits and Provider Failover</h2>
+<p><b>MOTTO:</b> The provider's 429 is your problem, not your excuse.</p>
+<h3>The Problem</h3>
+<p>Launch day. Traffic 10×. Your provider returns 429s, your naive code retries instantly (making it worse), and every feature in your product that touches the LLM goes down together.</p>
+<h3>The Concept</h3>
+<p>Two disciplines. <b>Client-side rate management</b>: token-bucket your own outbound requests below your quota, queue the excess, backoff-with-jitter on 429s. <b>Failover</b>: a model registry with equivalence tiers, so when Provider A is down or throttled you degrade to Provider B or a smaller model — a circuit breaker deciding when to flip and when to flip back. Like an airline rebooking desk: same destination, different plane, clearly communicated downgrade.</p>
+<h3>Build It</h3>
+<ul><li>Central LLM gateway (one choke point) that enforces per-model concurrency and tokens-per-minute budgets locally — don't discover limits via 429.</li><li>Circuit breaker per provider: open after N failures in window, half-open probes, close on recovery. On open, route to the fallback tier.</li><li>Test it: a chaos flag that fakes 429/500/timeout from a provider in staging. Failover you haven't drilled is failover you don't have.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Role</th></tr></thead><tbody><tr><td>LiteLLM proxy</td><td>One API, routing, fallbacks, retries</td></tr><tr><td>OpenRouter</td><td>Hosted multi-provider routing</td></tr><tr><td>Portkey / Helicone gateway</td><td>Gateway with fallback + observability</td></tr><tr><td>Envoy/Nginx + your code</td><td>The DIY honest option</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>On February 28, 2017, an AWS engineer debugging S3 billing mistyped a command and removed far more capacity than intended, taking down S3 in us-east-1 for about four hours. Huge swaths of the internet failed with it — including, famously, the AWS status dashboard itself, which depended on S3 and couldn't display the outage. The lesson agents inherit: your health checks, fallbacks, and status reporting must not depend on the thing that's down.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is client-side rate limiting better than reacting to 429s?</li><li>What makes two models "equivalent enough" to be failover pairs? How do you verify (hint: lesson 06)?</li><li>Your fallback provider is up but 3× slower. How should the circuit breaker and UX respond?</li></ol>
+<hr>
+<h2 id="lesson-09"><span class="lnum">09</span> The Agent Ops Runbook</h2>
+<p><b>MOTTO:</b> 2 a.m. you should only have to read, not think.</p>
+<h3>The Problem</h3>
+<p>The agent is misbehaving in production right now. Who gets paged? How do you pause it? Can you roll back the prompt without a deploy? If the answers live in one engineer's head, you don't have operations — you have a hostage situation.</p>
+<h3>The Concept</h3>
+<p>A runbook is a decision tree written by calm-you for panicked-you: symptoms → checks → actions, plus the big red switches. Agents add novel entries to classic ops: kill switch for autonomous actions, tool-level disable flags, prompt rollback, budget freeze, "degrade to human handoff" mode.</p>
+<h3>Build It</h3>
+<p>Write the runbook as a repo doc with sections per symptom:</p>
+<ul><li><b>Loops/runaway cost</b> → check top traces by cost → lower turn cap / freeze tenant budget.</li><li><b>Bad outputs spike</b> → check recent prompt/model versions (lesson 06) → rollback prompt (config change, not deploy).</li><li><b>Provider degraded</b> → check circuit-breaker state → force failover tier.</li><li><b>Harmful tool action</b> → kill switch: env flag that turns all effectful tools read-only, agent announces reduced mode.</li></ul>
+<p>Then run a game day: break staging on purpose, follow the doc, fix the doc where it lied.</p>
+<h3>Use It</h3>
+<p>PagerDuty/Opsgenie (paging), Grafana + trace tooling dashboards (the "is it the agent or the provider?" view), feature flags (LaunchDarkly or a config table) for tool disables and prompt pins, Sentry for exceptions.</p>
+<h3>War Story</h3>
+<p>On October 21, 2018, a 43-second network partition during routine maintenance left GitHub's MySQL topology split across coasts, and the site ran degraded for over 24 hours while they carefully reconciled data rather than risk losing writes. Their public postmortem became a classic partly because the response was so procedural: pre-agreed priorities (integrity over availability), staged recovery, constant status updates. That's what a rehearsed runbook buys you — a bad day instead of a fatal one.</p>
+<h3>Checkpoint</h3>
+<ol><li>What are the three fastest levers to stop a misbehaving agent without a code deploy?</li><li>Why must the kill switch make tools read-only rather than killing the process?</li><li>What does an agent game day exercise that unit tests can't?</li></ol>
+<hr>
+<h2 id="lesson-10"><span class="lnum">10</span> Multi-Tenancy and Isolation</h2>
+<p><b>MOTTO:</b> Tenant A's data in Tenant B's context is the last bug you ship.</p>
+<h3>The Problem</h3>
+<p>Your agent serves 40 companies from one deployment. One shared vector store, one memory table, one set of tool credentials. A retrieval query matches another tenant's document, the model helpfully summarizes it, and your security questionnaire answers become fiction.</p>
+<h3>The Concept</h3>
+<p>Isolation at every layer the agent touches: <b>data</b> (tenant-scoped retrieval namespaces, row-level security), <b>memory</b> (session and long-term memory keyed by tenant, never global), <b>tools</b> (per-tenant credentials with least privilege — the agent acting for Tenant A physically cannot query Tenant B's CRM), <b>budget/limits</b> (lesson 02, per tenant so one noisy tenant can't starve others). Hotel keycards, not a master key with a policy document.</p>
+<h3>Build It</h3>
+<ul><li>Thread a <code>tenant_id</code> through the entire request context; make it impossible to construct a retrieval or memory query without one (constructor-required, not optional param).</li><li>Vector store: one namespace/collection per tenant, or hard metadata filters applied server-side. Postgres: RLS policies as the backstop for application bugs.</li><li>Tool layer fetches credentials from a per-tenant vault entry at call time; log which tenant's credentials every tool span used.</li><li>Write the cross-tenant test: seed two tenants with distinctive documents, run 100 adversarial prompts ("summarize everything you know"), assert zero leakage.</li></ul>
+<h3>Use It</h3>
+<p>Pinecone namespaces / Qdrant collections / pgvector + RLS, Postgres row-level security, Vault/AWS Secrets Manager per-tenant paths, LiteLLM per-tenant keys and budgets.</p>
+<h3>War Story</h3>
+<p>On March 20, 2023, OpenAI took ChatGPT offline after a bug in the <code>redis-py</code> client library caused some users to see titles from other users' chat histories — and, for about 1.3% of ChatGPT Plus subscribers in a nine-hour window, another user's name, email, and partial payment details. The cause wasn't the model at all: it was a cache-layer session mix-up under load. Tenancy bugs live in the boring plumbing, which is exactly why the plumbing needs the tests.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why should tenant scoping be structurally required rather than a query parameter convention?</li><li>Where can cross-tenant leakage occur besides the vector store?</li><li>Design the automated test that would catch a leaking retrieval filter before customers do.</li></ol>
+<hr>
+<h2 id="lesson-11"><span class="lnum">11</span> Feedback Loops: Learning from Production</h2>
+<p><b>MOTTO:</b> Production is the eval set you didn't know to write.</p>
+<h3>The Problem</h3>
+<p>You shipped. Users are thumbs-downing, rephrasing, abandoning — a river of signal — and it's all draining into nothing. Meanwhile your eval suite still tests the twelve cases you invented in month one.</p>
+<h3>The Concept</h3>
+<p>Close the loop: <b>capture</b> signal (explicit: ratings, corrections; implicit: retries, escalations, abandoned sessions, edited outputs), <b>triage</b> it (cluster failures, find patterns), <b>convert</b> it (worst cases become new golden-set entries — lesson 06 — and few-shot examples or prompt fixes), <b>verify</b> the fix against the very traces that exposed it. A flywheel: production feeds evals, evals gate changes, changes improve production.</p>
+<pre><code>production traces → signal capture → cluster/triage
+        ▲                                   │
+        └── gated deploy ← fix ← new eval cases</code></pre>
+<h3>Build It</h3>
+<ul><li>Attach feedback to traces: <code>score(trace_id, kind, value, comment)</code>. Implicit signals too: log when a user edits the agent's output or immediately re-asks.</li><li>Weekly triage job: pull bottom-decile traces, cluster by embedding, surface the top 3 failure patterns with example traces.</li><li>One-click "promote trace to eval case": failure trace → golden set with corrected expected behavior. Watch the golden set grow from 50 invented cases to 500 earned ones.</li></ul>
+<h3>Use It</h3>
+<p>Langfuse scores API, LangSmith annotation queues, Braintrust (logs→datasets is the core workflow), your own <code>feedback</code> table joined to traces.</p>
+<h3>War Story</h3>
+<p>Microsoft's Tay (March 2016) is the canonical cautionary tale for <i>unfiltered</i> learning from production: a Twitter chatbot designed to learn from interactions was coordinated-trolled into posting racist output and was pulled within about 16 hours. The modern lesson isn't "don't learn from users" — it's that the loop needs a human-reviewed gate between raw production signal and changed behavior. Feedback is training data for your process, not a live wire into the model.</p>
+<h3>Checkpoint</h3>
+<ol><li>Name three implicit feedback signals and what each likely indicates.</li><li>Why route production feedback through the eval suite instead of directly editing prompts?</li><li>How do you prevent adversarial or low-quality feedback from steering the flywheel?</li></ol>
+<hr>
+<h2 id="lesson-12"><span class="lnum">12</span> The Production Readiness Checklist</h2>
+<p><b>MOTTO:</b> Boring on launch day is the achievement.</p>
+<h3>The Problem</h3>
+<p>"Is it ready?" is unanswerable as a feeling. Every previous lesson is a way to get burned; the checklist is how you verify you won't be — before users, not after.</p>
+<h3>The Concept</h3>
+<p>Aviation solved this: competent people under pressure forget steps, so you enumerate them. A readiness review is the checklist plus a meeting where someone who didn't build it asks the awkward questions.</p>
+<h3>Build It</h3>
+<p>Run this gate before real users:</p>
+<p><b>Observability &amp; cost</b></p>
+<ul><li>[ ] Every run produces a replayable trace with cost attached (L01)</li><li>[ ] Turn caps, per-run and per-tenant budgets enforced; alerts fire in staging test (L02)</li></ul>
+<p><b>Reliability</b></p>
+<ul><li>[ ] p50/p95 latency measured; streaming and progress events wired (L03)</li><li>[ ] Effectful tools idempotent; retry policy differs for reads vs. writes (L04)</li><li>[ ] Kill a worker mid-run in staging → session resumes from checkpoint (L05)</li><li>[ ] Provider chaos test passes: 429s and outages trigger drilled failover (L08)</li></ul>
+<p><b>Change safety</b></p>
+<ul><li>[ ] Prompts versioned; golden-set gate blocks regressions in CI; canary path exists (L06)</li><li>[ ] Long tasks run async with progress; client retries can't duplicate jobs (L07)</li></ul>
+<p><b>Security &amp; ops</b></p>
+<ul><li>[ ] Cross-tenant leakage test passes; per-tenant credentials verified (L10)</li><li>[ ] Runbook exists; a game day has actually been run (L09)</li><li>[ ] Kill switch flips effectful tools to read-only via config (L09)</li><li>[ ] Feedback capture wired; triage→eval promotion path works (L11)</li></ul>
+<p><b>The awkward questions</b></p>
+<ul><li>[ ] What's the worst action this agent can take autonomously, and what limits the blast radius?</li><li>[ ] Who is legally answerable for what it says?</li></ul>
+<h3>Use It</h3>
+<p>Encode the checklist as a CI job where possible (eval gate, chaos test, leakage test run automatically); keep the judgment items as a review doc with named sign-offs.</p>
+<h3>War Story</h3>
+<p>In February 2024, a British Columbia tribunal ordered Air Canada to honor a bereavement-fare policy its website chatbot had invented — rejecting the airline's argument that the chatbot was "a separate legal entity responsible for its own actions." The tribunal found the airline responsible for all information on its site, chatbot included, and awarded the passenger damages. It's a small-claims case with a giant moral: the readiness question "who answers for what it says?" already has a legal answer, and it's you.</p>
+<h3>Checkpoint</h3>
+<ol><li>Which checklist items can be automated in CI, and which require human review? Why the split?</li><li>Why should the readiness review include someone who didn't build the agent?</li><li>Pick any three checklist items and describe the production incident each one prevents.</li></ol>
+  </article>
+  <div class="pager">
+    <a href="15-safety-and-security.html">← 🛡️ Phase 15</a>
+    <span class="spacer"></span>
+    <a href="17-advanced-topics.html">Phase 17 🧪 →</a>
+  </div>
+</div>
+</body>
+</html>

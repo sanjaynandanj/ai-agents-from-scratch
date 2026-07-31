@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open Models & Local Agents — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 10</div>
+  <h1><span class="pnum">10</span> 🦙 Open Models &amp; Local Agents</h1>
+  <div class="tagline">Your agent, your weights, your GPU, your rules.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>The open-model landscape: Llama, Qwen, Mistral, Hermes</a>
+<a href="#lesson-02"><span class="lnum">02</span>Hermes and open tool-calling formats</a>
+<a href="#lesson-03"><span class="lnum">03</span>Serving: Ollama, vLLM, llama.cpp</a>
+<a href="#lesson-04"><span class="lnum">04</span>Quantization: fitting brains in small boxes</a>
+<a href="#lesson-05"><span class="lnum">05</span>Local agent stacks end to end</a>
+<a href="#lesson-06"><span class="lnum">06</span>Fine-tuning for tool use</a>
+<a href="#lesson-07"><span class="lnum">07</span>Distillation: teaching small models agent tricks</a>
+<a href="#lesson-08"><span class="lnum">08</span>Structured output on open models</a>
+<a href="#lesson-09"><span class="lnum">09</span>Privacy and on-prem agent deployments</a>
+<a href="#lesson-10"><span class="lnum">10</span>Build a local agent with an open model</a>
+  </div>
+  <article>
+<blockquote>Your agent, your weights, your GPU, your rules.</blockquote>
+<p>Everything so far worked against hosted APIs; this phase moves the model onto hardware you control. Open-weight models change the economics (no per-token bill), the privacy story (data never leaves the building), and the engineering (you now own serving, quantization, and tool-calling formats that hosted providers hid from you). The models are smaller and rougher than frontier APIs — that's the honest trade, and this phase teaches you when it's worth making. By the end you'll run a complete agent loop against a model whose weights sit on your own disk.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> The Open-Model Landscape: Llama, Qwen, Mistral, Hermes</h2>
+<p><b>MOTTO:</b> "Open" is a spectrum, and the license is part of the spec.</p>
+<h3>The Problem</h3>
+<p>"Just use an open model" hides real choices: model families differ in license terms, tool-calling ability, language coverage, and how much community tooling exists. Picking by leaderboard rank alone ships you a model you can't legally or practically deploy.</p>
+<h3>The Concept</h3>
+<p>Think of model families as Linux distributions: a few big upstream lineages, each with its own release culture, plus downstream fine-tunes (like Hermes) that repackage base models with different behavior. "Open weights" usually means you get the parameters, not the training data or pipeline — so it's more like getting the compiled binary plus a permissive-ish EULA than true open source.</p>
+<h3>Build It</h3>
+<p>Make a shortlist spreadsheet: for three candidate models record license, parameter count, context length, native tool-calling support, and GGUF availability. Then run the same three-tool agent prompt from Phase 2 against each via a hosted playground and grade the tool calls by hand.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Family</th><th>Origin</th><th>Notable trait</th></tr></thead><tbody><tr><td>Llama</td><td>Meta</td><td>Huge ecosystem; custom "community license" with conditions</td></tr><tr><td>Qwen</td><td>Alibaba</td><td>Strong multilingual + tool use; most releases Apache 2.0</td></tr><tr><td>Mistral</td><td>Mistral AI</td><td>Efficient dense + MoE models; Apache 2.0 on many</td></tr><tr><td>Hermes</td><td>Nous Research</td><td>Fine-tunes of Llama/other bases; explicit function-calling training</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>Meta released the original LLaMA in February 2023 to approved researchers only — and within about a week the weights leaked via a torrent posted to 4chan. Rather than retreat, Meta shipped Llama 2 that July with a commercial-use license, effectively ratifying the open-weights era the leak had started.</p>
+<h3>Checkpoint</h3>
+<ol><li>What do you get with "open weights" that you still don't get versus true open source?</li><li>Why does license type belong in your model selection spreadsheet?</li><li>What distinguishes a fine-tune family like Hermes from a base family like Llama?</li></ol>
+<h2 id="lesson-02"><span class="lnum">02</span> Hermes and Open Tool-Calling Formats</h2>
+<p><b>MOTTO:</b> Tool calling isn't magic — it's a chat template and a parsing convention.</p>
+<h3>The Problem</h3>
+<p>Hosted APIs hand you a clean <code>tool_calls</code> array. An open model just emits tokens. If you don't know the exact format the model was trained to emit tool calls in — and render your prompt with the matching chat template — you get prose about tools instead of calls.</p>
+<h3>The Concept</h3>
+<p>Open tool calling has three layers: (1) the <i>chat template</i> (a Jinja template shipped with the model) that turns your message list into the token stream the model expects; (2) the <i>tool definition convention</i> — JSON schemas injected into the system prompt; (3) the <i>call syntax</i> the model emits. Nous Research's Hermes models popularized a widely copied convention: JSON inside XML-style tags.</p>
+<pre><code>System prompt:  ...here are your tools: [{&quot;name&quot;: &quot;get_weather&quot;, ...}]
+                Wrap calls in &lt;tool_call&gt; tags.
+Model output:   &lt;tool_call&gt;{&quot;name&quot;: &quot;get_weather&quot;,
+                            &quot;arguments&quot;: {&quot;city&quot;: &quot;Pune&quot;}}&lt;/tool_call&gt;
+Your runtime:   parse tags -&gt; run tool -&gt; reply in &lt;tool_response&gt; tags</code></pre>
+<h3>Build It</h3>
+<p>Write a parser: regex out <code>&lt;tool_call&gt;...&lt;/tool_call&gt;</code> blocks, <code>json.loads</code> the payload, dispatch, then append the result wrapped in the response convention. Handle the failure case where the model half-emits a tag — that's the case that separates demos from agents.</p>
+<h3>Use It</h3>
+<p>In practice you rarely hand-roll this: <code>transformers</code> applies chat templates via <code>apply_chat_template(tools=...)</code>, and servers like vLLM and Ollama ship per-family tool-call parsers behind an OpenAI-compatible API. But debugging a local agent means reading raw output, so learn the tags.</p>
+<h3>War Story</h3>
+<p>Nous Research's Hermes 2 Pro (2024) shipped with a dedicated function-calling format — schemas in the system prompt, calls in <code>&lt;tool_call&gt;</code> XML tags — plus a public GitHub repo documenting it, and the convention was adopted well beyond Hermes, including as a named parser in vLLM. Hermes 3 followed in August 2024, scaling the recipe up to a 405B Llama 3.1 fine-tune.</p>
+<h3>Checkpoint</h3>
+<ol><li>What are the three layers between your message list and a parsed tool call?</li><li>Why does using the wrong chat template silently degrade tool calling?</li><li>What should your parser do with a malformed or unterminated <code>&lt;tool_call&gt;</code> block?</li></ol>
+<h2 id="lesson-03"><span class="lnum">03</span> Serving: Ollama, vLLM, llama.cpp</h2>
+<p><b>MOTTO:</b> The weights are the engine; the server is the transmission.</p>
+<h3>The Problem</h3>
+<p>A model file does nothing by itself. You need an inference server that loads weights, batches requests, manages KV cache, and speaks an API your agent loop understands — and the right choice differs wildly between "my laptop" and "forty concurrent users."</p>
+<h3>The Concept</h3>
+<p>Three tiers, one metaphor — kitchens: llama.cpp is a camp stove (runs anywhere, C/C++, CPU-friendly); Ollama is a home kitchen (wraps llama.cpp with model management, one-line pulls, an API); vLLM is a restaurant line (GPU-first, continuous batching, PagedAttention to stop wasting KV-cache memory). All three can expose OpenAI-compatible endpoints, which is what keeps your agent code portable.</p>
+<h3>Build It</h3>
+<pre><code>ollama pull qwen2.5:7b
+curl http://localhost:11434/v1/chat/completions \
+  -d &#x27;{&quot;model&quot;: &quot;qwen2.5:7b&quot;, &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;hi&quot;}]}&#x27;</code></pre>
+<p>Then point your Phase 9 Lesson 01 raw loop at <code>base_url="http://localhost:11434/v1"</code>. Nothing else changes. That's the payoff of the compatible API.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Server</th><th>Sweet spot</th><th>Weak spot</th></tr></thead><tbody><tr><td>llama.cpp</td><td>CPU/edge, minimal deps, GGUF native</td><td>DIY ergonomics</td></tr><tr><td>Ollama</td><td>Local dev, model management</td><td>Not built for high concurrency</td></tr><tr><td>vLLM</td><td>Multi-user GPU serving, throughput</td><td>Heavier setup, GPU required</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>Georgi Gerganov wrote llama.cpp in March 2023, and within days the community had Llama running on MacBooks and even a Raspberry Pi 4 — at seconds per token, but running. vLLM came from the other direction: its PagedAttention paper (Kwon et al., SOSP 2023) showed KV-cache paging could deliver order-of-magnitude throughput gains over naive serving, and it became the default for serious GPU deployments.</p>
+<h3>Checkpoint</h3>
+<ol><li>Which server would you pick for a CPU-only laptop demo, and why?</li><li>What problem does PagedAttention solve, in one sentence?</li><li>Why do OpenAI-compatible endpoints matter for your agent code specifically?</li></ol>
+<h2 id="lesson-04"><span class="lnum">04</span> Quantization: Fitting Brains in Small Boxes</h2>
+<p><b>MOTTO:</b> Trade decimal places for gigabytes; just measure what you traded.</p>
+<h3>The Problem</h3>
+<p>A 70B model at 16-bit needs ~140 GB just for weights — no consumer GPU holds that. Without quantization, "local agent" means "7B or nothing" for most people.</p>
+<h3>The Concept</h3>
+<p>Quantization stores weights at lower precision — 8, 5, or 4 bits instead of 16 — like compressing a photo: file shrinks, and artifacts appear gradually, then suddenly. GGUF is the container format (llama.cpp lineage) with quant levels like <code>Q8_0</code>, <code>Q5_K_M</code>, <code>Q4_K_M</code>; the K-quants spend their bit budget unevenly, protecting sensitive layers.</p>
+<pre><code>FP16     ~14 GB (7B model)   reference quality
+Q8_0      ~7 GB              nearly indistinguishable
+Q4_K_M    ~4 GB              the popular sweet spot
+Q2_K      ~3 GB              noticeably lobotomized</code></pre>
+<h3>Build It</h3>
+<p>Pull the same model at <code>Q8_0</code> and <code>Q4_K_M</code>, then run your <i>agent</i> eval — tool-call correctness over 20 prompts — not just a chat vibe check. Quantization damage shows up first in precise formats (JSON, arguments), exactly where agents live.</p>
+<h3>Use It</h3>
+<p>GGUF quants on Hugging Face (community quantizers publish full ladders per model); GPTQ/AWQ for GPU-native quantization under vLLM. Rule of thumb: a bigger model at 4-bit usually beats a smaller model at 16-bit at equal memory — but verify on <i>your</i> tasks.</p>
+<h3>War Story</h3>
+<p>The QLoRA paper (Dettmers et al., May 2023) showed you could fine-tune a 65B model on a single 48 GB GPU by quantizing the base to 4-bit NF4 and training LoRA adapters on top — collapsing what had been a multi-node job into one card and kicking off the consumer fine-tuning wave.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does quantization damage appear in tool calls before casual chat?</li><li>What does the K in <code>Q4_K_M</code> buy over naive uniform quantization?</li><li>Given 16 GB of VRAM, how would you decide between a 7B-Q8 and a 14B-Q4?</li></ol>
+<h2 id="lesson-05"><span class="lnum">05</span> Local Agent Stacks End to End</h2>
+<p><b>MOTTO:</b> A local agent is five layers, and you now own all five.</p>
+<h3>The Problem</h3>
+<p>Individually you understand models, servers, and loops. Assembled, they fail in cross-layer ways: the server's template doesn't match the model's tool format, the quant breaks JSON, the context window fills silently. Someone has to own the whole stack — locally, that someone is you.</p>
+<h3>The Concept</h3>
+<pre><code>┌─────────────────────────────┐
+│ Agent loop (your code)      │  retries, tool dispatch, memory
+├─────────────────────────────┤
+│ Structured-output layer     │  grammars/validation (Lesson 08)
+├─────────────────────────────┤
+│ API surface                 │  OpenAI-compatible endpoint
+├─────────────────────────────┤
+│ Inference server            │  Ollama / vLLM / llama.cpp
+├─────────────────────────────┤
+│ Model + quant + template    │  the actual weights
+└─────────────────────────────┘</code></pre>
+<p>Debugging rule: failures propagate <i>up</i>, so diagnose <i>down</i> — bad agent behavior is usually a template or quant problem wearing a costume.</p>
+<h3>Build It</h3>
+<p>Compose a stack spec file (model, quant, server, template, context limit, tool format) for one working configuration, and a smoke test that exercises every layer: raw completion, chat template, one tool call, one multi-turn run. Run it whenever any layer changes.</p>
+<h3>Use It</h3>
+<p>Common working combos: Ollama + Qwen or Llama instruct models for dev boxes; vLLM + AWQ-quantized models with its tool-call parsers for shared GPU servers; llama.cpp + GGUF + GBNF grammar for embedded/edge. Pin versions — server updates change template handling more often than you'd hope.</p>
+<h3>War Story</h3>
+<p>Ollama added an OpenAI-compatible API in February 2024, and it quietly became the biggest enabler of local agent stacks: overnight, every tutorial, SDK, and framework written against OpenAI's API shape could target local weights by changing one base URL. Compatibility, not capability, was the unlock.</p>
+<h3>Checkpoint</h3>
+<ol><li>Name the five layers and one characteristic failure per layer.</li><li>Why "diagnose down" when the symptom appears at the top?</li><li>What belongs in a stack spec file, and why pin server versions?</li></ol>
+<h2 id="lesson-06"><span class="lnum">06</span> Fine-Tuning for Tool Use</h2>
+<p><b>MOTTO:</b> If the model won't call tools reliably, teach it — with traces, not scolding.</p>
+<h3>The Problem</h3>
+<p>Base and casually instruction-tuned models emit tool calls inconsistently: wrong format, hallucinated arguments, calling tools when they shouldn't. Prompt engineering plateaus; below a certain model size, formats must be <i>trained in</i>.</p>
+<h3>The Concept</h3>
+<p>Supervised fine-tuning (SFT) on tool-call transcripts: each example is a full conversation — system prompt with schemas, user request, correctly formatted <code>&lt;tool_call&gt;</code>, tool response, final answer. LoRA/QLoRA makes this cheap by training small adapter matrices instead of all weights. The analogy is drilling a new employee on the ticketing system: you don't retrain their whole education, just the workflows — including <i>negative</i> examples (requests that need no tool) so they don't file tickets for everything.</p>
+<h3>Build It</h3>
+<p>Assemble ~1k traces: harvest successful runs from a stronger model, convert to your target's chat template, and include failure-mode counterexamples (no-tool-needed, missing-parameter-so-ask). Train with a standard SFT stack (<code>trl</code>/<code>axolotl</code>/<code>unsloth</code>, QLoRA config), then eval against the tool-correctness suite from Lesson 04 — never against loss alone.</p>
+<h3>Use It</h3>
+<p>Public function-calling datasets (e.g., Glaive's, credited in Hermes model cards) bootstrap the format; your own domain traces provide the last mile. Benchmark on the Berkeley Function-Calling Leaderboard style of eval: schema-exact matching, not vibes.</p>
+<h3>War Story</h3>
+<p>Berkeley's Gorilla project (Patil et al., 2023) fine-tuned a 7B LLaMA on API-call data and reported it beating GPT-4 on their APIBench API-invocation benchmark — an early, concrete demonstration that a small specialist can out-call a giant generalist on the narrow skill agents actually need.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why do negative (no-tool) examples belong in the training set?</li><li>What does LoRA change about the cost and artifact of fine-tuning?</li><li>Why is eval-by-loss insufficient for a tool-use fine-tune?</li></ol>
+<h2 id="lesson-07"><span class="lnum">07</span> Distillation: Teaching Small Models Agent Tricks</h2>
+<p><b>MOTTO:</b> Big model writes the textbook; small model studies it.</p>
+<h3>The Problem</h3>
+<p>Frontier models plan and recover well but are too big to run locally; small open models fit on your GPU but reason clumsily. You want the big model's <i>behavior</i> at the small model's <i>price</i>.</p>
+<h3>The Concept</h3>
+<p>Distillation trains a student model on a teacher's outputs. For agents, that means generating thousands of teacher trajectories — plans, tool calls, error recoveries — filtering for successful ones, and fine-tuning the student on them. It's an apprenticeship: the student copies worked examples, including the <i>reasoning traces</i>, not just final answers. Limits are real: students inherit style more easily than judgment, and generalization beyond the trace distribution is the first thing to break.</p>
+<pre><code>teacher (API) ──&gt; 10k task trajectories ──&gt; filter successes ──&gt; SFT student (7B)</code></pre>
+<h3>Build It</h3>
+<p>Distill one skill, narrowly: generate 500 teacher runs of your Phase 2 agent's task family, keep the runs that pass your eval, convert to student chat format, QLoRA-train, then compare student-vs-teacher pass rates on held-out tasks. Expect a gap; measure it honestly.</p>
+<h3>Use It</h3>
+<p>Note the legal wrinkle before you build a product on this: most hosted providers' terms restrict using their outputs to train competing models. Distilling from your <i>own</i> larger open model (Llama 405B → 8B) sidesteps that cleanly.</p>
+<h3>War Story</h3>
+<p>Stanford's Alpaca (March 2023) fine-tuned LLaMA 7B on 52k instruction examples generated by OpenAI's text-davinci-003, for a reported training cost under $600 — then took its public demo down within weeks over safety and cost concerns. It proved both halves of the distillation story at once: startlingly cheap capability transfer, and the governance questions that follow it.</p>
+<h3>Checkpoint</h3>
+<ol><li>What gets filtered between teacher generation and student training, and why?</li><li>Why do students inherit style more reliably than judgment?</li><li>What terms-of-service issue affects distilling from hosted frontier models?</li></ol>
+<h2 id="lesson-08"><span class="lnum">08</span> Structured Output on Open Models</h2>
+<p><b>MOTTO:</b> Don't ask nicely for JSON — make invalid JSON impossible to emit.</p>
+<h3>The Problem</h3>
+<p>Agents die on almost-JSON: trailing commas, unquoted keys, a chatty preamble before the brace. Retry loops mask the problem and burn latency. On hosted APIs you clicked "JSON mode"; locally, you get to build the mode.</p>
+<h3>The Concept</h3>
+<p>Grammar-constrained decoding filters the model's next-token distribution: at each step, mask every token that would violate the target grammar, then sample from what's left. The model literally <i>cannot</i> emit invalid output. It's bowling with bumper rails — the ball still chooses its path, but the gutter is physically closed. This is a decisive home-field advantage of local inference: you control the sampler, so you can compile a JSON Schema to a token-level automaton.</p>
+<pre><code>logits ──&gt; mask (tokens legal under grammar state) ──&gt; sample ──&gt; advance grammar</code></pre>
+<h3>Build It</h3>
+<p>Two routes: llama.cpp's GBNF — write a grammar, pass it at inference; or Outlines — <code>outlines.generate.json(model, MySchema)</code> compiles a Pydantic schema to a finite-state machine over tokens. Wire either under your tool-call parser so <i>arguments</i> are schema-valid before your code ever sees them.</p>
+<h3>Use It</h3>
+<p>Outlines (dottxt), llama.cpp GBNF, vLLM's guided/structured decoding options, XGrammar. Caveat worth knowing: constraints guarantee <i>validity</i>, not <i>quality</i> — a model forced into a schema can still fill it with confident nonsense, so validation-by-type and evaluation-by-content remain separate jobs.</p>
+<h3>War Story</h3>
+<p>The technique went mainstream through Outlines, whose underlying paper (Willard &amp; Louf, 2023) showed guided generation could run with negligible per-token overhead by precompiling the constraint into a finite-state machine. When OpenAI shipped Structured Outputs in August 2024 advertising 100% schema conformance, it was the same family of constrained-decoding ideas — arriving at the API tier a year after open-source samplers had it.</p>
+<h3>Checkpoint</h3>
+<ol><li>Mechanically, where in the sampling pipeline does the grammar intervene?</li><li>Why can constrained decoding guarantee validity but not correctness?</li><li>Why is this technique easier to apply locally than through most hosted APIs?</li></ol>
+<h2 id="lesson-09"><span class="lnum">09</span> Privacy and On-Prem Agent Deployments</h2>
+<p><b>MOTTO:</b> The cheapest data-processing agreement is the one you never need to sign.</p>
+<h3>The Problem</h3>
+<p>Agents see everything: source code, contracts, patient notes, financials — plus whatever their tools read. Sending that to a third-party API creates residency, retention, and regulatory exposure that some industries (health, defense, finance) simply cannot accept.</p>
+<h3>The Concept</h3>
+<p>Local inference collapses the data-flow diagram: prompt and completion never cross your network boundary, so whole categories of GDPR/HIPAA analysis reduce to "the data stayed on our metal." But — and this is the part vendors skip — the <i>agent</i> is more than the model. Tool calls, logs, traces, and memory stores each leak independently. On-prem means auditing the whole stack from Lesson 05, not just pointing at the GPU.</p>
+<pre><code>Hosted:  your data ──&gt; internet ──&gt; provider (retention? training? subpoena?)
+On-prem: your data ──&gt; localhost ──&gt; your disk ──&gt; your retention policy</code></pre>
+<h3>Build It</h3>
+<p>Threat-model your Lesson 05 stack: enumerate every place agent data lands (server logs, Ollama history, trace files, tool outputs, vector store), then write the retention and access policy per location. Run the agent on an airgapped or egress-blocked host and confirm with a packet capture that nothing phones home.</p>
+<h3>Use It</h3>
+<p>Deployment tiers: fully local (llama.cpp/Ollama on workstation), private cluster (vLLM behind your VPN), VPC-hosted open weights (cloud GPUs, your tenancy). Compliance artifacts that open weights simplify: data-processing agreements, sub-processor lists, cross-border transfer analysis.</p>
+<h3>War Story</h3>
+<p>In early May 2023, Samsung banned employee use of generative AI tools after engineers pasted internal source code into ChatGPT; weeks earlier, Italy's data-protection authority had temporarily blocked ChatGPT nationwide over GDPR concerns. Both incidents pushed enterprises toward the same conclusion: for sensitive workloads, inference has to happen where the data already lives.</p>
+<h3>Checkpoint</h3>
+<ol><li>Which agent components besides the model can leak data, and how?</li><li>What does egress-blocking plus packet capture actually verify?</li><li>Which compliance artifacts get simpler when inference is on-prem, and which don't change?</li></ol>
+<h2 id="lesson-10"><span class="lnum">10</span> Build a Local Agent with an Open Model</h2>
+<p><b>MOTTO:</b> One base URL, one loop, zero API keys.</p>
+<blockquote>⚙️ <b>Setup required</b> — this is the only lesson in this phase that needs software installed: <a href="https://ollama.com">Ollama</a> running locally with a tool-capable model pulled (e.g. <code>ollama pull qwen2.5:7b</code>). Everything else in this phase reads fine dry; this one you run.</blockquote>
+<h3>The Problem</h3>
+<p>You've met every layer separately. Time to prove the whole thesis: a complete tool-calling agent loop, on your machine, against weights you control, with no external dependency but Python and Ollama.</p>
+<h3>The Concept</h3>
+<p>Same loop as Phase 9 Lesson 01 — the only differences are the endpoint (<code>localhost:11434</code>) and that <i>you</i> are the provider. Ollama's <code>/api/chat</code> accepts a <code>tools</code> array, applies the model's chat template, parses the model's tool-call convention, and hands you structured <code>tool_calls</code> back. The hosted-API experience, reconstructed from parts you now individually understand.</p>
+<h3>Build It</h3>
+<pre><code>import requests, json
+
+def get_weather(city: str) -&gt; str:
+    return json.dumps({&quot;city&quot;: city, &quot;temp_c&quot;: 31})   # mock it; wiring is the lesson
+
+TOOLS = [{&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {
+    &quot;name&quot;: &quot;get_weather&quot;, &quot;description&quot;: &quot;Current weather for a city&quot;,
+    &quot;parameters&quot;: {&quot;type&quot;: &quot;object&quot;,
+                   &quot;properties&quot;: {&quot;city&quot;: {&quot;type&quot;: &quot;string&quot;}},
+                   &quot;required&quot;: [&quot;city&quot;]}}}]
+
+messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What&#x27;s the weather in Pune?&quot;}]
+while True:
+    r = requests.post(&quot;http://localhost:11434/api/chat&quot;, json={
+        &quot;model&quot;: &quot;qwen2.5:7b&quot;, &quot;messages&quot;: messages,
+        &quot;tools&quot;: TOOLS, &quot;stream&quot;: False}).json()
+    msg = r[&quot;message&quot;]; messages.append(msg)
+    calls = msg.get(&quot;tool_calls&quot;)
+    if not calls:
+        print(msg[&quot;content&quot;]); break
+    for c in calls:
+        fn = c[&quot;function&quot;]
+        out = get_weather(**fn[&quot;arguments&quot;])
+        messages.append({&quot;role&quot;: &quot;tool&quot;, &quot;content&quot;: out, &quot;tool_name&quot;: fn[&quot;name&quot;]})</code></pre>
+<p>Extensions: add a second tool and watch routing; swap models and re-run your eval; kill your Wi-Fi first, for the principle of the thing.</p>
+<h3>Use It</h3>
+<p>From here the upgrades map to earlier lessons: grammar-constrain the arguments (Lesson 08), quantize down until your eval complains (Lesson 04), fine-tune if it complains too early (Lesson 06), then move the whole thing to vLLM when a second user shows up (Lesson 03).</p>
+<h3>War Story</h3>
+<p>This exact stack is the descendant of llama.cpp's March 2023 proof that frontier-adjacent models could run on commodity hardware — the demos of Llama grinding out tokens on a MacBook and a Raspberry Pi. Three years of quantization, serving, and fine-tuning work later, the same class of hardware runs full tool-calling agents; the loop you just wrote is that history, operationalized.</p>
+<h3>Checkpoint</h3>
+<ol><li>Which layers from Lesson 05 does Ollama handle in this code, and which remain yours?</li><li>What would you change to run this loop against vLLM instead?</li><li>Run it with Wi-Fi off: what does that demonstrate about the trust boundary?</li></ol>
+  </article>
+  <div class="pager">
+    <a href="09-frameworks.html">← 🤖 Phase 09</a>
+    <span class="spacer"></span>
+    <a href="11-multi-agent-fundamentals.html">Phase 11 👥 →</a>
+  </div>
+</div>
+</body>
+</html>

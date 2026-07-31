@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agents From Scratch — 212 lessons, 20 phases</title>
+<meta name="description" content="An exhaustive, free, open-source AI agents curriculum. 212 lessons across 20 phases — every agent pattern built as a bare loop before a single framework gets imported.">
+<style>
+  :root {
+    --bg: #0d0b14;
+    --bg-alt: #14111f;
+    --card: #191526;
+    --border: #2b243b;
+    --text: #d8dee9;
+    --muted: #9089a6;
+    --accent: #c792ea;
+    --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.6; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem;
+    background: rgba(13,11,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+
+  header.hero { padding: 5rem 0 3.5rem; text-align: center; }
+  .hero .kicker { font-family: var(--mono); color: var(--accent); font-size: 0.9rem; letter-spacing: 0.15em; text-transform: uppercase; }
+  .hero h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); line-height: 1.15; margin: 0.8rem 0 1.2rem; }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p.sub { color: var(--muted); max-width: 640px; margin: 0 auto 2rem; font-size: 1.1rem; }
+  .hero .ascii {
+    font-family: var(--mono); font-size: 0.72rem; color: var(--muted);
+    white-space: pre; overflow-x: auto; margin: 0 auto 2.2rem; display: inline-block; text-align: left;
+  }
+  .btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    font-family: var(--mono); font-size: 0.9rem; padding: 0.7rem 1.5rem;
+    border-radius: 8px; border: 1px solid var(--border); color: var(--text);
+    background: var(--card); cursor: pointer; transition: all .15s;
+  }
+  .btn:hover { border-color: var(--accent); text-decoration: none; transform: translateY(-1px); }
+  .btn.primary { background: var(--accent); color: #1f0b2e; border-color: var(--accent); font-weight: 700; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 3rem 0; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; text-align: center; }
+  .stat .num { font-family: var(--mono); font-size: 2rem; font-weight: 700; color: var(--accent); }
+  .stat .label { color: var(--muted); font-size: 0.85rem; }
+
+  section { padding: 3.5rem 0; border-top: 1px solid var(--border); }
+  h2.sec { font-size: 1.7rem; margin-bottom: 0.4rem; }
+  h2.sec::before { content: "## "; color: var(--accent); font-family: var(--mono); }
+  p.secsub { color: var(--muted); margin-bottom: 2rem; }
+
+  .beats { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; }
+  .beat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem; }
+  .beat b { font-family: var(--mono); color: var(--warn); display: block; margin-bottom: 0.3rem; }
+  .beat span { color: var(--muted); font-size: 0.9rem; }
+
+  #progress-panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+  .pbar-row { display: flex; align-items: center; gap: 1rem; margin: 0.6rem 0; font-family: var(--mono); font-size: 0.85rem; }
+  .pbar-row .plabel { width: 110px; color: var(--muted); }
+  .pbar { flex: 1; height: 10px; background: var(--bg); border-radius: 5px; overflow: hidden; }
+  .pbar > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); width: 0%; transition: width .4s; }
+  .pbar-row .pnum { width: 90px; text-align: right; color: var(--text); }
+  #reset-progress { margin-top: 0.8rem; font-size: 0.75rem; background: none; border: none; color: var(--muted); cursor: pointer; font-family: var(--mono); text-decoration: underline; }
+  #reset-progress:hover { color: var(--warn); }
+
+  .phase { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 0.8rem; overflow: hidden; }
+  .phase-head { display: flex; align-items: center; gap: 0.9rem; padding: 1rem 1.2rem; cursor: pointer; user-select: none; }
+  .phase-head:hover { background: var(--bg-alt); }
+  .phase-head .emoji { font-size: 1.4rem; }
+  .phase-head .info { flex: 1; min-width: 0; }
+  .phase-head .pname { font-weight: 600; }
+  .phase-head .pname .pnum { font-family: var(--mono); color: var(--accent); margin-right: 0.5rem; }
+  .phase-head .ptag { color: var(--muted); font-size: 0.82rem; }
+  .phase-head .pmeta { text-align: right; font-family: var(--mono); font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+  .phase-head .mini-bar { width: 90px; height: 6px; background: var(--bg); border-radius: 3px; margin-top: 5px; overflow: hidden; }
+  .phase-head .mini-bar > div { height: 100%; background: var(--accent); width: 0%; }
+  .phase-head .chev { color: var(--muted); transition: transform .2s; font-family: var(--mono); }
+  .phase.open .chev { transform: rotate(90deg); }
+  .lessons { display: none; border-top: 1px solid var(--border); padding: 0.6rem 1.2rem 1rem; }
+  .phase.open .lessons { display: block; }
+  .lesson { display: flex; align-items: center; gap: 0.7rem; padding: 0.4rem 0.3rem; border-radius: 6px; font-size: 0.92rem; }
+  .lesson:hover { background: var(--bg-alt); }
+  .lesson input { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
+  .lesson .lnum { font-family: var(--mono); color: var(--muted); font-size: 0.78rem; width: 24px; flex-shrink: 0; }
+  .lesson.done a.ltitle { color: var(--muted); text-decoration: line-through; }
+  .lesson a.ltitle { color: var(--text); }
+  .lesson a.ltitle:hover { color: var(--accent); text-decoration: underline; }
+  .read-link { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); white-space: nowrap; margin-right: 0.3rem; }
+  .expand-all { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); background: none; border: none; cursor: pointer; text-decoration: underline; margin-bottom: 1rem; }
+  .expand-all:hover { color: var(--text); }
+
+  .code-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.8rem; }
+  .code-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; font-size: 0.88rem; }
+  .code-card code { font-family: var(--mono); color: var(--warn); font-size: 0.85rem; }
+  .code-card p { color: var(--muted); font-size: 0.82rem; margin-top: 0.3rem; }
+
+  #glossary-search {
+    width: 100%; padding: 0.7rem 1rem; margin-bottom: 1.2rem;
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-family: var(--mono); font-size: 0.9rem;
+  }
+  #glossary-search:focus { outline: none; border-color: var(--accent); }
+  .term { padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+  .term b { font-family: var(--mono); color: var(--accent); }
+  .term span { color: var(--muted); font-size: 0.92rem; }
+
+  footer { border-top: 1px solid var(--border); padding: 2.5rem 0 3rem; text-align: center; color: var(--muted); font-size: 0.85rem; }
+  footer .clone { font-family: var(--mono); background: var(--card); border: 1px solid var(--border); border-radius: 8px; display: inline-block; padding: 0.5rem 1rem; margin: 1rem 0; color: var(--text); font-size: 0.8rem; }
+  footer .links { display: flex; gap: 1.5rem; justify-content: center; margin-top: 1rem; font-family: var(--mono); }
+
+  @media (max-width: 640px) {
+    nav { gap: 0.9rem; padding: 0.8rem 1rem; overflow-x: auto; }
+    .phase-head .ptag { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#top">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="#how">How</a>
+  <a href="#curriculum">Curriculum</a>
+  <a href="#code">Code</a>
+  <a href="#projects">Projects</a>
+  <a href="#glossary">Glossary</a>
+  <a href="#about">About</a>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="kicker">free · open-source · zero api keys needed</div>
+    <h1>AI Agents<br><em>From Scratch</em></h1>
+    <p class="sub" id="hero-sub">212 lessons. 20 phases. Every agent pattern built as a bare
+    while-loop before a single framework gets imported — then scaled to swarms.</p>
+    <div class="ascii">┌──────────────── THE AGENT LOOP ────────────────┐
+│                                                │
+│   ┌─────────┐    ┌─────────┐    ┌─────────┐    │
+├──▶│ OBSERVE │───▶│  THINK  │───▶│   ACT   │────┤
+│   └─────────┘    └─────────┘    └────┬────┘    │
+│        ▲          ┌────────┐         │         │
+│        └──────────│ MEMORY │◀────────┘         │
+│                   └────────┘                   │
+└────────────────────────────────────────────────┘</div>
+    <div class="btns">
+      <a class="btn primary" href="#curriculum">Start Learning ↓</a>
+      <a class="btn" href="https://github.com/sanjaynandanj/ai-agents-from-scratch">View on GitHub ★</a>
+    </div>
+    <div class="stats wrap">
+      <div class="stat"><div class="num" id="stat-lessons">212</div><div class="label">lessons</div></div>
+      <div class="stat"><div class="num" id="stat-phases">20</div><div class="label">phases</div></div>
+      <div class="stat"><div class="num" id="stat-code">12</div><div class="label">from-scratch builds</div></div>
+      <div class="stat"><div class="num" id="stat-projects">6</div><div class="label">hands-on projects</div></div>
+      <div class="stat"><div class="num" id="stat-hours">~200</div><div class="label">hours of content</div></div>
+    </div>
+  </div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <h2 class="sec">How this works</h2>
+    <p class="secsub">Frameworks change; loops are forever. Every lesson cycles through
+    seven beats — intuition before jargon, mechanism before frameworks, and a quiz so you
+    can't lie to yourself. All code runs offline against a deterministic MockLLM.</p>
+    <div class="beats">
+      <div class="beat"><b>MOTTO</b><span>The whole lesson in one sentence.</span></div>
+      <div class="beat"><b>PROBLEM</b><span>The concrete pain that makes this topic exist.</span></div>
+      <div class="beat"><b>CONCEPT</b><span>Analogies and ASCII diagrams before any jargon.</span></div>
+      <div class="beat"><b>BUILD IT</b><span>The mechanism, from scratch — code included.</span></div>
+      <div class="beat"><b>USE IT</b><span>The frameworks and APIs, with their tradeoffs.</span></div>
+      <div class="beat"><b>WAR STORY</b><span>A real incident, paper, or engineering legend.</span></div>
+      <div class="beat"><b>CHECKPOINT</b><span>Quiz questions. Can't answer? Re-read.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="curriculum">
+  <div class="wrap">
+    <h2 class="sec">Curriculum</h2>
+    <p class="secsub">Tick lessons off as you go — progress is stored in your browser.
+    Every lesson title opens the full lesson.</p>
+
+    <div id="progress-panel">
+      <div class="pbar-row"><div class="plabel">lessons</div><div class="pbar"><div id="bar-lessons"></div></div><div class="pnum" id="num-lessons">0 / 212</div></div>
+      <div class="pbar-row"><div class="plabel">phases</div><div class="pbar"><div id="bar-phases"></div></div><div class="pnum" id="num-phases">0 / 20</div></div>
+      <button id="reset-progress">reset progress</button>
+    </div>
+
+    <button class="expand-all" id="expand-all">expand all</button>
+    <div id="phases"></div>
+  </div>
+</section>
+
+<section id="code">
+  <div class="wrap">
+    <h2 class="sec">From-scratch builds</h2>
+    <p class="secsub">Dependency-free Python implementations of every agent primitive,
+    powered by a deterministic MockLLM — no API keys, fully reproducible.
+    Run any of them: <code style="font-family:var(--mono);color:var(--warn)">python code/&lt;file&gt;.py</code>.</p>
+    <div class="code-grid" id="code-grid"></div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <h2 class="sec">Hands-on projects</h2>
+    <p class="secsub">Real multi-component agent systems in <code style="font-family:var(--mono);color:var(--warn)">projects/</code> —
+    each with a build guide and a runnable offline reference:
+    <code style="font-family:var(--mono);color:var(--warn)">python projects/&lt;name&gt;/&lt;file&gt;.py --demo</code>.</p>
+    <div class="code-grid" id="projects-grid"></div>
+  </div>
+</section>
+
+<section id="glossary">
+  <div class="wrap">
+    <h2 class="sec">Glossary</h2>
+    <p class="secsub">The vocabulary of agent engineering, one honest sentence at a time.</p>
+    <input id="glossary-search" type="text" placeholder="filter terms… (e.g. 'mcp', 'injection')">
+    <div id="terms"></div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <h2 class="sec">About</h2>
+    <p class="secsub" style="margin-bottom:0.8rem">
+      <b style="color:var(--text)">Frameworks change. Loops are forever.</b></p>
+    <p style="color:var(--muted)">When you've written the agent loop yourself, every framework becomes readable.
+    When you've built memory, RAG, and handoffs by hand, every architecture diagram is familiar.
+    And when you've attacked your own agent with prompt injection, you'll never ship the naive
+    version again. 20 phases from the bare loop to swarms, open models (Hermes, Llama, Qwen),
+    MCP servers, evals, security, and production — ending in case studies and capstones you
+    actually ship. MIT licensed. No paywalls. Runs on your laptop, offline.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>AI Agents From Scratch · MIT License</div>
+    <div class="clone">git clone https://github.com/sanjaynandanj/ai-agents-from-scratch</div>
+    <div class="links">
+      <a href="#curriculum">Curriculum</a>
+      <a href="#code">Code</a>
+      <a href="#projects">Projects</a>
+      <a href="#glossary">Glossary</a>
+      <a href="#top">Top</a>
+    </div>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="glossary.js"></script>
+<script>
+  const LS_KEY = "aafs-progress";
+  const load = () => { try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; } };
+  const save = (p) => localStorage.setItem(LS_KEY, JSON.stringify(p));
+  let progress = load();
+
+  const CODE_FILES = [
+    ["mock_llm.py", "The deterministic fake brain every demo shares — scripted and rule modes."],
+    ["agent_loop.py", "ReAct in the raw: thought, action, observation, repeat."],
+    ["tool_router.py", "Schemas, validation, dispatch, and error feedback."],
+    ["memory_store.py", "Buffer + rolling summary + long-term recall with a write policy."],
+    ["rag_pipeline.py", "Chunk, index, retrieve, answer with [1][2] citations."],
+    ["planner.py", "Plan-and-execute with mid-flight replanning."],
+    ["structured_output.py", "Schema validation with a repair-prompt loop."],
+    ["mcp_server.py", "MCP-style JSON-RPC: initialize, tools/list, tools/call."],
+    ["multi_agent.py", "Orchestrator-worker with handoffs and synthesis."],
+    ["swarm_sim.py", "Blackboard + auctions — watch specialization emerge."],
+    ["evals.py", "Trajectory grading, pass@k, and a scorecard."],
+    ["guardrails.py", "Injection detection, permission gates, exfil filters."]
+  ];
+
+  const PROJECTS = [
+    ["coding-agent-lite", "An agent that edits files and reruns tests until green."],
+    ["research-agent", "Plan → search → read → cited report, verified."],
+    ["support-agent", "Router + tools + guardrails + human escalation."],
+    ["multi-agent-newsroom", "Planner, researcher, writer, fact-checker, editor — one story."],
+    ["mcp-toolbox", "A real MCP server and client talking JSON-RPC over stdio."],
+    ["agent-eval-harness", "Task suite, three graders, leaderboard, regression gate."]
+  ];
+
+  // Curriculum accordion
+  const phasesEl = document.getElementById("phases");
+  CURRICULUM.forEach(ph => {
+    const div = document.createElement("div");
+    div.className = "phase";
+    div.innerHTML = `
+      <div class="phase-head">
+        <div class="emoji">${ph.emoji}</div>
+        <div class="info">
+          <div class="pname"><span class="pnum">${String(ph.id).padStart(2,"0")}</span>${ph.name}</div>
+          <div class="ptag">${ph.tagline}</div>
+        </div>
+        <a class="read-link" href="phases/${ph.slug}.html" onclick="event.stopPropagation()">read →</a>
+        <div class="pmeta">
+          <div class="pcount" id="pcount-${ph.id}">0 / ${ph.lessons.length}</div>
+          <div class="mini-bar"><div id="pbar-${ph.id}"></div></div>
+        </div>
+        <div class="chev">▶</div>
+      </div>
+      <div class="lessons">
+        ${ph.lessons.map((l, i) => {
+          const id = `p${ph.id}-l${i}`;
+          const anchor = `phases/${ph.slug}.html#lesson-${String(i+1).padStart(2,"0")}`;
+          return `<div class="lesson" id="row-${id}">
+            <span class="lnum">${String(i+1).padStart(2,"0")}</span>
+            <input type="checkbox" id="${id}" data-phase="${ph.id}">
+            <a class="ltitle" href="${anchor}">${l}</a>
+          </div>`;
+        }).join("")}
+      </div>`;
+    phasesEl.appendChild(div);
+    div.querySelector(".phase-head").addEventListener("click", () => div.classList.toggle("open"));
+  });
+
+  function refresh() {
+    let done = 0, phasesDone = 0;
+    CURRICULUM.forEach(ph => {
+      let pd = 0;
+      ph.lessons.forEach((_, i) => {
+        const id = `p${ph.id}-l${i}`;
+        const checked = !!progress[id];
+        const box = document.getElementById(id);
+        box.checked = checked;
+        document.getElementById(`row-${id}`).classList.toggle("done", checked);
+        if (checked) { done++; pd++; }
+      });
+      document.getElementById(`pcount-${ph.id}`).textContent = `${pd} / ${ph.lessons.length}`;
+      document.getElementById(`pbar-${ph.id}`).style.width = (pd / ph.lessons.length * 100) + "%";
+      if (pd === ph.lessons.length) phasesDone++;
+    });
+    const total = STATS.lessons;
+    document.getElementById("bar-lessons").style.width = (done / total * 100) + "%";
+    document.getElementById("num-lessons").textContent = `${done} / ${total}`;
+    document.getElementById("bar-phases").style.width = (phasesDone / STATS.phases * 100) + "%";
+    document.getElementById("num-phases").textContent = `${phasesDone} / ${STATS.phases}`;
+  }
+
+  phasesEl.addEventListener("change", e => {
+    if (e.target.matches("input[type=checkbox]")) {
+      if (e.target.checked) progress[e.target.id] = 1; else delete progress[e.target.id];
+      save(progress);
+      refresh();
+    }
+  });
+
+  document.getElementById("reset-progress").addEventListener("click", () => {
+    if (confirm("Reset all progress?")) { progress = {}; save(progress); refresh(); }
+  });
+
+  let expanded = false;
+  document.getElementById("expand-all").addEventListener("click", (e) => {
+    expanded = !expanded;
+    document.querySelectorAll(".phase").forEach(p => p.classList.toggle("open", expanded));
+    e.target.textContent = expanded ? "collapse all" : "expand all";
+  });
+
+  document.getElementById("code-grid").innerHTML = CODE_FILES.map(([f, d]) =>
+    `<div class="code-card"><code>${f}</code><p>${d}</p></div>`).join("");
+  document.getElementById("projects-grid").innerHTML = PROJECTS.map(([f, d]) =>
+    `<div class="code-card"><code>${f}/</code><p>${d}</p></div>`).join("");
+
+  // Glossary
+  const termsEl = document.getElementById("terms");
+  function renderGlossary(filter) {
+    const q = (filter || "").toLowerCase();
+    termsEl.innerHTML = GLOSSARY
+      .filter(([t, d]) => !q || t.toLowerCase().includes(q) || d.toLowerCase().includes(q))
+      .map(([t, d]) => `<div class="term"><b>${t}</b> — <span>${d}</span></div>`).join("")
+      || `<div class="term"><span>no matches — try another term</span></div>`;
+  }
+  document.getElementById("glossary-search").addEventListener("input", e => renderGlossary(e.target.value));
+  renderGlossary("");
+
+  // Stats from data
+  document.getElementById("stat-lessons").textContent = STATS.lessons;
+  document.getElementById("stat-phases").textContent = STATS.phases;
+  document.getElementById("stat-projects").textContent = STATS.projects;
+  document.getElementById("hero-sub").innerHTML =
+    `${STATS.lessons} lessons. ${STATS.phases} phases. Every agent pattern built as a bare while-loop before a single framework gets imported — then scaled to swarms.`;
+
+  refresh();
+</script>
+</body>
+</html>

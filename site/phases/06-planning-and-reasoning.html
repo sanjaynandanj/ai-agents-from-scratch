@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planning & Reasoning — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 06</div>
+  <h1><span class="pnum">06</span> 🗂️ Planning &amp; Reasoning</h1>
+  <div class="tagline">Amateurs improvise. Agents that ship make plans — then revise them.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Task decomposition: big goals into small steps</a>
+<a href="#lesson-02"><span class="lnum">02</span>Plan-and-execute vs ReAct: when to plan ahead</a>
+<a href="#lesson-03"><span class="lnum">03</span>Tree of Thoughts: exploring alternatives</a>
+<a href="#lesson-04"><span class="lnum">04</span>Search over reasoning: beams and MCTS-lite</a>
+<a href="#lesson-05"><span class="lnum">05</span>Replanning: when step 3 destroys the plan</a>
+<a href="#lesson-06"><span class="lnum">06</span>Hierarchical planning: managers and workers</a>
+<a href="#lesson-07"><span class="lnum">07</span>Verification loops: check before you claim</a>
+<a href="#lesson-08"><span class="lnum">08</span>Reasoning models: o-series, R1, and extended thinking</a>
+<a href="#lesson-09"><span class="lnum">09</span>Inference-time compute: pay more, think harder</a>
+<a href="#lesson-10"><span class="lnum">10</span>Task lists and progress tracking</a>
+<a href="#lesson-11"><span class="lnum">11</span>Long-horizon coherence: not losing the plot</a>
+<a href="#lesson-12"><span class="lnum">12</span>Build a planning agent from scratch</a>
+  </div>
+  <article>
+<blockquote>Amateurs improvise. Agents that ship make plans — then revise them.</blockquote>
+<p>So far your agent reacts: see prompt, pick tool, repeat. That works for "what's the weather" and falls apart for "migrate this codebase to Python 3.12." This phase is about giving agents a frontal lobe — decomposition, lookahead, search, verification, and the discipline to notice when the plan is on fire. By the end you'll build a plan → execute → replan loop in raw Python, no framework required.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> Task Decomposition: Big Goals Into Small Steps</h2>
+<p><b>MOTTO:</b> You can't eat an elephant, but you can eat 400 elephant-sized bites.</p>
+<h3>The Problem</h3>
+<p>Give an LLM "build me a landing page" as one shot and you get a mediocre average of every landing page it has seen. Big goals overflow attention, hide missing requirements, and give you no place to catch errors until the very end.</p>
+<h3>The Concept</h3>
+<p>Decomposition turns one vague goal into an ordered list of small, verifiable steps — like a recipe instead of "make dinner."</p>
+<pre><code>GOAL: &quot;Ship the report&quot;
+  ├── 1. Fetch sales data        (verifiable: rows &gt; 0)
+  ├── 2. Compute monthly totals  (verifiable: sums match)
+  ├── 3. Render chart            (verifiable: file exists)
+  └── 4. Write summary + email   (verifiable: draft reviewed)</code></pre>
+<p>Each step should be small enough that failure is obvious and cheap. If you can't say how you'd check a step, it's still too big.</p>
+<h3>Build It</h3>
+<p>Prompt the model to emit steps as structured data, not prose:</p>
+<pre><code>DECOMPOSE_PROMPT = &quot;&quot;&quot;Break this goal into 3-7 concrete steps.
+Return JSON: [{&quot;id&quot;: 1, &quot;action&quot;: &quot;...&quot;, &quot;done_when&quot;: &quot;...&quot;}]
+Goal: {goal}&quot;&quot;&quot;</code></pre>
+<p>The <code>done_when</code> field is the trick — forcing a completion criterion per step exposes vague steps immediately.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>How it decomposes</th></tr></thead><tbody><tr><td>Claude Code</td><td>Maintains a visible todo list per task</td></tr><tr><td>LangGraph</td><td>You define nodes; the graph is the decomposition</td></tr><tr><td>CrewAI</td><td>Tasks assigned to role-based agents</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>Least-to-most prompting (Zhou et al., 2022) showed that asking the model to decompose a problem before solving each piece dramatically beat standard prompting on compositional generalization tasks like SCAN — the same model, just forced to bite smaller. Decomposition isn't a framework feature; it's a prompting-era result that still holds.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does a <code>done_when</code> criterion per step matter more than the step description itself?</li><li>What's the failure mode of decomposing too finely?</li><li>How would you detect that two steps in a plan are secretly the same step?</li></ol>
+<h2 id="lesson-02"><span class="lnum">02</span> Plan-and-Execute vs ReAct: When to Plan Ahead</h2>
+<p><b>MOTTO:</b> Planning is cheap. Re-planning after step 9 of 10 is not.</p>
+<h3>The Problem</h3>
+<p>ReAct interleaves thinking and acting — great for exploration, but every step re-decides the whole strategy, burning tokens and drifting off-goal. Pure upfront planning is efficient but blind: the plan can't see what step 2 discovered.</p>
+<h3>The Concept</h3>
+<p>Two ends of a dial:</p>
+<pre><code>ReAct:            think → act → observe → think → act → ...
+Plan-and-execute: PLAN [1..N] → act 1 → act 2 → ... → act N</code></pre>
+<p>ReAct is a hiker with a compass; plan-and-execute is a hiker with a printed route. The compass wins in fog (unknown environments); the route wins on mapped trails (known workflows). Most production agents plan first, then run a small ReAct loop <i>inside</i> each step.</p>
+<h3>Build It</h3>
+<ul><li>Planner call: emit the full step list once (use lesson 01's schema).</li><li>Executor loop: for each step, allow up to K tool calls to complete it.</li><li>Escape hatch: if a step's observations contradict the plan, jump to replanning (lesson 05).</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Pattern</th><th>Where you see it</th></tr></thead><tbody><tr><td>ReAct</td><td>LangChain's original agents, simple tool loops</td></tr><tr><td>Plan-and-execute</td><td>LangGraph plan-execute template, BabyAGI lineage</td></tr><tr><td>Hybrid</td><td>Claude Code: todo list up front, reactive loop per todo</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>The ReAct paper (Yao et al., 2022) showed that interleaving reasoning traces with actions beat both act-only and reason-only baselines on HotpotQA and ALFWorld. A year later, Plan-and-Solve prompting (Wang et al., 2023) showed upfront planning beat zero-shot chain-of-thought on math reasoning. Neither wins everywhere — which is exactly the point.</p>
+<h3>Checkpoint</h3>
+<ol><li>Name a task where ReAct clearly beats plan-and-execute, and one where it loses.</li><li>Why does plan-and-execute usually cost fewer tokens per task?</li><li>What signal should trigger a fallback from executing to replanning?</li></ol>
+<h2 id="lesson-03"><span class="lnum">03</span> Tree of Thoughts: Exploring Alternatives</h2>
+<p><b>MOTTO:</b> Your first idea is a sample, not a decision.</p>
+<h3>The Problem</h3>
+<p>Greedy generation commits to the first token path the model likes. For problems where early choices matter — puzzles, designs, proofs — one bad early thought poisons everything downstream, and the model never looks back.</p>
+<h3>The Concept</h3>
+<p>Tree of Thoughts (ToT) generates <i>multiple</i> candidate thoughts at each step, scores them, and expands only the promising ones. It's chess-player thinking: consider three moves, mentally evaluate each, then go deeper on the best.</p>
+<pre><code>            [problem]
+           /    |    \
+        t1a    t1b    t1c      ← generate 3 thoughts
+        0.9    0.2    0.6      ← self-evaluate each
+       /  \           |
+    t2a    t2b       t2c       ← expand only survivors</code></pre>
+<h3>Build It</h3>
+<p>Three functions, one loop:</p>
+<ol><li><code>propose(state, k)</code> — ask the LLM for k next-step thoughts.</li><li><code>evaluate(state)</code> — ask the LLM (or a heuristic) to score 0–1, or vote "sure/maybe/impossible."</li><li><code>search</code> — BFS or DFS over states, keeping the top-b per depth.</li></ol>
+<p>The evaluator is the whole game. A sloppy evaluator turns your tree into an expensive random walk.</p>
+<h3>Use It</h3>
+<p>ToT is rarely a library import — it's a pattern you hand-roll for high-stakes, checkable steps: SQL query generation with EXPLAIN as the evaluator, code fixes with tests as the evaluator, plans scored by a critic prompt.</p>
+<h3>War Story</h3>
+<p>In the Tree of Thoughts paper (Yao et al., 2023), GPT-4 with chain-of-thought solved only 4% of Game of 24 puzzles; with ToT it solved 74%. Same model, same weights — the entire gain came from search structure around the model.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is the evaluator more important than the proposer in ToT?</li><li>When is ToT a waste of money?</li><li>What real-world signal (not an LLM score) could evaluate a code-generation thought?</li></ol>
+<h2 id="lesson-04"><span class="lnum">04</span> Search Over Reasoning: Beams and MCTS-lite</h2>
+<p><b>MOTTO:</b> Don't argue with the model — outvote it.</p>
+<h3>The Problem</h3>
+<p>ToT with naive BFS explodes: branching factor 3, depth 5 is 243 states, each costing LLM calls. You need principled ways to spend a fixed budget on the most promising branches.</p>
+<h3>The Concept</h3>
+<p>Two classic algorithms, downsized for LLMs:</p>
+<ul><li><b>Beam search</b>: at each depth keep only the top-b candidates by score. Predictable cost: <code>b × k</code> calls per depth.</li><li><b>MCTS-lite</b>: repeat select → expand → rollout (cheap simulation or quick score) → backpropagate value up the tree. Spends budget adaptively where value estimates are high or uncertain.</li></ul>
+<pre><code>Beam (b=2):   ████ ████ ▁▁▁▁ ▁▁▁▁     keep best 2, prune rest
+MCTS:         visits pile up on branches that keep paying off</code></pre>
+<p>And the simplest search of all — <b>self-consistency</b>: sample N full answers, majority-vote the result. No tree, embarrassingly parallel, surprisingly strong.</p>
+<h3>Build It</h3>
+<ul><li>Start with self-consistency (N samples + vote). Measure the gain.</li><li>Upgrade to beam search only if intermediate steps are scoreable.</li><li>Reach for MCTS-lite only when you have a cheap rollout signal (tests pass, parser accepts, constraint satisfied).</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Technique</th><th>Cost profile</th><th>Needs</th></tr></thead><tbody><tr><td>Self-consistency</td><td>N× one query</td><td>Votable final answer</td></tr><tr><td>Beam</td><td>b×k× per depth</td><td>Step-level scores</td></tr><tr><td>MCTS-lite</td><td>Adaptive</td><td>Cheap rollout/verifier</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>AlphaGo's 2016 win over Lee Sedol ran MCTS guided by neural value and policy networks — move 37 in game 2, a move human pros initially called a mistake, came out of that search. Earlier, self-consistency (Wang et al., 2022) showed that just sampling multiple chains of thought and voting gave large accuracy jumps on GSM8K. Search around the model is an old, repeatedly winning trick.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is self-consistency the right first experiment before building any tree?</li><li>What property must intermediate states have for beam search to work?</li><li>In MCTS-lite for code generation, what plays the role of the "rollout"?</li></ol>
+<h2 id="lesson-05"><span class="lnum">05</span> Replanning: When Step 3 Destroys the Plan</h2>
+<p><b>MOTTO:</b> The plan is a hypothesis. Reality is the reviewer.</p>
+<h3>The Problem</h3>
+<p>Plans age badly. Step 3 reveals the API is deprecated, the file doesn't exist, the user actually meant something else. An agent that keeps executing a dead plan produces confident garbage; one that replans from scratch on every hiccup never finishes.</p>
+<h3>The Concept</h3>
+<p>Replanning is a controlled feedback edge, not a panic button:</p>
+<pre><code>plan → execute step → observe
+              │
+        result matches done_when? ──yes──▶ next step
+              │no
+        retry (≤2) → still failing?
+              │yes
+        REPLAN(goal, completed_steps, failure_context)</code></pre>
+<p>Key detail: the replanner receives what <i>already succeeded</i> so it doesn't redo work, plus the failure evidence so it doesn't repeat the mistake.</p>
+<h3>Build It</h3>
+<ul><li>Track plan state: <code>pending / running / done / failed</code> per step.</li><li>Cap retries per step and replans per task (2 and 3 are sane defaults).</li><li>On replan, prompt with: original goal, completed steps + results, failed step, error text. Ask for a <i>revised remainder</i>, not a whole new plan.</li></ul>
+<h3>Use It</h3>
+<p>Every serious agent framework has this edge: LangGraph conditional edges back to a planner node, Claude Code revising its todo list mid-task after a failed command, CI-fixing agents that re-diagnose after a red build.</p>
+<h3>War Story</h3>
+<p>AutoGPT, the March 2023 phenomenon that rocketed to over 100k GitHub stars in weeks, became equally famous for looping — re-attempting failed steps and re-generating near-identical plans until users killed the process or the API bill did. Its core missing piece was exactly this: replan caps and failure context, not more autonomy.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why should the replanner receive completed steps rather than starting fresh?</li><li>What's the difference between a retry and a replan, mechanically?</li><li>How do replan caps prevent the AutoGPT loop failure mode?</li></ol>
+<h2 id="lesson-06"><span class="lnum">06</span> Hierarchical Planning: Managers and Workers</h2>
+<p><b>MOTTO:</b> The CEO doesn't write the SQL.</p>
+<h3>The Problem</h3>
+<p>One agent holding the whole task in context means one context window holding everything: the grand strategy, the current file diff, the API docs, the error logs. Quality degrades as the window fills with details irrelevant to the current step.</p>
+<h3>The Concept</h3>
+<p>Split by altitude. A <b>manager</b> agent owns the goal and the plan; <b>worker</b> agents each get one subtask, a clean context, and only the inputs they need. Workers return results, not transcripts.</p>
+<pre><code>        [Manager: goal, plan, results summary]
+          │            │             │
+     [Worker A]   [Worker B]    [Worker C]
+     fresh ctx    fresh ctx     fresh ctx
+     one subtask  one subtask   one subtask</code></pre>
+<p>This is HTN (hierarchical task network) planning from classical AI, reborn with LLMs in every role.</p>
+<h3>Build It</h3>
+<ul><li>Manager prompt: decompose, dispatch, integrate. It never touches tools directly.</li><li>Worker prompt: one subtask + <code>done_when</code> + relevant context only.</li><li>Contract: workers return a structured result <code>{status, output, notes}</code> — the manager sees a paragraph, not 50 tool calls.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>System</th><th>Hierarchy</th></tr></thead><tbody><tr><td>Claude Code subagents</td><td>Main agent dispatches Task agents with fresh context</td></tr><tr><td>MetaGPT</td><td>Software-company roles: PM → architect → engineer</td></tr><tr><td>LangGraph</td><td>Supervisor pattern with worker nodes</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>MetaGPT (Hong et al., 2023) assigned LLM agents fixed company roles — product manager, architect, engineer — passing structured documents between them instead of raw chat, and outperformed flat multi-agent chat on code-generation benchmarks. The structure, not extra model capability, delivered the gain.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why do workers get <i>fresh</i> context instead of a copy of the manager's?</li><li>What belongs in the worker→manager return contract?</li><li>When does hierarchy add latency without adding quality?</li></ol>
+<h2 id="lesson-07"><span class="lnum">07</span> Verification Loops: Check Before You Claim</h2>
+<p><b>MOTTO:</b> "It should work now" is not a test result.</p>
+<h3>The Problem</h3>
+<p>LLMs are fluent about success. An agent that writes code, doesn't run it, and reports "done!" is optimizing for your approval, not your outcome. Unverified claims compound: step 5 builds on step 3's imaginary success.</p>
+<h3>The Concept</h3>
+<p>Insert a verifier between "did the thing" and "claim the thing":</p>
+<pre><code>generate → VERIFY → pass? → claim done
+              │ fail
+              ▼
+        feed error back → regenerate (≤K)</code></pre>
+<p>Verifiers come in a hierarchy of trustworthiness: hard checks (tests, compilers, schema validators) &gt; soft checks (LLM critic with a rubric) &gt; vibes (none). Always prefer the hardest verifier available — generation is creative, verification should be boring.</p>
+<h3>Build It</h3>
+<ul><li>After every claimed step completion, run its <code>done_when</code> check <i>mechanically</i> where possible: run the test, hit the endpoint, stat the file.</li><li>For unverifiable-by-machine steps, use a separate critic call with a rubric — a fresh context critic, not the same conversation grading its own homework.</li><li>Log verify results; they're your replan triggers.</li></ul>
+<h3>Use It</h3>
+<p>Coding agents live on this loop: generate patch → run test suite → feed failures back. Claude Code runs commands and reads their output; SWE-bench-style agents are scored <i>only</i> on whether tests pass, which is verification as ground truth.</p>
+<h3>War Story</h3>
+<p>OpenAI's "Let's Verify Step by Step" (Lightman et al., 2023) trained a process reward model that checked each reasoning step rather than just the final answer, and found process supervision significantly outperformed outcome supervision on MATH problems. Checking steps beats trusting conclusions — even for the model's own reasoning.</p>
+<h3>Checkpoint</h3>
+<ol><li>Rank: unit test, LLM critic, "looks right" — and justify the ordering.</li><li>Why should an LLM critic get a fresh context instead of the working transcript?</li><li>What goes wrong when the same prompt both generates and verifies?</li></ol>
+<h2 id="lesson-08"><span class="lnum">08</span> Reasoning Models: o-series, R1, and Extended Thinking</h2>
+<p><b>MOTTO:</b> Some models now do the scratchpad for you. Know when to let them.</p>
+<h3>The Problem</h3>
+<p>Everything so far — ToT, search, verification — is scaffolding <i>you</i> build around a model. Reasoning models internalize much of it: they emit long private chains of thought, explore, backtrack, and self-correct before answering. Your scaffolding decisions change when the model plans natively.</p>
+<h3>The Concept</h3>
+<p>Three flavors of the same idea:</p>
+<ul><li><b>OpenAI o-series</b> (o1, Sept 2024): RL-trained to produce long hidden reasoning tokens before the visible answer.</li><li><b>DeepSeek-R1</b> (Jan 2025): open-weights reasoning model whose training showed reasoning behaviors (self-checking, backtracking) <i>emerging</i> from RL on verifiable problems; thinking exposed in <code>&lt;think&gt;</code> tags.</li><li><b>Anthropic extended thinking</b> (Claude 3.7 Sonnet, Feb 2025): one model with a dial — a token budget for visible thinking, from zero to thousands.</li></ul>
+<p>Rule of thumb: reasoning models replace <i>within-step</i> scaffolding (ToT for one hard step) but not <i>across-step</i> orchestration (plans, tools, verification against reality).</p>
+<h3>Build It</h3>
+<ul><li>Route: hard, self-contained problems (math, tricky code, analysis) → reasoning model; simple tool dispatch → fast model.</li><li>Don't pile chain-of-thought prompts on a reasoning model — "think step by step" is redundant and can hurt.</li><li>Still verify externally: internal reasoning checks logic, not reality.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Model family</th><th>Thinking control</th></tr></thead><tbody><tr><td>OpenAI o-series / GPT-5</td><td><code>reasoning_effort</code> parameter</td></tr><tr><td>Claude</td><td>Extended thinking with token budget</td></tr><tr><td>DeepSeek-R1</td><td>Open weights; think tags in output</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>DeepSeek-R1's January 2025 release — open weights, MIT license, benchmark scores near o1 at a fraction of the claimed training cost — triggered a market panic that wiped roughly $600B off Nvidia's market cap in a single day, the largest one-day value loss for any US company at the time. Reasoning stopped being a proprietary moat that week.</p>
+<h3>Checkpoint</h3>
+<ol><li>What scaffolding does a reasoning model make redundant, and what does it not?</li><li>Why can "think step by step" hurt an o-series model?</li><li>Why must you still run external verification even with a reasoning model?</li></ol>
+<h2 id="lesson-09"><span class="lnum">09</span> Inference-Time Compute: Pay More, Think Harder</h2>
+<p><b>MOTTO:</b> Intelligence is now a slider with a price tag.</p>
+<h3>The Problem</h3>
+<p>For years, the only way to a better answer was a bigger model. But you can't retrain per query — and some queries are worth $0.001 of thought while others are worth $10. You need a knob at inference time, not training time.</p>
+<h3>The Concept</h3>
+<p>Inference-time (test-time) compute: spend more tokens/samples/search on a single query to get a better answer.</p>
+<pre><code>accuracy
+   ▲          ___----
+   │      _--
+   │    /
+   │   /
+   └──────────────▶ log(inference compute)</code></pre>
+<p>The mechanisms are everything from this phase: longer thinking budgets, self-consistency sampling, best-of-N with a verifier, tree search. The curve is roughly log-linear — each doubling of compute buys a fixed accuracy bump, until it doesn't.</p>
+<h3>Build It</h3>
+<ul><li>Define per-task compute tiers: cheap (1 sample, no thinking), standard (thinking on), expensive (best-of-N + verifier).</li><li>Route by stakes and by measured difficulty (e.g., escalate on verifier failure — retry the failed query at the next tier).</li><li>Track cost-per-solved-task, not cost-per-call. An expensive call that avoids three retries is cheap.</li></ul>
+<h3>Use It</h3>
+<p><code>reasoning_effort</code> (OpenAI), thinking budgets (Anthropic, Gemini), and best-of-N with reranking are all this knob wearing different clothes. Escalation routing — cheap model first, expensive on failure — is the production version.</p>
+<h3>War Story</h3>
+<p>In December 2024, OpenAI's o3 scored 87.5% on the ARC-AGI semi-private eval in high-compute mode — a benchmark designed to resist LLMs — but reported compute costs ran to thousands of dollars per task at that setting. The o1 announcement (Sept 2024) had already published log-scale plots of accuracy climbing with test-time compute. The capability is real; so is the invoice.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is cost-per-solved-task the right metric rather than cost-per-call?</li><li>What does the log-linear compute/accuracy curve imply about diminishing returns?</li><li>Design an escalation policy for a code-fixing agent with three compute tiers.</li></ol>
+<h2 id="lesson-10"><span class="lnum">10</span> Task Lists and Progress Tracking (Todo-Driven Agents)</h2>
+<p><b>MOTTO:</b> The humble checkbox is a state machine you can read.</p>
+<h3>The Problem</h3>
+<p>Long tasks drift. Forty tool calls in, the context is a swamp of logs and the model half-remembers what it was doing. Users, meanwhile, stare at a spinner with no idea whether the agent is on step 2 or step 9 — or looping.</p>
+<h3>The Concept</h3>
+<p>Make the plan a <i>live artifact</i>: a todo list the agent writes, updates, and re-reads. It serves three masters at once — the model (re-anchors attention on the goal every turn), the user (visible progress), and the system (machine-checkable state for resumption and timeouts).</p>
+<pre><code>[x] 1. Locate failing test          done
+[x] 2. Reproduce locally            done
+[~] 3. Patch off-by-one in parser   in_progress
+[ ] 4. Run full suite               pending
+[ ] 5. Update changelog             pending</code></pre>
+<h3>Build It</h3>
+<ul><li>Give the agent two tools: <code>todo_write(items)</code> and <code>todo_update(id, status)</code>.</li><li>Inject the current list into every turn's context — this is the anti-drift mechanism.</li><li>Enforce invariants in code, not prompts: exactly one <code>in_progress</code> item; can't mark done without a verify result (lesson 07).</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Todo mechanism</th></tr></thead><tbody><tr><td>Claude Code</td><td>Built-in todo list, visible in the UI</td></tr><tr><td>BabyAGI lineage</td><td>Task queue: create, prioritize, execute</td></tr><tr><td>LangGraph</td><td>Plan held in typed graph state</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>BabyAGI (Yohei Nakajima, April 2023) was little more than a task list and three loops — create tasks, prioritize tasks, execute tasks — yet it became one of the defining agent demos of 2023 and shaped a generation of frameworks. Two years later, Claude Code shipped todo tracking as a core built-in tool, not an add-on. The checkbox won.</p>
+<h3>Checkpoint</h3>
+<ol><li>What three audiences does a live todo list serve simultaneously?</li><li>Why enforce "one in_progress item" in code rather than in the prompt?</li><li>How does re-injecting the todo list each turn fight context drift?</li></ol>
+<h2 id="lesson-11"><span class="lnum">11</span> Long-Horizon Coherence: Not Losing the Plot</h2>
+<p><b>MOTTO:</b> Any agent can start strong. Shipping is a 400-turn problem.</p>
+<h3>The Problem</h3>
+<p>Over hundreds of turns, agents forget constraints stated at turn 3, redo finished work, contradict earlier decisions, and mistake activity for progress. Context windows fill; summaries lose the one detail that mattered; the goal quietly mutates.</p>
+<h3>The Concept</h3>
+<p>Coherence is engineered, not prompted. The toolkit:</p>
+<pre><code>┌─ Goal card ──────────────┐  restated verbatim every turn
+├─ Todo list ──────────────┤  live plan state (lesson 10)
+├─ Decision log ───────────┤  &quot;chose X over Y because Z&quot; — append-only
+├─ Compaction ─────────────┤  summarize old turns, PRESERVE decisions
+└─ Milestone checkpoints ──┤  verify against original goal, not last summary</code></pre>
+<p>The decision log is the underrated one: most incoherence is silently <i>re-litigating</i> settled decisions after compaction erased the reasoning.</p>
+<h3>Build It</h3>
+<ul><li>Pin an immutable goal statement outside the compactable region.</li><li>On compaction, summarize observations aggressively but carry decisions and constraints verbatim.</li><li>Every N steps, run a drift check: "Given the original goal, is the current activity on the critical path?" — with the <i>original</i> goal text, not the summary.</li></ul>
+<h3>Use It</h3>
+<p>Claude Code compacts long sessions while preserving key state; long-running research and coding agents checkpoint to files (<code>NOTES.md</code>, plan files) precisely so that coherence survives context resets and process restarts.</p>
+<h3>War Story</h3>
+<p>Anthropic's "Claude Plays Pokémon" experiment (streamed on Twitch, Feb 2025) showed Claude 3.7 making real progress but also spending long stretches stuck — wandering areas and revisiting failed approaches as context about past attempts decayed. METR's March 2025 study framed the field's trajectory: the length of tasks agents can complete has been doubling roughly every seven months. Horizon <i>is</i> the frontier.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why should drift checks compare against the original goal instead of the latest summary?</li><li>What information must survive compaction verbatim, and why?</li><li>How does a decision log prevent re-litigating settled choices?</li></ol>
+<h2 id="lesson-12"><span class="lnum">12</span> Build a Planning Agent From Scratch</h2>
+<p><b>MOTTO:</b> If you can't build the loop in 100 lines, you don't understand the loop.</p>
+<h3>The Problem</h3>
+<p>Frameworks hide the plan-execute-replan loop behind abstractions. Time to prove there's no magic: a planner, an executor, a verifier, and a replan edge — in plain Python with a mock LLM you can swap for a real one later.</p>
+<h3>The Concept</h3>
+<p>The full Phase 6 pipeline in one loop: decompose (01), execute steps (02), verify (07), retry-then-replan (05), track progress (10).</p>
+<h3>Build It</h3>
+<pre><code>import json
+
+def mock_llm(prompt: str) -&gt; str:
+    &quot;&quot;&quot;Swap for a real API call. Returns JSON plans/results.&quot;&quot;&quot;
+    if &quot;PLAN&quot; in prompt:
+        return json.dumps([
+            {&quot;id&quot;: 1, &quot;action&quot;: &quot;fetch_data&quot;, &quot;done_when&quot;: &quot;rows &gt; 0&quot;},
+            {&quot;id&quot;: 2, &quot;action&quot;: &quot;summarize&quot;, &quot;done_when&quot;: &quot;summary non-empty&quot;},
+        ])
+    return json.dumps({&quot;output&quot;: &quot;42 rows&quot;, &quot;ok&quot;: True})
+
+def plan(goal, context=&quot;&quot;):
+    return json.loads(mock_llm(f&quot;PLAN steps for: {goal}\n{context}&quot;))
+
+def execute(step):
+    return json.loads(mock_llm(f&quot;EXECUTE: {step[&#x27;action&#x27;]}&quot;))
+
+def verify(step, result):
+    return result.get(&quot;ok&quot;, False)  # real: run tests, check schema, etc.
+
+def run(goal, max_replans=2):
+    steps, done = plan(goal), []
+    replans = 0
+    while steps:
+        step = steps.pop(0)
+        for attempt in range(2):                     # retry cap
+            result = execute(step)
+            if verify(step, result):
+                done.append((step, result)); break
+        else:                                        # both attempts failed
+            if replans &gt;= max_replans:
+                return {&quot;status&quot;: &quot;failed&quot;, &quot;done&quot;: done, &quot;stuck_on&quot;: step}
+            replans += 1
+            ctx = f&quot;Completed: {done}\nFailed: {step} — replan the remainder.&quot;
+            steps = plan(goal, ctx)                  # revised remainder
+    return {&quot;status&quot;: &quot;success&quot;, &quot;done&quot;: done}
+
+print(run(&quot;Ship the weekly report&quot;))</code></pre>
+<p>Exercises: (a) make <code>mock_llm</code> fail step 2 once and watch the retry; (b) make it fail persistently and watch the replan; (c) add a todo-list printout each iteration; (d) swap in a real LLM client.</p>
+<h3>Use It</h3>
+<p>This skeleton <i>is</i> LangGraph's plan-and-execute template, CrewAI's task loop, and Claude Code's todo-driven flow, minus the ergonomics. Now when a framework misbehaves, you know which of these five moving parts to blame.</p>
+<h3>War Story</h3>
+<p>BabyAGI's original April 2023 script was a couple hundred lines of Python doing essentially this loop, and it captivated the industry. The moat was never the loop — it's the verifiers, the prompts, and the judgment about when to replan.</p>
+<h3>Checkpoint</h3>
+<ol><li>Trace the code path when a step fails twice and a replan is available.</li><li>Why does the replan prompt include completed steps?</li><li>What would you change to make <code>verify</code> trustworthy for a code-writing agent?</li></ol>
+  </article>
+  <div class="pager">
+    <a href="05-rag-for-agents.html">← 🔍 Phase 05</a>
+    <span class="spacer"></span>
+    <a href="07-structured-control.html">Phase 07 🧩 →</a>
+  </div>
+</div>
+</body>
+</html>

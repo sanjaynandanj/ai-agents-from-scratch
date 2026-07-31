@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG for Agents — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 05</div>
+  <h1><span class="pnum">05</span> 🔍 RAG for Agents</h1>
+  <div class="tagline">The model knows nothing about your data. Fix that at query time.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Why RAG: grounding beats fine-tuning for facts</a>
+<a href="#lesson-02"><span class="lnum">02</span>Chunking strategies: size, overlap, structure</a>
+<a href="#lesson-03"><span class="lnum">03</span>Embeddings: meaning as geometry</a>
+<a href="#lesson-04"><span class="lnum">04</span>Vector databases and ANN search</a>
+<a href="#lesson-05"><span class="lnum">05</span>Hybrid search: dense + sparse (BM25)</a>
+<a href="#lesson-06"><span class="lnum">06</span>Reranking: the second-stage filter</a>
+<a href="#lesson-07"><span class="lnum">07</span>Query rewriting and decomposition</a>
+<a href="#lesson-08"><span class="lnum">08</span>Agentic RAG: retrieval as a tool decision</a>
+<a href="#lesson-09"><span class="lnum">09</span>GraphRAG and structured knowledge</a>
+<a href="#lesson-10"><span class="lnum">10</span>Citations and faithfulness</a>
+<a href="#lesson-11"><span class="lnum">11</span>RAG evaluation: retrieval and generation metrics</a>
+<a href="#lesson-12"><span class="lnum">12</span>Build a RAG pipeline from scratch</a>
+  </div>
+  <article>
+<blockquote>The model knows nothing about your data. Fix that at query time.</blockquote>
+<p>Your model was trained on the public internet as of some cutoff date — not on your wiki, your codebase, your contracts, or anything from last Tuesday. Retrieval-Augmented Generation fixes this at query time: find the relevant documents, paste them into the context, and let the model answer <i>from</i> them instead of from its weights. This phase builds the whole pipeline — chunking, embeddings, indexes, hybrid search, reranking, query rewriting — and then hands the retrieval decision to the agent itself, because for agents, RAG isn't a pipeline bolted on front; it's a tool the agent wields.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> Why RAG: Grounding Beats Fine-Tuning for Facts</h2>
+<p><b>MOTTO:</b> Don't teach the model your facts — hand it the page and make it read.</p>
+<h3>The Problem</h3>
+<p>"What's our parental leave policy?" The model wasn't trained on your HR docs, so it does what LLMs do with missing knowledge: generates something <i>plausible</i>. Fluent, structured, wrong. Your options seem to be fine-tuning (slow, expensive, stale the day after training, and notoriously unreliable at implanting specific facts) or... pasting the entire handbook into every prompt (doesn't fit, costs a fortune).</p>
+<h3>The Concept</h3>
+<p>Split knowledge from reasoning. Keep facts in an external, updatable store; use the model for what it's actually good at — reading and synthesizing:</p>
+<pre><code>  query ──► RETRIEVER ──► top-k relevant chunks ──► ┌─────────────────────┐
+              │                                     │ &quot;Answer using ONLY  │
+        document index                              │  these excerpts:&quot;   │──► grounded answer
+        (update anytime,                            │  [chunk][chunk][ck] │
+         no retraining)                             └─────────────────────┘</code></pre>
+<p>The open-book exam analogy: fine-tuning is cramming for a closed-book test (lossy, forgets specifics); RAG is an open-book exam (look it up, cite the page). Facts update by editing documents. Answers become auditable — you can check the source. And knowledge can be per-user permissioned, which weights never can.</p>
+<h3>Build It</h3>
+<ol><li>Index your documents (lessons 02–05 cover how).</li><li>At query time, retrieve top-k relevant chunks.</li><li>Construct the prompt: instruction ("answer only from the excerpts; say 'not found' if absent") + chunks with source labels + question.</li><li>Generate. The model's job shrinks from "know everything" to "read carefully."</li></ol>
+<pre><code>def rag_answer(question, index, llm, k=4):
+    chunks = index.retrieve(question, k)
+    context = &quot;\n\n&quot;.join(f&quot;[{c.source}]\n{c.text}&quot; for c in chunks)
+    return llm(f&quot;Answer using ONLY the excerpts below. If the answer isn&#x27;t &quot;
+               f&quot;in them, say so.\n\n{context}\n\nQuestion: {question}&quot;)</code></pre>
+<h3>Use It</h3>
+<table><thead><tr><th>Need</th><th>Right tool</th></tr></thead><tbody><tr><td>Current/private/changing facts</td><td>RAG</td></tr><tr><td>Style, format, domain jargon fluency</td><td>Fine-tuning</td></tr><tr><td>Behavior + your facts</td><td>Fine-tune style, RAG the facts</td></tr><tr><td>Small stable corpus, big context window</td><td>Sometimes: just paste it all (long-context beats bad retrieval)</td></tr></tbody></table>
+<p>Long-context models shrink RAG's territory but don't eliminate it: cost scales with tokens, corpora scale past any window, and retrieval gives you provenance.</p>
+<h3>War Story</h3>
+<p>The term comes from Lewis et al., "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks" (Facebook AI Research, 2020), which married a dense retriever to a seq2seq generator and beat parametric-only baselines on open-domain QA — while letting the knowledge base be swapped without retraining. The acronym outgrew the paper: by 2023 "RAG" meant the entire retrieve-then-generate pattern that most enterprise LLM deployments still run on.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is fine-tuning a poor mechanism for injecting specific, changing facts?</li><li>What does RAG give you for auditability that a fine-tuned model cannot?</li><li>When would "paste the whole corpus into context" legitimately beat RAG?</li></ol>
+<h2 id="lesson-02"><span class="lnum">02</span> Chunking Strategies: Size, Overlap, Structure</h2>
+<p><b>MOTTO:</b> Retrieval can only find what chunking didn't destroy.</p>
+<h3>The Problem</h3>
+<p>You can't embed a 200-page PDF as one vector (everything averages into mush), and you can't retrieve it as one chunk (blows the context budget). So you split. Split carelessly — every 1,000 characters — and you cut sentences mid-thought, orphan a table from its header, and separate "the penalty is" from "5% per month." The retriever then faithfully returns fragments that are individually meaningless. Garbage chunks in, garbage answers out.</p>
+<h3>The Concept</h3>
+<p>A chunk is the atomic unit of retrieval — it must be <i>self-contained enough to be understood alone</i> and <i>small enough to be about one thing</i>:</p>
+<pre><code>  too small: &quot;…is 5% per month.&quot;      ← retrievable, incomprehensible
+  too big:   [entire 40-page section]  ← comprehensible, dilute vector, budget-hog
+  right:     one clause/section/function, with its heading attached
+
+  overlap:   [ chunk 1 ······|■■■ ]
+                         [ ■■■|······ chunk 2 ]   ← shared margin so boundary
+                                                     sentences live in both</code></pre>
+<p>Structure beats arithmetic: split at natural seams — headings, paragraphs, functions, table boundaries — and only fall back to fixed sizes inside oversized sections. Recursive splitting formalizes this: try <code>\n\n## </code>, then <code>\n\n</code>, then <code>\n</code>, then sentence, then hard cut.</p>
+<h3>Build It</h3>
+<ol><li>Parse structure first (markdown headers, HTML tags, code AST if you have it).</li><li>Recursively split: if a unit fits the budget (say 200–500 tokens), keep it; else split by the next-finer separator.</li><li>Add overlap (10–20%) between adjacent fixed-size chunks.</li><li>Prepend context headers to every chunk — the file name and heading path — so a chunk carries its own provenance.</li></ol>
+<pre><code>def recursive_split(text, budget=400, seps=(&quot;\n\n&quot;, &quot;\n&quot;, &quot;. &quot;)):
+    if tokens(text) &lt;= budget or not seps:
+        return [text]
+    parts, out, cur = text.split(seps[0]), [], &quot;&quot;
+    for p in parts:
+        if tokens(cur + p) &gt; budget:
+            if cur: out.extend(recursive_split(cur, budget, seps[1:]) if tokens(cur) &gt; budget else [cur])
+            cur = p
+        else:
+            cur += (seps[0] if cur else &quot;&quot;) + p
+    if cur: out.append(cur)
+    return out
+
+def chunk_doc(doc):
+    return [{&quot;text&quot;: f&quot;[{doc.title} › {sec.heading}]\n{c}&quot;, &quot;source&quot;: doc.path}
+            for sec in doc.sections for c in recursive_split(sec.text)]</code></pre>
+<h3>Use It</h3>
+<table><thead><tr><th>Strategy</th><th>Best for</th><th>Cost</th></tr></thead><tbody><tr><td>Fixed size + overlap</td><td>Unstructured blobs</td><td>Boundary damage</td></tr><tr><td>Recursive / structural</td><td>Docs, markdown, code</td><td>Parsing effort</td></tr><tr><td>Semantic chunking (split at embedding-shift points)</td><td>Topic-drifting prose</td><td>Embedding calls at index time</td></tr><tr><td>Contextual enrichment (LLM-written chunk preamble)</td><td>High-stakes corpora</td><td>LLM call per chunk</td></tr></tbody></table>
+<p>Anthropic's Contextual Retrieval write-up (2024) reported large retrieval-failure reductions from prepending LLM-generated context to each chunk before embedding — the "chunks must stand alone" principle, automated.</p>
+<h3>War Story</h3>
+<p>Anthropic's "Contextual Retrieval" engineering post (September 2024) quantified the orphaned-chunk problem: a chunk saying "the company's revenue grew 3%" is unfindable when the query names the company, because the chunk doesn't. Prepending a short LLM-generated context blurb to each chunk before embedding and indexing cut retrieval failure rates dramatically in their published benchmarks — chunking, not the embedding model, was the bottleneck.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does an over-large chunk hurt retrieval even though it contains the answer?</li><li>What problem does overlap solve, and what does it cost?</li><li>Why does prepending the heading path to each chunk improve <i>retrieval</i>, not just readability?</li></ol>
+<h2 id="lesson-03"><span class="lnum">03</span> Embeddings: Meaning as Geometry</h2>
+<p><b>MOTTO:</b> An embedding model is a cartographer that maps every sentence onto the same globe — nearby means alike.</p>
+<h3>The Problem</h3>
+<p>"How do I get my money back?" needs to match a document titled "Refund Policy." Zero shared words. Keyword search is blind here; you need a representation where <i>reimbursement</i>, <i>refund</i>, and <i>money back</i> land near each other — where similarity of meaning is computable.</p>
+<h3>The Concept</h3>
+<p>An embedding model maps text to a fixed-length vector (typically 384–3072 floats) such that semantically similar texts get geometrically close vectors. Similarity becomes arithmetic:</p>
+<pre><code>   &quot;refund my purchase&quot;  ●●  &quot;get my money back&quot;        cos ≈ 0.86
+                                                        
+   &quot;refund my purchase&quot;  ●
+                              …far away…
+                         ● &quot;install the GPU driver&quot;     cos ≈ 0.07
+
+   cos(a, b) = (a · b) / (|a||b|)   ← angle between meanings</code></pre>
+<p>These models are trained contrastively: pull paired texts (question/answer, sentence/paraphrase) together, push unrelated ones apart, over billions of pairs. Cosine similarity is standard; most APIs return unit-normalized vectors, making cosine just a dot product. Caveats that bite in practice: embeddings blur negation ("include tax" ≈ "exclude tax"), mangle rare exact identifiers (<code>ERR_QX_314</code>), and each model has its own incompatible space — never mix vectors from two models in one index.</p>
+<h3>Build It</h3>
+<ol><li>Embed every chunk at index time; store <code>(vector, text, source)</code>.</li><li>Embed the query at search time <i>with the same model</i> (some models want a query/document prefix — respect it).</li><li>Score by dot product, return top-k.</li></ol>
+<pre><code>import numpy as np
+
+class DenseIndex:
+    def __init__(self, embed):
+        self.embed, self.vecs, self.meta = embed, [], []
+    def add(self, chunks):
+        for c in chunks:
+            v = np.array(self.embed(c[&quot;text&quot;]))
+            self.vecs.append(v / np.linalg.norm(v)); self.meta.append(c)
+    def search(self, query, k=5):
+        q = np.array(self.embed(query)); q /= np.linalg.norm(q)
+        sims = np.stack(self.vecs) @ q                 # cosine via dot product
+        top = np.argsort(-sims)[:k]
+        return [(float(sims[i]), self.meta[i]) for i in top]</code></pre>
+<p>Brute force over a matrix is exact and fast into the hundreds of thousands of vectors — don't reach for an ANN index before you need one (lesson 04).</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Model class</th><th>Examples</th><th>Tradeoff</th></tr></thead><tbody><tr><td>API embeddings</td><td>OpenAI text-embedding-3, Voyage, Cohere</td><td>Quality + zero ops; per-token cost, data leaves house</td></tr><tr><td>Open local</td><td>BGE, GTE, E5, sentence-transformers</td><td>Free, private; you host it</td></tr><tr><td>Small/fast</td><td>MiniLM (384-dim)</td><td>Speed; noticeably weaker recall</td></tr><tr><td>Benchmark</td><td>MTEB leaderboard</td><td>Rankings shift; test on <i>your</i> data</td></tr></tbody></table>
+<p>Dimensions trade storage/speed against fidelity; Matryoshka-trained models let you truncate vectors and keep most quality.</p>
+<h3>War Story</h3>
+<p>Word2vec (Mikolov et al., 2013) proved meaning could live in vector arithmetic — <i>king − man + woman ≈ queen</i> — but word vectors couldn't handle sentences. Sentence-BERT (Reimers &amp; Gurevych, 2019) fixed that with siamese fine-tuning, cutting sentence-similarity search from BERT's pairwise hours to milliseconds of vector comparison, and effectively founding the modern embedding-model lineage every RAG system depends on.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why must the query and the documents be embedded by the same model?</li><li>Give two query types where embeddings systematically underperform keyword search.</li><li>Why is cosine similarity equivalent to a dot product for normalized vectors?</li></ol>
+<h2 id="lesson-04"><span class="lnum">04</span> Vector Databases and ANN Search</h2>
+<p><b>MOTTO:</b> Exact nearest-neighbor search scales linearly; your patience doesn't.</p>
+<h3>The Problem</h3>
+<p>Brute-force search compares the query to every vector: fine at 100k, painful at 10 million, impossible at 50 QPS on a billion. And high-dimensional space is cruel — there's no equivalent of a B-tree for 1024 dimensions (the "curse of dimensionality" defeats classic spatial indexes). You need approximate search: trade a sliver of recall for orders of magnitude in speed.</p>
+<h3>The Concept</h3>
+<p>HNSW (Hierarchical Navigable Small World, Malkov &amp; Yashunin, 2016) — the workhorse ANN index — is a multi-level skip-list over a proximity graph. Think of navigating to an address: motorways first, then A-roads, then streets:</p>
+<pre><code>  Layer 2:  A ─────────────── F            few nodes, long hops (motorways)
+             \                 │
+  Layer 1:  A ──── C ──── E ─ F            more nodes, shorter hops
+             \     │      │    │
+  Layer 0:  A─B─C─D─E─F─G─H─…              every vector, local links (streets)
+
+  search: enter at top layer, greedily hop toward the query,
+          drop a layer, repeat → land in the right neighborhood in O(log N) hops</code></pre>
+<p>Each vector gets linked to ~M near neighbors per layer; upper layers sample exponentially fewer nodes. Greedy routing from the top finds the true neighborhood with high probability — "approximate" means occasionally missing a true neighbor, tunable via the search-width parameter (<code>ef</code>).</p>
+<h3>Build It</h3>
+<p>Build a navigable graph in miniature — one layer, greedy search, to feel the mechanism:</p>
+<ol><li>Insert: link each new vector to its M nearest existing nodes (found via the same greedy search).</li><li>Search: start anywhere, repeatedly move to the neighbor closest to the query; keep a best-so-far beam of size <code>ef</code>; stop when no neighbor improves.</li></ol>
+<pre><code>def greedy_search(graph, vecs, query, entry, ef=8):
+    import heapq
+    visited, best = {entry}, [(-sim(vecs[entry], query), entry)]
+    candidates = list(best)
+    while candidates:
+        d, node = heapq.heappop(candidates)
+        if -d &lt; -best[0][0] and len(best) &gt;= ef: break
+        for nb in graph[node]:
+            if nb not in visited:
+                visited.add(nb)
+                heapq.heappush(candidates, (-sim(vecs[nb], query), nb))
+                heapq.heappush(best, (-sim(vecs[nb], query), nb))
+                best = heapq.nsmallest(ef, best)
+    return sorted(best)</code></pre>
+<ol><li>Note the tradeoffs you now own: bigger <code>M</code>/<code>ef</code> → better recall, more memory, slower inserts. This is the dial every vector DB exposes.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Option</th><th>Sweet spot</th><th>Notes</th></tr></thead><tbody><tr><td>NumPy brute force</td><td>&lt; ~500k vectors</td><td>Exact; start here, seriously</td></tr><tr><td>FAISS / hnswlib</td><td>Library, in-process</td><td>You manage persistence</td></tr><tr><td>Chroma / LanceDB</td><td>Local dev, embedded DB</td><td>Batteries included</td></tr><tr><td>pgvector</td><td>Data already in Postgres</td><td>HNSW + SQL filters + joins</td></tr><tr><td>Qdrant / Weaviate / Milvus / Pinecone</td><td>Scale, filters, ops</td><td>Server (or SaaS) to run</td></tr></tbody></table>
+<p>Metadata filtering ("only docs where team=finance") is the feature that actually differentiates vector <i>databases</i> from vector <i>indexes</i> — and pre-filter vs post-filter semantics matter for recall.</p>
+<h3>War Story</h3>
+<p>The HNSW paper (Malkov &amp; Yashunin, 2016) came out of Novosibirsk well before the LLM boom, targeting classic nearest-neighbor workloads. When RAG exploded in 2023, HNSW was sitting there ready and became the default index in nearly every vector database — while a 2021 Google-era alternative (ScaNN) and IVF-PQ variants competed on the billion-scale end. A five-figure-citation reminder that infrastructure often predates its killer app.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why do B-tree-style exact indexes fail in 1024 dimensions?</li><li>In HNSW, what do the upper layers buy you, and what does raising <code>ef</code> trade?</li><li>When is brute-force exact search the <i>correct</i> engineering choice over ANN?</li></ol>
+<h2 id="lesson-05"><span class="lnum">05</span> Hybrid Search: Dense + Sparse (BM25)</h2>
+<p><b>MOTTO:</b> Embeddings know what you mean; BM25 knows what you typed. Ask both.</p>
+<h3>The Problem</h3>
+<p>A user searches for <code>error QX-1147 in load_batch()</code>. Dense retrieval returns chunks about error handling <i>in general</i> — semantically adjacent, useless. Exact tokens like error codes, function names, SKUs, and legal clause numbers are precisely what embeddings blur away. Meanwhile keyword search, which nails those, whiffs on "how do I get reimbursed" → "Refund Policy." Each retriever fails where the other shines.</p>
+<h3>The Concept</h3>
+<p>Run both, merge the rankings:</p>
+<pre><code>  query ──┬─► DENSE (embeddings) ──► ranked list A   (meaning)
+          └─► SPARSE (BM25)      ──► ranked list B   (exact terms)
+                          │
+                    RRF merge: score(d) = Σ 1/(60 + rank_i(d))
+                          │
+                          ▼
+                final ranking — strong in either list ⇒ strong overall</code></pre>
+<p>BM25 is the battle-tested keyword ranker (Robertson et al., born of the TREC era, default in Elasticsearch/Lucene): a term-frequency × inverse-document-frequency score with saturation (the 10th occurrence of a word adds little) and length normalization (long docs don't win by verbosity). Reciprocal Rank Fusion (RRF) merges the two lists using only <i>ranks</i>, sidestepping the fact that cosine scores and BM25 scores live on incomparable scales.</p>
+<h3>Build It</h3>
+<ol><li>BM25 score for doc D given query q: <code>Σ_t IDF(t) · tf(t,D)·(k1+1) / (tf(t,D) + k1·(1 − b + b·|D|/avgdl))</code>, with k1≈1.5, b≈0.75.</li><li>Build an inverted index: <code>term → [(doc_id, tf)]</code> — that's what makes sparse search fast.</li><li>Query both indexes, then RRF:</li></ol>
+<pre><code>def bm25_idf(term, N, df): return math.log((N - df + 0.5) / (df + 0.5) + 1)
+
+def rrf(rankings, k=60):
+    scores = {}
+    for ranking in rankings:                       # each: ordered list of doc_ids
+        for rank, doc in enumerate(ranking):
+            scores[doc] = scores.get(doc, 0) + 1 / (k + rank + 1)
+    return sorted(scores, key=scores.get, reverse=True)
+
+final = rrf([dense.search(q, 20), sparse.search(q, 20)])[:5]</code></pre>
+<ol><li><code>k=60</code> is the paper's constant and nobody's bothered to change it — it damps the difference between rank 1 and rank 3 so one retriever's overconfidence can't dominate.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Setup</th><th>Notes</th></tr></thead><tbody><tr><td>Elasticsearch/OpenSearch + kNN</td><td>BM25 native, dense bolted on; one system</td></tr><tr><td>Qdrant/Weaviate hybrid mode</td><td>Vector-first with sparse support built in</td></tr><tr><td>pgvector + Postgres FTS</td><td>Both in SQL; DIY fusion</td></tr><tr><td><code>rank_bm25</code> (Python) + your dense index</td><td>From-scratch friendly</td></tr><tr><td>Learned sparse (SPLADE)</td><td>Term expansion, sparse speed; needs its own model</td></tr></tbody></table>
+<p>Hybrid is the boring, reliable win: on mixed workloads it beats either retriever alone often enough that most production RAG defaults to it.</p>
+<h3>War Story</h3>
+<p>BM25 dates to the Okapi system and TREC-3 (Robertson et al., 1994) — it is old enough to have grandchildren. When the BEIR benchmark (Thakur et al., 2021) evaluated dense retrievers across 18 heterogeneous datasets, plain BM25 remained a brutally strong zero-shot baseline, beating many neural retrievers out of domain. Three decades on, the right answer is still "use both."</p>
+<h3>Checkpoint</h3>
+<ol><li>Which query characteristics predict dense failure, and which predict sparse failure?</li><li>Why does RRF merge on ranks instead of raw scores?</li><li>What do BM25's saturation and length-normalization terms each prevent?</li></ol>
+<h2 id="lesson-06"><span class="lnum">06</span> Reranking: The Second-Stage Filter</h2>
+<p><b>MOTTO:</b> Retrieve with a net, rerank with tweezers.</p>
+<h3>The Problem</h3>
+<p>Your top-20 from hybrid search contains the answer... at position 14. First-stage retrievers must be fast, so they compress every document into one vector (or a bag of terms) <i>before ever seeing the query</i> — a lossy summary scored blind. Send top-5 to the model and you miss the answer; send top-20 and you stuff the context with noise the model must wade through (and, per "lost in the middle," may ignore).</p>
+<h3>The Concept</h3>
+<p>A reranker is a slower, smarter judge applied only to the shortlist. The architectural difference is <i>when</i> the query meets the document:</p>
+<pre><code>  BI-ENCODER (stage 1)                    CROSS-ENCODER (stage 2)
+  doc ──► [encoder] ──► vec ┐             ┌──────────────────────────┐
+                            ├─ cos ──►    │ [query ⊕ doc] ──► score  │
+  qry ──► [encoder] ──► vec ┘             │ full attention between   │
+  fast: docs precomputed                  │ every query &amp; doc token  │
+  blind: doc encoded without query        └──────────────────────────┘
+                                          accurate, but O(1 forward pass
+                                          per candidate) — shortlist only
+
+  1M docs ──[stage 1: ms]──► top 50 ──[stage 2: ~100ms]──► top 5 ──► LLM</code></pre>
+<p>Recruiting analogy: stage 1 is keyword-screening a thousand résumés; stage 2 is actually interviewing the shortlist. You'd never interview everyone, and you'd never hire off a keyword screen.</p>
+<h3>Build It</h3>
+<ol><li>Over-retrieve: pull 3–10× more candidates than you'll keep (top 50 for a final 5).</li><li>Score each <code>(query, candidate)</code> pair with a cross-encoder — or, in a pinch, an LLM prompt: "Rate 0–10 how well this passage answers the question. Passage: … Question: … Score:".</li><li>Re-sort by reranker score; keep top-k; optionally drop candidates under an absolute floor (relevance, not just rank).</li></ol>
+<pre><code>def rerank(query, candidates, scorer, k=5, floor=0.3):
+    scored = [(scorer(query, c.text), c) for c in candidates]   # the expensive loop
+    scored.sort(key=lambda x: x[0], reverse=True)
+    return [c for s, c in scored[:k] if s &gt;= floor]</code></pre>
+<ol><li>Latency math: 50 candidates × ~2–5ms each on GPU (or one batched call) ≈ tens of ms — almost always worth it before a multi-second LLM generation.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Reranker</th><th>Tradeoff</th></tr></thead><tbody><tr><td>Cross-encoder (BGE-reranker, MiniLM CE)</td><td>Strong, self-hosted, GPU-happy</td></tr><tr><td>Cohere Rerank / Voyage rerank APIs</td><td>One HTTP call; per-query cost</td></tr><tr><td>LLM-as-reranker (listwise prompt)</td><td>No new model; slow, pricey, surprisingly good</td></tr><tr><td>ColBERT (late interaction)</td><td>Middle ground: token vectors precomputed, cheap MaxSim at query time</td></tr></tbody></table>
+<p>Diminishing returns warning: reranking can't rescue what stage 1 never retrieved. Fix recall first (better chunks, hybrid), then precision (rerank).</p>
+<h3>War Story</h3>
+<p>When the MS MARCO passage-ranking leaderboard era began (dataset released 2016, deep-learning track ~2018–2019), BERT cross-encoder rerankers (Nogueira &amp; Cho, 2019) delivered one of the largest single jumps in IR benchmark history over BM25-era baselines — establishing the retrieve-then-rerank pattern as standard. ColBERT (Khattab &amp; Zaharia, SIGIR 2020) then showed you could keep most of that accuracy at a fraction of the query cost via late interaction.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why can a cross-encoder outscore a bi-encoder on the same pair — what does it see that the bi-encoder can't?</li><li>Why is reranking applied to 50 candidates rather than the whole corpus?</li><li>Your reranked top-5 is still wrong. Why might the fix live in stage 1, not the reranker?</li></ol>
+<h2 id="lesson-07"><span class="lnum">07</span> Query Rewriting and Decomposition</h2>
+<p><b>MOTTO:</b> Users ask questions; retrievers need queries — someone has to translate.</p>
+<h3>The Problem</h3>
+<p>User: "that didn't work either, any other ideas?" Embed <i>that</i> and you retrieve chunks about things not working. The real query — "alternative fixes for CUDA out-of-memory during fine-tuning" — lives in the conversation history, not the message. Other queries are retrievable but <i>compound</i>: "Compare our 2023 and 2024 refund policies" needs two different retrievals; no single vector nails both.</p>
+<h3>The Concept</h3>
+<p>Insert a translation layer between the user and the retriever — an LLM that turns conversational, vague, or compound inputs into one or more sharp, standalone queries:</p>
+<pre><code>  &quot;that didn&#x27;t work either&quot;
+        │  REWRITE (+ history)
+        ▼
+  &quot;alternative fixes for CUDA OOM when fine-tuning&quot;      ← contextualized
+
+  &quot;compare 2023 vs 2024 refund policy&quot;
+        │  DECOMPOSE
+        ├──► &quot;refund policy 2023&quot;   ──► retrieve ┐
+        └──► &quot;refund policy 2024&quot;   ──► retrieve ┴──► merged context ──► answer</code></pre>
+<p>Three standard moves: <b>contextualize</b> (fold conversation history into a standalone query), <b>decompose</b> (split multi-part questions into sub-queries, retrieve each), and <b>expand</b> (generate paraphrases / a hypothetical answer and retrieve with those too — HyDE, Gao et al. 2022, embeds a <i>fake answer</i> because answers live nearer to documents than questions do).</p>
+<h3>Build It</h3>
+<ol><li>Rewrite prompt: "Given the conversation and the latest message, write 1–3 standalone search queries that would retrieve the needed information. JSON list."</li><li>Retrieve per query (in parallel — Phase 3, lesson 03), dedupe by chunk id, then RRF-merge or rerank the union.</li><li>Skip the rewrite when it's useless: single-turn, self-contained queries go straight through. A cheap heuristic (pronouns/ellipsis/anaphora present? multi-part?) or a tiny classifier gates the extra LLM call.</li></ol>
+<pre><code>def smart_retrieve(msg, history, index, llm, k=5):
+    queries = json.loads(llm(REWRITE_PROMPT.format(history=history[-6:], msg=msg)))
+    seen, pool = set(), []
+    for q in queries:
+        for c in index.retrieve(q, k):
+            if c.id not in seen:
+                seen.add(c.id); pool.append(c)
+    return rerank(msg, pool, k=k)          # rerank against the ORIGINAL message</code></pre>
+<ol><li>Note the last line: rewritten queries drive <i>retrieval</i>, but the original user intent drives <i>ranking</i> — rewrites can drift, and this catches it.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Technique</th><th>Fixes</th><th>Cost</th></tr></thead><tbody><tr><td>Contextualization</td><td>Follow-ups, pronouns</td><td>1 small LLM call</td></tr><tr><td>Decomposition</td><td>Compare/multi-hop questions</td><td>N retrievals</td></tr><tr><td>Multi-query expansion</td><td>Vocabulary mismatch</td><td>N retrievals + merge</td></tr><tr><td>HyDE</td><td>Question↔document gap</td><td>1 generation + embed</td></tr><tr><td>Step-back prompting</td><td>Over-specific queries</td><td>1 LLM call</td></tr></tbody></table>
+<p>This is the single highest-leverage upgrade for chat-over-docs products — most "RAG is broken" complaints are actually "we embedded the raw follow-up message."</p>
+<h3>War Story</h3>
+<p>The HyDE paper (Gao et al., 2022) formalized a counterintuitive trick: ask the LLM to hallucinate an answer, then embed the <i>hallucination</i> and search with it. The fake answer is factually unreliable but <i>distributionally</i> correct — it sounds like the documents you want — and it improved zero-shot dense retrieval across benchmarks. A rare case of hallucination deployed as a feature.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does embedding a follow-up message like "why not?" fail, mechanically?</li><li>Why rerank against the original message rather than the rewritten query?</li><li>What insight makes HyDE work despite the generated answer being unreliable?</li></ol>
+<h2 id="lesson-08"><span class="lnum">08</span> Agentic RAG: Retrieval as a Tool Decision</h2>
+<p><b>MOTTO:</b> Stop bolting retrieval onto every query — hand the agent a search tool and let it decide.</p>
+<h3>The Problem</h3>
+<p>Classic RAG is a fixed pipeline: every input triggers exactly one retrieve-then-generate pass. So "thanks, looks good!" triggers a pointless (and possibly misleading) retrieval, while a genuinely hard question gets one shot — if the first retrieval misses, the model answers from bad context with no chance to try a different query. A pipeline can't decide, and can't iterate. An agent can do both.</p>
+<h3>The Concept</h3>
+<p>Flip the architecture: retrieval stops being a stage in front of the model and becomes a <i>tool</i> the model calls — zero, one, or many times — inside the agent loop you built in Phase 3:</p>
+<pre><code>  PIPELINE RAG:  query ─► retrieve ─► generate           (always, once)
+
+  AGENTIC RAG:   query ─► agent loop:
+                   ├─ answer directly            (no retrieval needed)
+                   ├─ search(&quot;refund policy&quot;)    → judge results…
+                   ├─   thin? → search(&quot;reimbursement terms 2024&quot;)   (reformulate!)
+                   ├─   compound? → search A, search B               (decompose!)
+                   └─ generate, grounded in accumulated evidence</code></pre>
+<p>The agent gains three abilities pipelines lack: <b>deciding whether</b> to retrieve, <b>judging</b> result quality and retrying with a better query, and <b>chaining</b> retrievals for multi-hop questions ("who manages the team that owns billing?" — find the team, then its manager).</p>
+<h3>Build It</h3>
+<ol><li>Wrap your retriever as a Phase-3 tool: <code>search_docs(query: str, k: int=5) -&gt; chunks</code>. The description is load-bearing: "Search internal documents. Call multiple times with reformulated queries if results look irrelevant. Prefer specific queries over broad ones."</li><li>Return results <i>with scores and sources</i> so the model can judge thinness.</li><li>System prompt sets the policy: "Answer from your own knowledge for general questions. For anything about [corpus domain], you MUST ground answers in search_docs results. If results don't answer the question, reformulate and search again, up to 3 times, then say what you couldn't find."</li><li>Cap it: a max-searches-per-turn limit prevents the agent from spelunking forever.</li></ol>
+<pre><code>@tool
+def search_docs(query: str, k: int = 5) -&gt; str:
+    &quot;&quot;&quot;Search company documents. If results look irrelevant, call again
+    with a reformulated, more specific query (max 3 attempts).&quot;&quot;&quot;
+    hits = rerank(query, index.retrieve(query, k * 4), k=k)
+    if not hits:
+        return &quot;No relevant documents found. Try different terms.&quot;
+    return &quot;\n\n&quot;.join(f&quot;[{h.source} | score={h.score:.2f}]\n{h.text}&quot; for h in hits)</code></pre>
+<h3>Use It</h3>
+<table><thead><tr><th>Pattern</th><th>When</th></tr></thead><tbody><tr><td>Pipeline RAG</td><td>High-volume, uniform queries (support deflection); cheapest, most predictable</td></tr><tr><td>Agentic single-tool</td><td>Mixed chit-chat + knowledge queries</td></tr><tr><td>Agentic multi-source</td><td>Several corpora/tools: docs, tickets, web — agent routes</td></tr><tr><td>Self-reflective loops (Self-RAG-style, 2023)</td><td>Model critiques retrievals/its own answer; +quality, +latency</td></tr></tbody></table>
+<p>Tradeoff in one line: pipelines are cheap and predictable; agents are adaptive and unbounded. Latency-sensitive products often run a pipeline with an agentic fallback for hard queries.</p>
+<h3>War Story</h3>
+<p>The research arc is visible in the papers: Self-RAG (Asai et al., 2023) trained models to emit reflection tokens deciding <i>when</i> to retrieve and critiquing what came back, and FLARE (Jiang et al., 2023) retrieved actively mid-generation whenever the model's next-sentence confidence dropped. Production tooling converged the same way from the engineering side — retrieval as a callable tool in an agent loop is now the default architecture in agent frameworks.</p>
+<h3>Checkpoint</h3>
+<ol><li>Name the three capabilities agentic RAG adds over pipeline RAG.</li><li>Why must search results include sources and scores when retrieval is a tool?</li><li>When is dumb pipeline RAG still the right architecture?</li></ol>
+<h2 id="lesson-09"><span class="lnum">09</span> GraphRAG and Structured Knowledge</h2>
+<p><b>MOTTO:</b> Vector search finds passages; some questions need the map, not the pages.</p>
+<h3>The Problem</h3>
+<p>"Which of our projects depend on the payments service?" The answer isn't <i>in</i> any chunk — it's smeared across forty documents, one dependency mention at a time. Similarly, "what are the main themes across all customer interviews?" defeats top-k retrieval by construction: k chunks can't summarize a thousand. Vector RAG answers <i>local</i> questions (the answer sits in a few passages); it structurally cannot answer <i>global</i> or <i>relational</i> ones.</p>
+<h3>The Concept</h3>
+<p>Extract structure at index time — entities and relations — into a knowledge graph, and retrieve <i>subgraphs</i> instead of (or alongside) chunks:</p>
+<pre><code>  docs ──LLM extraction──►  (ProjectA) ─depends_on─► (Payments) ◄─owns─ (Team Rho)
+                                 │                        ▲
+                             uses│                        │depends_on
+                                 ▼                        │
+                             (Postgres)              (ProjectB)
+
+  relational query ──► graph traversal ──► &quot;ProjectA and ProjectB depend on Payments&quot;
+  global query     ──► community summaries (pre-computed per cluster) ──► themes</code></pre>
+<p>Microsoft's GraphRAG (2024) adds the second trick: cluster the graph into communities (Leiden algorithm), pre-summarize each community with an LLM at index time, and answer global "what are the themes" questions from those summaries — map-reduce over a knowledge graph.</p>
+<h3>Build It</h3>
+<ol><li>Extraction pass per chunk: "List entities (name, type) and relations (source, relation, target) as JSON." Merge across chunks; resolve duplicate entities (the hard part — normalize names, use aliases).</li><li>Store triples; SQLite is fine: <code>edges(src, rel, dst, source_chunk)</code>.</li><li>Query time, three retrieval modes: (a) local — match query entities, expand 1–2 hops, verbalize the subgraph into context; (b) global — retrieve community summaries; (c) hybrid — subgraph + supporting chunks (keep <code>source_chunk</code> pointers so every edge can cite its evidence).</li></ol>
+<pre><code>def local_graph_retrieve(query, graph, hops=2):
+    seeds = [e for e in graph.entities if e.name.lower() in query.lower()]
+    sub = graph.expand(seeds, hops)
+    return &quot;\n&quot;.join(f&quot;{s} —{r}→ {t}  (source: {src})&quot; for s, r, t, src in sub.edges)</code></pre>
+<h3>Use It</h3>
+<table><thead><tr><th>Question shape</th><th>Best tool</th></tr></thead><tbody><tr><td>"What does the policy say about X?"</td><td>Plain vector RAG</td></tr><tr><td>"How is A connected to B?"</td><td>Graph traversal</td></tr><tr><td>"Summarize themes across the corpus"</td><td>Community summaries</td></tr><tr><td>Entity-heavy corpora (orgs, codebases, contracts)</td><td>Graph + chunks hybrid</td></tr></tbody></table>
+<p>Costs to respect: extraction is an LLM call per chunk (indexing gets expensive), entity resolution is never fully solved, and the graph goes stale unless re-extraction is in your update path. GraphRAG is a scalpel, not a default.</p>
+<h3>War Story</h3>
+<p>Microsoft Research released GraphRAG in 2024 (paper: Edge et al., "From Local to Global") with an honest framing: baseline RAG <i>fails</i> on query-focused summarization over whole corpora, and their entity-graph + community-summary approach substantially beat vector RAG on comprehensiveness and diversity of answers for exactly those global questions. The open-source release triggered a wave of graph-flavored RAG variants — and an equally useful wave of "you probably don't need it for local questions" follow-ups.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why can't top-k chunk retrieval answer corpus-wide thematic questions, regardless of k?</li><li>What do community summaries precompute, and which query class do they serve?</li><li>Why keep <code>source_chunk</code> provenance on every extracted edge?</li></ol>
+<h2 id="lesson-10"><span class="lnum">10</span> Citations and Faithfulness</h2>
+<p><b>MOTTO:</b> An answer you can't trace to a source is a hallucination with good posture.</p>
+<h3>The Problem</h3>
+<p>Your RAG system retrieves the right chunks — and the model answers with a blend of the chunks and its pretraining, seasoned with plausible invention. The user can't tell which sentences are grounded. Worse, RAG <i>increases</i> misplaced trust: "it searched our docs, so it must be right." Grounding isn't automatic; retrieval puts evidence in the room, but nothing yet forces the model to use it — or admit when it can't.</p>
+<h3>The Concept</h3>
+<p>Two properties, enforced separately: <b>faithfulness</b> — every claim in the answer is supported by retrieved context — and <b>attribution</b> — each claim points at its supporting source:</p>
+<pre><code>  chunks in ──► [1] refund-policy.md  [2] terms-2024.md  [3] faq.md
+  answer out:  &quot;Refunds are allowed within 30 days [1]. Digital goods
+                are excluded [2]. Shipping costs are not refunded [1].&quot;
+                                          │
+                verify: for each sentence, does the cited chunk entail it?
+                sentence with no support ──► flag / strip / regenerate</code></pre>
+<p>Mechanics that make it work: number the chunks in the prompt, instruct sentence-level citation, explicitly authorize refusal ("if the excerpts don't contain the answer, say so — this is a correct answer, not a failure"), and — for high stakes — verify claims <i>post-hoc</i> with an entailment check. The refusal instruction matters most: a model not offered "not found" as an option will always find something.</p>
+<h3>Build It</h3>
+<ol><li>Prompt with numbered sources and citation rules; require <code>[n]</code> after each factual sentence.</li><li>Parse citations from the answer; any factual sentence without one is suspect.</li><li>Verify (high-stakes mode): for each (sentence, cited chunk) pair, ask a cheap model "Does the passage support the claim? SUPPORTED / NOT_SUPPORTED." Strip or flag failures; regenerate if too many fail.</li></ol>
+<pre><code>CITE_PROMPT = &quot;&quot;&quot;Answer using ONLY the numbered excerpts. After every factual
+sentence, cite its source like [2]. If the excerpts don&#x27;t contain the answer,
+reply exactly: &quot;Not found in the provided documents.&quot;
+
+{numbered_chunks}
+
+Question: {q}&quot;&quot;&quot;
+
+def verify(answer, chunks, judge):
+    for sent, refs in parse_citations(answer):
+        if not refs:
+            yield sent, &quot;UNCITED&quot;
+        elif not any(judge(chunks[r], sent) == &quot;SUPPORTED&quot; for r in refs):
+            yield sent, &quot;UNSUPPORTED&quot;</code></pre>
+<ol><li>UX detail with outsized impact: render citations as clickable snippets showing the actual source text — users catch model errors your verifier misses.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Mechanism</th><th>Strength</th><th>Cost</th></tr></thead><tbody><tr><td>Prompted <code>[n]</code> citations</td><td>Easy, decent</td><td>Model can cite wrong chunk</td></tr><tr><td>Anthropic Citations API / grounded-generation APIs</td><td>Spans tied to sources at generation time</td><td>Provider-specific</td></tr><tr><td>Post-hoc NLI/LLM verification</td><td>Catches fabrication</td><td>Extra calls, latency</td></tr><tr><td>"Not found" refusal path</td><td>Kills the worst failure</td><td>Users must accept "no answer"</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>GopherCite (Menick et al., DeepMind, 2022) trained a model via RLHF to answer with verbatim supporting quotes and — crucially — to <i>decline</i> to answer when unsure, boosting the rate of plausible-and-supported answers on NaturalQuestions substantially. Its sobering finding presaged today's practice: citation improves but does not guarantee correctness — models can quote accurately from sources that don't actually settle the question.</p>
+<h3>Checkpoint</h3>
+<ol><li>Distinguish faithfulness from attribution — can an answer have one without the other?</li><li>Why does explicitly authorizing "not found" reduce hallucination?</li><li>What class of error survives even perfect citation formatting, per GopherCite's findings?</li></ol>
+<h2 id="lesson-11"><span class="lnum">11</span> RAG Evaluation: Retrieval and Generation Metrics</h2>
+<p><b>MOTTO:</b> If you didn't measure retrieval separately from generation, you don't know which half is broken.</p>
+<h3>The Problem</h3>
+<p>"The RAG bot gave a wrong answer." Was the right chunk never retrieved (retrieval failure)? Retrieved but ranked 9th and ignored (ranking failure)? In context but contradicted by the model (faithfulness failure)? Each has a different fix — better chunking, a reranker, a stronger prompt — and eyeballing outputs can't tell them apart. Un-decomposed evals produce vibes, and vibes don't regress-test.</p>
+<h3>The Concept</h3>
+<p>Evaluate the stages independently, then end-to-end:</p>
+<pre><code>  RETRIEVAL (needs: query → relevant-chunk labels)
+    recall@k   = fraction of queries where a relevant chunk is in top k
+    precision@k= fraction of top k that are relevant
+    MRR        = mean(1 / rank of first relevant result)
+                 first hit at rank 1 → 1.0; rank 3 → 0.33; miss → 0
+    nDCG@k     = graded relevance, discounted by log(rank)
+
+  GENERATION (needs: judge — human or LLM)
+    faithfulness      = claims supported by retrieved context?
+    answer relevance  = does it address the question?
+    correctness       = matches gold answer? (needs gold answers)</code></pre>
+<p>Recall@k is the metric to watch first: if the evidence isn't in the top k, <i>nothing downstream can save you</i> — it's the ceiling on the whole system. MRR then tells you whether the evidence arrives near the top, where the model actually attends.</p>
+<h3>Build It</h3>
+<ol><li>Build a golden set: 50–200 real queries, each labeled with relevant chunk IDs (label with an LLM, verify by hand — tedious, non-negotiable).</li><li>Compute retrieval metrics per configuration; this is now your regression suite for every chunking/embedding/reranker change.</li><li>Generation: score faithfulness by claim-decomposition — split the answer into atomic claims, judge each against the retrieved context (this is what RAGAS-style tooling automates).</li></ol>
+<pre><code>def eval_retrieval(golden, retriever, k=5):
+    hits, rr = 0, 0.0
+    for q in golden:
+        got = [c.id for c in retriever(q[&quot;query&quot;], k)]
+        rel = set(q[&quot;relevant_ids&quot;])
+        if rel &amp; set(got): hits += 1
+        ranks = [i + 1 for i, cid in enumerate(got) if cid in rel]
+        rr += 1 / ranks[0] if ranks else 0
+    n = len(golden)
+    return {&quot;recall@k&quot;: hits / n, &quot;MRR&quot;: rr / n}</code></pre>
+<ol><li>Read the matrix diagnostically: low recall@k → fix chunking/embeddings/hybrid; good recall, low MRR → add reranking; good retrieval, bad answers → fix prompt/faithfulness/model.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Covers</th><th>Note</th></tr></thead><tbody><tr><td>Hand-rolled golden set (above)</td><td>Retrieval metrics</td><td>Start here; you own it</td></tr><tr><td>RAGAS</td><td>Faithfulness, relevance, context metrics</td><td>LLM-judged; validate the judge</td></tr><tr><td>TREC/BEIR-style harnesses</td><td>Retriever benchmarking</td><td>Public data ≠ your data</td></tr><tr><td>LangSmith / Braintrust / Arize</td><td>Tracing + eval infra</td><td>Ops layer, not metrics theory</td></tr></tbody></table>
+<p>LLM-as-judge caveat: judges have biases (verbosity, position, self-preference — documented in Zheng et al.'s MT-Bench/Chatbot Arena paper, 2023). Spot-check the judge against humans before trusting the dashboard.</p>
+<h3>War Story</h3>
+<p>The BEIR benchmark (Thakur et al., 2021) delivered the field's favorite cautionary tale: dense retrievers that dominated in-domain (MS MARCO) evaluation were beaten by 1994-vintage BM25 on many out-of-domain datasets. The lesson generalizes to every RAG deployment: a retriever's leaderboard score is not its score on <i>your</i> corpus — which is why the golden set you hand-label this week outvalues every published benchmark.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is recall@k the ceiling metric for an entire RAG system?</li><li>Good recall@10, terrible MRR — what's the diagnosis and the standard fix?</li><li>Why must an LLM judge itself be evaluated before its scores are trusted?</li></ol>
+<h2 id="lesson-12"><span class="lnum">12</span> Build a RAG Pipeline From Scratch</h2>
+<p><b>MOTTO:</b> One index, one retriever, one prompt, zero dependencies — earn your abstractions.</p>
+<h3>The Problem</h3>
+<p>You've studied every stage. Frameworks will now happily hide them all behind <code>RetrievalQA.from_chain_type(...)</code> — and when relevance is bad, you won't know if it's the chunker, the scorer, or the prompt. So: a complete pipeline — chunk, index (TF-IDF), retrieve (cosine), generate with citations — in pure stdlib Python. Small enough to read in one sitting, real enough to answer questions over actual files.</p>
+<h3>The Concept</h3>
+<pre><code>  *.md files ─► chunk (paragraphs, ~1200 chars) ─► TF-IDF vectors ─► index
+                                                                       │
+  question ─► TF-IDF vector ─► cosine top-k ─► numbered context ─► prompt ─► cited answer</code></pre>
+<p>TF-IDF is the honest stand-in for embeddings: each chunk becomes a sparse vector of term weights — <code>tf × idf</code>, where idf up-weights rare, discriminative words — and retrieval is the same cosine-similarity ranking you'd run over dense vectors. Sparse features, identical machinery: swap <code>_vectorize</code> for an embeddings call and the pipeline is production-shaped.</p>
+<h3>Build It</h3>
+<pre><code>import json, math, os, re, sys
+from collections import Counter
+
+def tokenize(text):
+    return re.findall(r&quot;[a-z0-9]+&quot;, text.lower())
+
+def chunk_file(path, max_chars=1200):
+    text = open(path, encoding=&quot;utf-8&quot;).read()
+    paras, chunks, cur = text.split(&quot;\n\n&quot;), [], &quot;&quot;
+    for p in paras:
+        if len(cur) + len(p) &gt; max_chars and cur:
+            chunks.append(cur.strip()); cur = &quot;&quot;
+        cur += p + &quot;\n\n&quot;
+    if cur.strip(): chunks.append(cur.strip())
+    return [{&quot;source&quot;: os.path.basename(path), &quot;text&quot;: c} for c in chunks]
+
+class TfidfIndex:
+    def __init__(self):
+        self.chunks, self.vecs, self.df, self.N = [], [], Counter(), 0
+    def build(self, chunks):
+        self.chunks, self.N = chunks, len(chunks)
+        toks = [Counter(tokenize(c[&quot;text&quot;])) for c in chunks]
+        for t in toks: self.df.update(t.keys())
+        self.vecs = [self._vectorize(t) for t in toks]
+    def _idf(self, w):
+        return math.log(1 + self.N / (1 + self.df.get(w, 0)))
+    def _vectorize(self, tf):
+        v = {w: (1 + math.log(c)) * self._idf(w) for w, c in tf.items()}
+        norm = math.sqrt(sum(x * x for x in v.values())) or 1.0
+        return {w: x / norm for w, x in v.items()}          # unit vector
+    def retrieve(self, query, k=4, floor=0.05):
+        q = self._vectorize(Counter(tokenize(query)))
+        scored = []
+        for i, v in enumerate(self.vecs):                    # cosine = dot (both unit)
+            s = sum(q[w] * v[w] for w in q.keys() &amp; v.keys())
+            scored.append((s, i))
+        scored.sort(reverse=True)
+        return [(s, self.chunks[i]) for s, i in scored[:k] if s &gt; floor]
+
+PROMPT = &quot;&quot;&quot;Answer using ONLY the numbered excerpts. Cite like [1] after each
+factual sentence. If the excerpts don&#x27;t contain the answer, say
+&quot;Not found in the indexed documents.&quot;
+
+{context}
+
+Question: {question}
+Answer:&quot;&quot;&quot;
+
+def answer(question, index, llm, k=4):
+    hits = index.retrieve(question, k)
+    if not hits:
+        return &quot;Not found in the indexed documents.&quot;, []
+    context = &quot;\n\n&quot;.join(f&quot;[{i+1}] (source: {c[&#x27;source&#x27;]})\n{c[&#x27;text&#x27;]}&quot;
+                          for i, (s, c) in enumerate(hits))
+    return llm(PROMPT.format(context=context, question=question)), hits
+
+if __name__ == &quot;__main__&quot;:
+    index = TfidfIndex()
+    docs = [c for f in sys.argv[1:] for c in chunk_file(f)]
+    index.build(docs)
+    print(f&quot;Indexed {len(docs)} chunks from {len(sys.argv)-1} files.&quot;)
+    mock_llm = lambda p: &quot;(plug in a real LLM here)\n--- prompt was ---\n&quot; + p[:600]
+    while True:
+        q = input(&quot;\nquestion&gt; &quot;).strip()
+        if not q: break
+        text, hits = answer(q, index, mock_llm)
+        print(text)
+        print(&quot;\nSources:&quot;, &quot;, &quot;.join(f&quot;[{i+1}] {c[&#x27;source&#x27;]} ({s:.2f})&quot;
+                                      for i, (s, c) in enumerate(hits)))</code></pre>
+<p>Run it on this repo's own phase READMEs and interrogate it. Then break it deliberately: ask a paraphrased question TF-IDF misses (embeddings fix that), ask a compound question (query decomposition fixes that), shrink <code>max_chars</code> until chunks fragment (chunking lesson, felt in the hands).</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Component here</th><th>Production swap</th></tr></thead><tbody><tr><td>Paragraph chunker</td><td>Recursive/structural splitter + overlap</td></tr><tr><td>TF-IDF <code>_vectorize</code></td><td>Embedding model (same interface!)</td></tr><tr><td>Linear cosine scan</td><td>pgvector / HNSW when N demands it</td></tr><tr><td>Single retrieve</td><td>Hybrid (keep TF-IDF! it's your sparse leg) + rerank</td></tr><tr><td><code>mock_llm</code></td><td>Real API + faithfulness verification</td></tr><tr><td>Nothing</td><td>The lesson-11 golden set — build it first</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>The distance from Lewis et al.'s 2020 RAG paper to the code above is smaller than the framework ecosystem suggests: the paper's contribution was jointly <i>training</i> retriever and generator, but the deployed pattern that conquered industry — retrieve top-k, stuff the prompt, generate — is what you just wrote. When the 2023 RAG boom hit, teams that understood these ~90 lines debugged their systems; teams that only knew the framework wrapper filed issues.</p>
+<h3>Checkpoint</h3>
+<ol><li>Which single function would you replace to convert this to dense retrieval, and why does nothing else change?</li><li>Why are vectors normalized at build time instead of at query time?</li><li>This pipeline retrieves nothing for "how do I get reimbursed?" over a refunds doc — name the failure and two lessons from this phase that fix it.</li></ol>
+  </article>
+  <div class="pager">
+    <a href="04-memory.html">← 📚 Phase 04</a>
+    <span class="spacer"></span>
+    <a href="06-planning-and-reasoning.html">Phase 06 🗂️ →</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swarms & Advanced Patterns — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 12</div>
+  <h1><span class="pnum">12</span> 🐝 Swarms &amp; Advanced Patterns</h1>
+  <div class="tagline">No one ant knows the plan. The colony still builds the bridge.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Swarm intelligence: emergence from simple rules</a>
+<a href="#lesson-02"><span class="lnum">02</span>Hierarchies: teams of teams</a>
+<a href="#lesson-03"><span class="lnum">03</span>Market mechanisms: auctions for task allocation</a>
+<a href="#lesson-04"><span class="lnum">04</span>Consensus among agents: voting and quorums</a>
+<a href="#lesson-05"><span class="lnum">05</span>Specialist pools and dynamic team formation</a>
+<a href="#lesson-06"><span class="lnum">06</span>Long-running agent societies and simulations</a>
+<a href="#lesson-07"><span class="lnum">07</span>Generative agents: the Smallville experiment</a>
+<a href="#lesson-08"><span class="lnum">08</span>Stigmergy: coordination through the environment</a>
+<a href="#lesson-09"><span class="lnum">09</span>Failure containment in agent groups</a>
+<a href="#lesson-10"><span class="lnum">10</span>Build a swarm simulation from scratch</a>
+  </div>
+  <article>
+<blockquote>No one ant knows the plan. The colony still builds the bridge.</blockquote>
+<p>You've built single agents and small teams. Now we zoom out to the weird stuff: systems where intelligence lives in the <i>interactions</i>, not in any individual agent. This phase covers emergence, hierarchies, auctions, voting, stigmergy, and long-running agent societies — the coordination patterns that let dumb parts produce smart wholes. By the end you'll build a working swarm from scratch: a blackboard plus an auction, in plain Python.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> Swarm Intelligence: Emergence from Simple Rules</h2>
+<p><b>MOTTO:</b> Complexity is not designed. It is grown from rules you can count on one hand.</p>
+<h3>The Problem</h3>
+<p>You want a system that handles situations you didn't anticipate. Centrally scripting every scenario doesn't scale: the script's author becomes the bottleneck, and the script breaks the moment reality deviates. You need global behavior that nobody wrote down.</p>
+<h3>The Concept</h3>
+<p>Emergence: simple local rules, applied by many agents, produce global structure none of them encodes. The classic demo is Craig Reynolds' boids — three rules (separation, alignment, cohesion) and you get flocking. No bird has a "flock" variable.</p>
+<pre><code>  agent rule (local)          system behavior (global)
+  ----------------------      ------------------------
+  &quot;stay near neighbors&quot;   -&gt;      flocks, convoys
+  &quot;claim unclaimed work&quot;  -&gt;      load balancing
+  &quot;copy what worked&quot;      -&gt;      convergence on tactics</code></pre>
+<p>For LLM agents, the "rules" are short system prompts: <i>pick the highest-value unclaimed task; post your result; flag anything blocked.</i> The intelligence you observe at the system level is not in any prompt.</p>
+<h3>Build It</h3>
+<p>Start embarrassingly small. Give N identical workers one loop each: read shared state → pick an action by a fixed local rule → write the result back. No orchestrator, no message routing, no roles. Log the shared state at every tick so you can <i>watch</i> structure appear (or not). The core skill of this phase is designing local rules and observing global consequences — resist the urge to add a manager the first time it wobbles.</p>
+<h3>Use It</h3>
+<p>Frameworks with swarm-ish primitives: OpenAI's Swarm (educational handoff-based multi-agent library, succeeded by the Agents SDK), CrewAI (role crews), LangGraph (graph-shaped control flow, including cycles). None gives you emergence for free — emergence is a property of your rules, not your framework.</p>
+<h3>War Story</h3>
+<p>Craig Reynolds published boids in 1987 as a computer-graphics trick: three local steering rules produced lifelike flocks without any central choreography, and the technique famously animated the bat swarms and penguins in <i>Batman Returns</i> (1992). Nobody scripted a single flight path. That's the whole pitch of this phase in one movie credit.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why can't you find "the flocking code" anywhere in a boids implementation?</li><li>Name a failure mode of emergent systems that centrally-planned systems don't have.</li><li>What's the LLM-agent equivalent of a boid's three steering rules?</li></ol>
+<h2 id="lesson-02"><span class="lnum">02</span> Hierarchies: Teams of Teams</h2>
+<p><b>MOTTO:</b> Flat swarms scale chaos. Hierarchies scale attention.</p>
+<h3>The Problem</h3>
+<p>A flat pool of 30 agents all reading the same channel drowns in its own chatter: every agent pays context-window tax on every other agent's output. Coordination cost grows roughly with the square of the group size. At some point the swarm spends more tokens coordinating than working.</p>
+<h3>The Concept</h3>
+<p>The fix is the same one armies and companies converged on: hierarchy. A lead agent decomposes work and delegates to sub-leads; sub-leads manage workers; summaries flow up, tasks flow down. Each node only holds context for its immediate team.</p>
+<pre><code>            [orchestrator]
+            /      |      \
+      [research] [build] [review]
+       /    \       |
+  [web-1] [web-2] [coder]</code></pre>
+<p>The key design decision is what crosses each boundary: tasks go down as <i>specs</i>, results come up as <i>summaries</i>. Raw transcripts never travel — that's the whole point.</p>
+<h3>Build It</h3>
+<p>Implement a <code>delegate(spec) -&gt; summary</code> function that spins up a child agent with a fresh context containing only the spec. The parent never sees the child's intermediate steps, only its return value. Enforce a depth limit (2–3 levels is plenty) and a fan-out limit per node. Add a budget field to each spec — tokens or dollars — that a parent splits among children, so runaway subtrees fail closed, not open.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Hierarchy mechanism</th></tr></thead><tbody><tr><td>Claude Code / Agent SDK</td><td>Subagents with isolated contexts</td></tr><tr><td>LangGraph</td><td>Supervisor pattern, nested graphs</td></tr><tr><td>CrewAI</td><td><code>hierarchical</code> process with a manager agent</td></tr><tr><td>AutoGen</td><td>GroupChat with a manager, nested chats</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>The MetaGPT paper (2023) organized LLM agents as a software company — product manager, architect, engineer, QA — with standardized documents passed between roles instead of free-form chat. ChatDev (2023) did the same with a virtual company metaphor. Both found that role structure and constrained artifacts beat unstructured group chat on code-generation tasks.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why should summaries, not transcripts, cross team boundaries?</li><li>What goes wrong without a fan-out or depth limit?</li><li>When is a flat swarm actually better than a hierarchy?</li></ol>
+<h2 id="lesson-03"><span class="lnum">03</span> Market Mechanisms: Auctions for Task Allocation</h2>
+<p><b>MOTTO:</b> Don't assign work. Sell it.</p>
+<h3>The Problem</h3>
+<p>An orchestrator assigning tasks needs a model of every worker's skills, load, and cost — a model that's stale the moment it's built. Central assignment is a knowledge problem: the dispatcher knows less about each worker's fitness for a task than the worker does.</p>
+<h3>The Concept</h3>
+<p>Auctions move the decision to where the knowledge lives. Announce a task; each agent bids based on its own assessment ("I have the right tools cached, I'm idle, I estimate 200 tokens"); best bid wins. This is the Contract Net Protocol, and it's older than you think.</p>
+<pre><code>  [manager] --announce task--&gt; [A] [B] [C]
+  [manager] &lt;---- bids ------  A:0.9  B:0.4  C:0.7
+  [manager] --award--&gt; [A]
+  [A] --result--&gt; [manager]</code></pre>
+<p>Bids can be a self-rated fitness score, an estimated cost, or an LLM's own confidence. The auction is also a <i>filter</i>: if nobody bids, you've learned the task is malformed before wasting a run on it.</p>
+<h3>Build It</h3>
+<p>A minimal auction needs three messages: <code>announce(task)</code>, <code>bid(task_id, score)</code>, <code>award(task_id, agent)</code>. Have each agent compute its bid with a cheap heuristic first (keyword match against its specialty) and only use an LLM call for tie-breaks. Log every auction: task, bids, winner, outcome. That log later becomes training data for better bids — score agents down when they win and then fail.</p>
+<h3>Use It</h3>
+<p>Market-based allocation shows up in multi-robot systems (warehouse robotics, Mars rover task allocation research) more than in LLM frameworks — which means building it yourself, as you will in Lesson 10, is genuinely from scratch. LangGraph or plain asyncio both work as substrates.</p>
+<h3>War Story</h3>
+<p>The Contract Net Protocol was published by Reid G. Smith in 1980 — decades before LLMs — as a way for distributed problem solvers to negotiate task allocation via announce-bid-award. It became a foundation of multi-agent systems research and an FIPA standard. Almost every "novel" LLM task-routing scheme is CNP wearing a new jacket.</p>
+<h3>Checkpoint</h3>
+<ol><li>What knowledge does an auction exploit that a central dispatcher lacks?</li><li>What does an empty bid round tell you?</li><li>How do you punish agents that overbid and underdeliver?</li></ol>
+<h2 id="lesson-04"><span class="lnum">04</span> Consensus Among Agents: Voting and Quorums</h2>
+<p><b>MOTTO:</b> One agent has an opinion. Five agents have an error bar.</p>
+<h3>The Problem</h3>
+<p>A single LLM run is a sample from a distribution, not a verdict. Sometimes it samples brilliance; sometimes it samples confident nonsense. If a decision matters — merge this code, send this email — betting it on one sample is malpractice.</p>
+<h3>The Concept</h3>
+<p>Sample multiple agents (or the same agent multiple times), then aggregate. Majority vote works when answers are discrete; for free-form outputs, cluster-then-vote (self-consistency) or have a judge pick. The statistics are on your side <i>only if errors are independent</i> — five agents sharing one flawed premise are one vote wearing five hats.</p>
+<pre><code>  Q ---&gt; [agent 1] --&gt; &quot;42&quot;
+    ---&gt; [agent 2] --&gt; &quot;42&quot;     majority =&gt; &quot;42&quot;
+    ---&gt; [agent 3] --&gt; &quot;17&quot;</code></pre>
+<p>Quorums add a safety valve: require K-of-N agreement to act, otherwise escalate to a human. Distributed-systems people have been here since Lamport's Byzantine generals (1982): agreement under faulty participants is hard, and thresholds are the tool.</p>
+<h3>Build It</h3>
+<p>Wrap any decision in <code>vote(question, n, quorum)</code>: run n samples at temperature &gt; 0 (or with varied prompts/models for real independence), normalize answers, count. Return the winner only if it clears the quorum; return <code>ESCALATE</code> otherwise. Track <i>margin</i> as a confidence signal — a 5–0 vote and a 3–2 vote should not be treated the same downstream.</p>
+<h3>Use It</h3>
+<p>Self-consistency decoding is built into many eval and inference stacks; LLM routers (e.g., ensembling across GPT/Claude/Gemini) give cheap independence; frameworks like AutoGen support multi-agent debate patterns. Vary the model, not just the seed, when the stakes are high.</p>
+<h3>War Story</h3>
+<p>The self-consistency paper (Wang et al., 2022) showed that sampling multiple chain-of-thought paths and majority-voting the final answer substantially boosted arithmetic and commonsense reasoning benchmarks — double-digit gains on GSM8K over greedy decoding, with no model changes at all. Voting is the cheapest capability upgrade in the book.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does voting fail when all voters share the same context and premise?</li><li>What should happen when a quorum isn't reached?</li><li>Why vote across different models rather than just different temperatures?</li></ol>
+<h2 id="lesson-05"><span class="lnum">05</span> Specialist Pools and Dynamic Team Formation</h2>
+<p><b>MOTTO:</b> Don't build a team. Build a bench, and draft per problem.</p>
+<h3>The Problem</h3>
+<p>Static teams fit static problems. Real workloads shift hour to hour: today it's mostly SQL, tomorrow it's mostly PDFs. A fixed roster means your French-legal-documents specialist idles while three generalists butcher a contract.</p>
+<h3>The Concept</h3>
+<p>Keep a <i>pool</i> of specialists — defined by system prompt, tools, and a capability card — and form teams per task. A router (rules, embeddings, or a cheap LLM) reads the task, matches it against capability cards, and drafts a squad. The team exists for one task, then dissolves.</p>
+<pre><code>  POOL: [sql] [scraper] [fr-legal] [charts] [pdf] [coder]
+                     |
+  task: &quot;chart FR contract clauses&quot; --router--&gt; {fr-legal, pdf, charts}</code></pre>
+<p>Capability cards are the load-bearing part: a short, honest, machine-readable description of what the agent is good at, what tools it holds, and what it costs. Vague cards produce vague drafts.</p>
+<h3>Build It</h3>
+<p>Represent each specialist as data, not code: <code>{name, description, tools, cost_hint}</code>. Route by embedding similarity between the task and each description, take the top-k, and hand them to a small orchestrator (Lesson 02's hierarchy, one level deep). Log which draft picks actually contributed to the final answer, and decay the ranking of specialists who get drafted but never help.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Pool mechanism</th></tr></thead><tbody><tr><td>Claude Code / Agent SDK</td><td>Agent definitions with descriptions; auto-delegation by description match</td></tr><tr><td>LangGraph</td><td>Router nodes → specialist subgraphs</td></tr><tr><td>CrewAI</td><td>Agent roles composed per crew</td></tr><tr><td>MCP ecosystem</td><td>Tool servers as pluggable capabilities</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>The Mixture-of-Agents work (2024) showed that layering multiple open-source LLMs — each round of agents refining the previous round's answers — outperformed GPT-4 Omni on AlpacaEval 2.0 using only open models. The pool beat the superstar. Specialization plus aggregation is a real capability multiplier, not just an org-chart aesthetic.</p>
+<h3>Checkpoint</h3>
+<ol><li>What makes a capability card good, and what makes it useless?</li><li>How do you detect a specialist that gets drafted but adds nothing?</li><li>Why dissolve teams after each task instead of keeping them warm?</li></ol>
+<h2 id="lesson-06"><span class="lnum">06</span> Long-Running Agent Societies and Simulations</h2>
+<p><b>MOTTO:</b> Anything that runs for weeks will develop habits. Choose whether you pick them.</p>
+<h3>The Problem</h3>
+<p>Everything so far assumed a task with an end. But some systems just <i>run</i> — a support fleet, a monitoring society, a simulated economy. Over long horizons, small biases compound, memories bloat, and agents drift into behaviors nobody designed. Turn-based thinking stops applying.</p>
+<h3>The Concept</h3>
+<p>A long-running society needs the things one-shot agents fake: persistent memory with <i>forgetting</i> (reflection, summarization, decay), a shared clock or tick, an economy of scarce resources (budget, attention) to keep behavior grounded, and periodic self-review so drift gets caught by the system instead of by your users. Think of it as running a small town, not calling a function: you're now doing governance, not orchestration.</p>
+<h3>Build It</h3>
+<p>Structure the world as a tick loop: each tick, every agent observes, updates memory, and acts under a per-tick budget. Add three hygiene mechanisms from day one: (1) memory compaction — periodically summarize and discard raw logs; (2) drift audits — an evaluator agent samples recent behavior against the original charter; (3) hard resource caps per agent per day. Run it for a simulated month before you run it for a real week.</p>
+<h3>Use It</h3>
+<p>Simulation substrates: Mesa (Python agent-based modeling), Concordia (DeepMind's library for generative agent simulations), plain asyncio with SQLite for state. For production societies, add real infra: queues, budgets, and the observability stack you built in earlier phases.</p>
+<h3>War Story</h3>
+<p>In Anthropic's Project Vend (2025), Claude ran a small office shop for about a month — real inventory, real money. It got talked into discounts, stocked tungsten cubes at a loss after employees joked about them, and at one point insisted it was a physical person who would deliver products in a blazer, before recovering. Long horizons surface failure modes that no single-turn eval will ever show you.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does memory need <i>forgetting</i> in long-running systems?</li><li>What's a drift audit and who performs it?</li><li>Name two resources you should make explicitly scarce in an agent society.</li></ol>
+<h2 id="lesson-07"><span class="lnum">07</span> Generative Agents: The Smallville Experiment</h2>
+<p><b>MOTTO:</b> Give agents memory, reflection, and a reason to talk, and they'll surprise you on schedule.</p>
+<h3>The Problem</h3>
+<p>Can LLM agents produce believable, coherent <i>social</i> behavior over days — remembering who they met, forming opinions, making plans together? Naive chatbots can't: without structured memory they contradict themselves within an hour and forget relationships entirely.</p>
+<h3>The Concept</h3>
+<p>The generative agents architecture (Park et al., 2023 — "Smallville") answers with three components layered on an LLM:</p>
+<pre><code>  observe --&gt; [ memory stream ]  (timestamped events)
+                    |
+              retrieval = recency * importance * relevance
+                    |
+              [ reflection ]  (periodic higher-level inferences)
+                    |
+              [ planning ]    (daily plans, revised on events)</code></pre>
+<p>Memory stream stores everything; retrieval scores memories by recency, importance, and relevance; reflection periodically distills observations into higher-level beliefs ("Klaus is passionate about research"); plans turn beliefs into scheduled action. Behavior emerges from the loop, not from scripts.</p>
+<h3>Build It</h3>
+<p>You can build a mini-Smallville with three tables: <code>memories(agent, ts, text, importance)</code>, <code>reflections</code>, <code>plans</code>. The retrieval scorer is a weighted sum — no vectors required at small scale, keyword overlap works. The critical engineering detail is the reflection trigger: fire it when accumulated importance crosses a threshold, not on a timer, so busy agents reflect more.</p>
+<h3>Use It</h3>
+<p>The original paper's code is open source (<code>joonspk-research/generative_agents</code>). Concordia and Mesa give you substrates for your own towns. Beyond research, the same memory/reflection/plan stack powers believable NPCs, social simulations for UX research, and synthetic user populations for testing products.</p>
+<h3>War Story</h3>
+<p>In the 2023 Smallville paper, researchers seeded one agent, Isabella, with the intent to host a Valentine's Day party. Over two simulated days the invitation spread agent-to-agent through conversations, agents asked each other on dates to it, and several showed up at the right place and time — coordination the researchers never scripted. Ablating reflection or memory made behavior measurably less believable.</p>
+<h3>Checkpoint</h3>
+<ol><li>What three factors score a memory for retrieval in the generative agents architecture?</li><li>Why trigger reflection on accumulated importance rather than on a timer?</li><li>What did the Valentine's party demonstrate that a scripted demo couldn't?</li></ol>
+<h2 id="lesson-08"><span class="lnum">08</span> Stigmergy: Coordination Through the Environment</h2>
+<p><b>MOTTO:</b> The best message queue is the world itself.</p>
+<h3>The Problem</h3>
+<p>Direct agent-to-agent messaging couples everyone to everyone: N agents, N² conversations, and every new agent needs introductions. Worse, messages are ephemeral — an agent that joins late missed the meeting.</p>
+<h3>The Concept</h3>
+<p>Stigmergy (from termite research — Grassé coined the term in 1959) is coordination through <i>traces left in a shared environment</i>. Ants don't message each other about food; they deposit pheromone, and the trail <i>is</i> the coordination. Agents read the environment, act, and modify it; the modification is the signal.</p>
+<pre><code>  [agent A] --writes--&gt; [ shared artifact ] &lt;--reads-- [agent B]
+                        (board, repo, files)</code></pre>
+<p>Your codebase already works this way: a failing test is a pheromone saying "work needed here"; a TODO comment is a trail; a lockfile is a "claimed" marker. The blackboard pattern is stigmergy formalized: a shared store where agents post partial results and pick up whatever they can advance.</p>
+<h3>Build It</h3>
+<p>Build a blackboard: a dict (or SQLite table) of entries <code>{id, content, status, claimed_by, updated_at}</code>. Agents loop: scan for entries matching their skill with status <code>open</code>, atomically claim one, work, write back with a new status. Add <i>evaporation</i> — stale claims expire, so a crashed agent's work returns to the pool automatically. That single TTL rule buys you more fault tolerance than any heartbeat protocol.</p>
+<h3>Use It</h3>
+<p>Real-world stigmergic media for agents: git repos (branches and PRs as traces), issue trackers, shared filesystems, wikis, and message-board tools like GitHub Issues that coding agents already use to coordinate with humans. If two agents can see the same repo, they can coordinate without ever exchanging a message.</p>
+<h3>War Story</h3>
+<p>Pierre-Paul Grassé, studying termites in the 1950s, showed that workers don't follow blueprints or leaders: each deposits soil pellets where existing pellets and pheromone concentrations stimulate deposition. The half-built structure itself directs construction. Termite mounds — meters tall, climate-controlled — are built by insects with no architect and no messages, only environment.</p>
+<h3>Checkpoint</h3>
+<ol><li>How does stigmergy avoid the N² communication problem?</li><li>What role does evaporation/TTL play in a blackboard system?</li><li>Name three stigmergic artifacts that already exist in a normal software project.</li></ol>
+<h2 id="lesson-09"><span class="lnum">09</span> Failure Containment in Agent Groups</h2>
+<p><b>MOTTO:</b> In a swarm, one agent's hallucination is everyone's input.</p>
+<h3>The Problem</h3>
+<p>Multi-agent systems don't just share work — they share errors. A hallucinated "fact" posted to the blackboard gets read, trusted, and built upon by every other agent. Feedback loops amplify: agent A's bad output raises agent B's confidence, which reinforces A. Swarms fail <i>correlated</i>, and correlated failure is the expensive kind.</p>
+<h3>The Concept</h3>
+<p>Borrow from distributed systems and finance: bulkheads, circuit breakers, and provenance.</p>
+<pre><code>  [pod 1]   [pod 2]   [pod 3]     &lt;- bulkheads: pods can&#x27;t write
+     \         |         /            to each other&#x27;s state
+      [ quarantined merge ]        &lt;- outputs cross only after checks</code></pre>
+<p>Bulkheads partition agents so failures stay local. Circuit breakers halt a pod whose error rate, spend rate, or output volume spikes. Provenance means every artifact records which agent produced it from which inputs — so when poison is found, you can trace and purge everything downstream of it.</p>
+<h3>Build It</h3>
+<p>Three concrete mechanisms: (1) tag every blackboard entry with its producer and input entry IDs, giving you a provenance DAG; (2) rate-limit and budget-limit per agent <i>and</i> per pod, with automatic suspension on breach; (3) run a skeptic agent that samples artifacts and re-verifies claims against source material — its job is to be annoying. When the skeptic flags an entry, mark the entry and its whole downstream subtree as <code>tainted</code> rather than deleting silently.</p>
+<h3>Use It</h3>
+<p>This is standard reliability engineering pointed at agents: circuit breakers (as in Netflix's Hystrix lineage), rate limiters, and audit logs. Observability platforms for LLM apps (LangSmith, Langfuse, Arize Phoenix) give you the traces; the containment logic is yours to write.</p>
+<h3>War Story</h3>
+<p>The May 6, 2010 Flash Crash saw U.S. markets lose around a trillion dollars of value in minutes, as automated trading systems reacted to each other's selling in a feedback loop, then mostly recovered within the hour. No single algorithm was "broken" — the interaction was. Exchanges responded with circuit breakers that halt trading on rapid moves: containment, not prevention.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is correlated failure worse than independent failure in a swarm?</li><li>What does a provenance DAG let you do after discovering one poisoned artifact?</li><li>What metrics should trip an agent-pod circuit breaker?</li></ol>
+<h2 id="lesson-10"><span class="lnum">10</span> Build a Swarm Simulation from Scratch</h2>
+<p><b>MOTTO:</b> You don't understand a coordination pattern until you've watched it deadlock.</p>
+<h3>The Problem</h3>
+<p>Reading about blackboards and auctions is comfortable. Now make real ones fight over tasks. The goal: N workers, a blackboard of tasks, auction-based allocation, no orchestrator — and watch throughput emerge.</p>
+<h3>The Concept</h3>
+<p>We combine Lesson 08 (blackboard) and Lesson 03 (auction). Tasks live on the board; each tick, agents bid on open tasks based on skill match; highest bid wins the claim; completed work returns to the board. Coordination lives entirely in board + bids.</p>
+<h3>Build It</h3>
+<pre><code>import random
+
+TASKS = [{&quot;id&quot;: i, &quot;skill&quot;: random.choice([&quot;sql&quot;, &quot;web&quot;, &quot;pdf&quot;]),
+          &quot;status&quot;: &quot;open&quot;, &quot;owner&quot;: None} for i in range(12)]
+
+AGENTS = [{&quot;name&quot;: f&quot;a{i}&quot;, &quot;skill&quot;: s, &quot;busy&quot;: 0}
+          for i, s in enumerate([&quot;sql&quot;, &quot;sql&quot;, &quot;web&quot;, &quot;pdf&quot;])]
+
+def bid(agent, task):                      # local knowledge only
+    fit = 1.0 if agent[&quot;skill&quot;] == task[&quot;skill&quot;] else 0.2
+    return fit / (1 + agent[&quot;busy&quot;]) + random.uniform(0, 0.05)
+
+for tick in range(1, 20):
+    for task in [t for t in TASKS if t[&quot;status&quot;] == &quot;open&quot;]:
+        bids = [(bid(a, task), a) for a in AGENTS]
+        best, winner = max(bids, key=lambda b: b[0])
+        task[&quot;status&quot;], task[&quot;owner&quot;] = &quot;claimed&quot;, winner[&quot;name&quot;]
+        winner[&quot;busy&quot;] += 1                # award changes future bids
+    for a in AGENTS:                       # work off one claim per tick
+        mine = [t for t in TASKS if t[&quot;owner&quot;] == a[&quot;name&quot;]
+                and t[&quot;status&quot;] == &quot;claimed&quot;]
+        if mine:
+            mine[0][&quot;status&quot;] = &quot;done&quot;; a[&quot;busy&quot;] -= 1
+    done = sum(t[&quot;status&quot;] == &quot;done&quot; for t in TASKS)
+    print(f&quot;tick {tick}: {done}/{len(TASKS)} done&quot;)
+    if done == len(TASKS):
+        break</code></pre>
+<p>Load-balancing emerges from <code>1/(1+busy)</code> — no scheduler anywhere. Extensions: add evaporation (claimed tasks whose owner "crashes" reopen), a poisoned task that always fails, and Lesson 09's taint-tracking.</p>
+<h3>Use It</h3>
+<p>Swap <code>bid()</code>'s heuristic for an LLM self-assessment and the fake work for real tool calls, and this skeleton is a production task router. The board becomes SQLite or Redis; ticks become an async loop. The architecture doesn't change.</p>
+<h3>War Story</h3>
+<p>OpenAI's 2019 hide-and-seek project trained simple agents in a physics playground and watched strategies emerge across generations — tool use, barricades, and eventually box-surfing exploits of the physics engine that no researcher intended. Simulations don't just confirm your design; they find the loopholes in it. Yours will too, at much lower compute.</p>
+<h3>Checkpoint</h3>
+<ol><li>Where does load balancing come from in this simulation, given that no component implements it?</li><li>What happens if two agents claim the same task in a truly concurrent version, and how do you fix it?</li><li>How would you add Lesson 09's failure containment to this swarm?</li></ol>
+  </article>
+  <div class="pager">
+    <a href="11-multi-agent-fundamentals.html">← 👥 Phase 11</a>
+    <span class="spacer"></span>
+    <a href="13-autonomous-agents.html">Phase 13 🖥️ →</a>
+  </div>
+</div>
+</body>
+</html>

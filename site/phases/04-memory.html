@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 04</div>
+  <h1><span class="pnum">04</span> 📚 Memory</h1>
+  <div class="tagline">Goldfish agents ask the same question twice. Give yours a hippocampus.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Short-term vs long-term memory</a>
+<a href="#lesson-02"><span class="lnum">02</span>Conversation buffers and windowing</a>
+<a href="#lesson-03"><span class="lnum">03</span>Summarization memory: compress or die</a>
+<a href="#lesson-04"><span class="lnum">04</span>Vector memory: remember by similarity</a>
+<a href="#lesson-05"><span class="lnum">05</span>Episodic vs semantic memory</a>
+<a href="#lesson-06"><span class="lnum">06</span>Entity memory: tracking people, places, things</a>
+<a href="#lesson-07"><span class="lnum">07</span>The write policy: what&#x27;s worth remembering</a>
+<a href="#lesson-08"><span class="lnum">08</span>Memory retrieval: when to recall what</a>
+<a href="#lesson-09"><span class="lnum">09</span>Forgetting: decay, eviction, and contradictions</a>
+<a href="#lesson-10"><span class="lnum">10</span>Build a memory system from scratch</a>
+  </div>
+  <article>
+<blockquote>Goldfish agents ask the same question twice. Give yours a hippocampus.</blockquote>
+<p>An LLM is stateless: every request starts from zero, and the only "memory" it has is whatever you paste into the context window. That works until the conversation outgrows the window, the session ends, or the user says "like I told you last week." This phase builds the memory stack — buffers, summaries, vector recall, entities, write policies, and forgetting — that turns a stateless function into something that appears to know you. The context window is RAM; everything else is a filing system you must design yourself.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> Short-Term vs Long-Term Memory</h2>
+<p><b>MOTTO:</b> The context window is RAM, not a hard drive — and RAM gets wiped.</p>
+<h3>The Problem</h3>
+<p>Your user tells the agent their name, their stack, and their deadline. Twenty minutes later — new session — the agent cheerfully asks for all three again. Nothing was "forgotten," because nothing was ever stored: the model's weights didn't change, and the conversation lived only in a request payload that no longer exists.</p>
+<h3>The Concept</h3>
+<p>Borrow the computer-architecture split. Short-term memory is whatever is <i>in the context window right now</i>: fast, fully attended-to, tiny, volatile. Long-term memory is everything <i>outside</i> the window — files, databases, indexes — that must be explicitly written and explicitly retrieved back in:</p>
+<pre><code>              ┌───────────────────────────┐
+   prompt ──► │  CONTEXT WINDOW (RAM)     │ ──► response
+              │  system + history + docs  │
+              └─────▲───────────────┬─────┘
+              retrieve             write
+              ┌─────┴───────────────▼─────┐
+              │  LONG-TERM STORE (disk)   │
+              │  summaries · facts · logs │
+              └───────────────────────────┘</code></pre>
+<p>The model never "remembers" anything across calls. Memory is an illusion your orchestration code constructs by moving the right bytes into the window at the right time.</p>
+<h3>Build It</h3>
+<ol><li>Short-term: a Python list of messages, re-sent on every call. That's it — that's the whole trick behind "chat."</li><li>Long-term: any persistence — start with a JSON file of facts.</li><li>The bridge: before each call, load relevant long-term items into the system prompt; after each call, decide what to save.</li></ol>
+<pre><code>class Agent:
+    def __init__(self, store_path=&quot;memory.json&quot;):
+        self.messages = []                      # short-term: dies with the process
+        self.store = load_json(store_path)      # long-term: survives it
+
+    def chat(self, user_msg):
+        context = &quot;Known facts: &quot; + &quot;; &quot;.join(self.store[&quot;facts&quot;])
+        reply = llm([{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: context}]
+                    + self.messages + [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_msg}])
+        self.messages += [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_msg},
+                          {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: reply}]
+        return reply</code></pre>
+<p>Everything else in this phase is refinements of the load/save steps.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Layer</th><th>Mechanism</th><th>Analogy</th></tr></thead><tbody><tr><td>In-window history</td><td>Message list</td><td>CPU registers / RAM</td></tr><tr><td>Session persistence</td><td>JSONL transcript on disk</td><td>Suspend-to-disk</td></tr><tr><td>Cross-session facts</td><td>Memory file / DB</td><td>Filing cabinet</td></tr><tr><td>Learned behavior</td><td>Fine-tuning (rare, slow)</td><td>Muscle memory</td></tr></tbody></table>
+<p>ChatGPT's Memory feature, Claude's memory tool, and frameworks' "memory modules" are all variations of the bridge step — none of them modify the model.</p>
+<h3>War Story</h3>
+<p>The MemGPT paper (Packer et al., October 2023) made the OS analogy explicit and load-bearing: treat the context window as main memory, external storage as disk, and let the LLM itself issue "syscalls" to page data in and out — a virtual-memory manager for conversations. The framing stuck; the paper's authors went on to build Letta around it.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does a "chat" feel stateful when the model is stateless?</li><li>What are the two explicit operations your code must perform to simulate long-term memory?</li><li>In the MemGPT analogy, what corresponds to a page fault?</li></ol>
+<h2 id="lesson-02"><span class="lnum">02</span> Conversation Buffers and Windowing</h2>
+<p><b>MOTTO:</b> You can't keep everything — decide what falls off the back of the truck.</p>
+<h3>The Problem</h3>
+<p>Message lists only grow. At turn 5 you're fine; at turn 150 you've blown the context limit and the API throws — or, subtler and worse, you're paying for 80k tokens per call, latency triples, and the model starts ignoring the middle of the pile. Unbounded buffers fail loud (overflow) or fail quiet (cost and degraded attention). Both are bugs.</p>
+<h3>The Concept</h3>
+<p>A windowed buffer keeps the most recent N turns (or, better, most recent T <i>tokens</i>) and drops the oldest — a conveyor belt, not a warehouse:</p>
+<pre><code>  turn:   1    2    3    4    5    6    7    8
+        ┌────┐
+  drop ◄│ s1 │ [ 2    3    4    5    6    7    8 ]  ← window (kept)
+        └────┘   ▲
+                 └─ oldest survivor; next to fall
+  Always pinned: system prompt (never drops)</code></pre>
+<p>Recency is a decent default heuristic — recent turns are usually most relevant — but windowing is <i>lossy amnesia</i>: the user's name from turn 1 is simply gone. That flaw is what lessons 03–08 exist to fix.</p>
+<h3>Build It</h3>
+<ol><li>Count tokens, not messages — messages vary wildly in size. A rough proxy (<code>len(text) // 4</code>) is fine to start.</li><li>Evict from the oldest end until under budget. Never evict the system prompt.</li><li>Keep message-pair integrity: don't orphan a tool result from its tool call, or an assistant reply from its user turn — providers reject dangling tool messages.</li></ol>
+<pre><code>def windowed(messages, budget=8000, count=lambda m: len(m[&quot;content&quot;]) // 4):
+    system, rest = messages[0], messages[1:]
+    kept, total = [], count(system)
+    for m in reversed(rest):                 # newest first
+        if total + count(m) &gt; budget:
+            break
+        kept.append(m); total += count(m)
+    kept = list(reversed(kept))
+    while kept and kept[0][&quot;role&quot;] in (&quot;assistant&quot;, &quot;tool&quot;):
+        kept.pop(0)                          # don&#x27;t start mid-exchange
+    return [system] + kept</code></pre>
+<h3>Use It</h3>
+<table><thead><tr><th>Strategy</th><th>Keeps</th><th>Fails when</th></tr></thead><tbody><tr><td>Last-N messages</td><td>Simple recency</td><td>One huge message busts budget</td></tr><tr><td>Token-budget window</td><td>Precise cost control</td><td>Early key facts needed later</td></tr><tr><td>Pinned + window</td><td>System prompt, first user goal</td><td>Mid-conversation facts</td></tr><tr><td>Window + summary (next lesson)</td><td>Gist of the dropped part</td><td>Details, verbatim quotes</td></tr></tbody></table>
+<p>Every chat product you've used does some version of this; the differences are in what they refuse to drop.</p>
+<h3>War Story</h3>
+<p>The "Lost in the Middle" paper (Liu et al., 2023) measured what practitioners suspected: models retrieve information best from the <i>beginning and end</i> of long contexts, with a pronounced U-shaped accuracy dip for facts placed in the middle. Windowing plus pinning — keep the start, keep the end, be suspicious of the middle — is that finding turned into an engineering rule.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why budget by tokens rather than by message count?</li><li>What goes wrong if eviction splits a tool call from its tool result?</li><li>What does the "lost in the middle" result imply about <i>where</i> to place must-not-miss facts in the window?</li></ol>
+<h2 id="lesson-03"><span class="lnum">03</span> Summarization Memory: Compress or Die</h2>
+<p><b>MOTTO:</b> When the window fills, don't drop the past — shrink it.</p>
+<h3>The Problem</h3>
+<p>Pure windowing threw away turn 1, where the user stated the whole point of the conversation. Forty turns of debugging later, the agent no longer knows what bug it's fixing. You need the <i>gist</i> of the dropped history without its token cost — because the alternative, keeping everything, is the overflow you just escaped.</p>
+<h3>The Concept</h3>
+<p>Compaction: when the buffer nears its budget, use the LLM itself to compress the oldest chunk into a dense summary, then replace those messages with it:</p>
+<pre><code>  before:  [sys][m1..m40 — 30k tok][m41..m60 — 10k tok]
+                     │ summarize (LLM call)
+                     ▼
+  after:   [sys][SUMMARY — 800 tok][m41..m60 — 10k tok]
+                                     └ recent turns stay verbatim</code></pre>
+<p>Lossy compression, like JPEG for conversations: the picture survives, fine detail doesn't. The art is in the summarization prompt — a generic "summarize this" loses decisions and open TODOs; a targeted prompt ("preserve: user goals, decisions made, unresolved questions, file names, exact identifiers") keeps what the agent will actually need.</p>
+<h3>Build It</h3>
+<ol><li>Trigger at a threshold (e.g., 80% of budget) — not at 100%, or you have no room to summarize.</li><li>Split: oldest ~half becomes summarization input; recent turns stay verbatim.</li><li>Summarize with a task-aware prompt; include the <i>previous</i> summary so summaries chain instead of stacking.</li><li>Splice the summary in as a system-adjacent message.</li></ol>
+<pre><code>SUMMARIZE = &quot;&quot;&quot;Compress this conversation for an agent&#x27;s memory.
+MUST preserve: user goals, decisions + reasons, unresolved questions,
+exact names/paths/IDs mentioned. Omit pleasantries. Max 300 words.
+Previous summary (merge into new one): {prev}&quot;&quot;&quot;
+
+def compact(messages, budget, llm):
+    if tokens(messages) &lt; 0.8 * budget:
+        return messages
+    system, old, recent = messages[0], messages[1:-10], messages[-10:]
+    prev = extract_prev_summary(system) or &quot;none&quot;
+    summary = llm(SUMMARIZE.format(prev=prev) + render(old))
+    return [system,
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: f&quot;[Conversation so far]: {summary}&quot;},
+            *recent]</code></pre>
+<ol><li>Beware summary drift: each re-summarization compounds loss, like photocopying a photocopy. Chaining from the previous summary (step 3) limits this; pinning critical facts outside the summary (lesson 06/07) fixes it properly.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Approach</th><th>Tradeoff</th></tr></thead><tbody><tr><td>Summarize-on-threshold</td><td>Occasional latency spike at compaction</td></tr><tr><td>Rolling summary each turn</td><td>Smooth, but an LLM call per turn</td></tr><tr><td>Hierarchical (summary of summaries)</td><td>Scales to very long sessions; more drift</td></tr><tr><td>Claude Code <code>/compact</code>-style</td><td>User-visible, on-demand; user controls timing</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>Compaction went from research idea to daily tooling fast: Claude Code ships auto-compaction that summarizes the conversation as the window fills (with <code>/compact</code> for manual control), and Anthropic later exposed the same idea at the API level as context editing. Anyone who has watched a long coding session survive three compactions — and then seen the agent misremember a detail from before the first one — has felt both the necessity and the lossiness firsthand.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why trigger compaction <i>before</i> the window is actually full?</li><li>What information should a summarization prompt explicitly order the model to preserve, and why does "just summarize" fail?</li><li>What is summary drift, and which design choice in Build It mitigates it?</li></ol>
+<h2 id="lesson-04"><span class="lnum">04</span> Vector Memory: Remember by Similarity</h2>
+<p><b>MOTTO:</b> Store meanings, not strings — so "my dog" can find "the golden retriever."</p>
+<h3>The Problem</h3>
+<p>Your agent stored "User adopted a golden retriever named Biscuit." Weeks later the user asks, "what food should I get for my dog?" A keyword search for "dog" finds nothing — the memory says <i>retriever</i>. Exact-match retrieval fails precisely when people do the normal human thing: refer to the same fact in different words.</p>
+<h3>The Concept</h3>
+<p>Embeddings map text to points in high-dimensional space where semantic neighbors land close together. Vector memory stores each memory's embedding alongside its text; recall embeds the query and returns nearest neighbors by cosine similarity:</p>
+<pre><code>        &quot;golden retriever named Biscuit&quot; ●
+                                    ●  &quot;what food for my dog?&quot;      near
+                                                                     │
+   &quot;user prefers dark mode&quot; ●                                      far
+                     ● &quot;quarterly tax deadline&quot;
+
+  recall(query) = top-k memories by cos(embed(query), embed(memory))</code></pre>
+<p>It's a filing cabinet organized by <i>aboutness</i> instead of alphabet. Cosine similarity — the angle between vectors — is the standard distance because it ignores magnitude and captures direction-of-meaning.</p>
+<h3>Build It</h3>
+<ol><li>On write: <code>store.append({text, vector: embed(text), ts})</code>.</li><li>On recall: embed the query, score against all stored vectors, take top-k above a floor.</li><li>Brute force is fine for thousands of memories — NumPy dot products are fast. (ANN indexes are a Phase 5 problem.)</li></ol>
+<pre><code>import math
+
+def cosine(a, b):
+    dot = sum(x * y for x, y in zip(a, b))
+    na = math.sqrt(sum(x * x for x in a)); nb = math.sqrt(sum(y * y for y in b))
+    return dot / (na * nb + 1e-9)
+
+def recall(query, store, embed, k=3, floor=0.3):
+    qv = embed(query)
+    scored = sorted(((cosine(qv, m[&quot;vector&quot;]), m) for m in store), reverse=True)
+    return [m for s, m in scored[:k] if s &gt; floor]</code></pre>
+<ol><li>The similarity floor matters: without it, top-k returns the <i>least irrelevant</i> garbage when nothing truly matches, and the model treats it as gospel.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Store</th><th>Sweet spot</th></tr></thead><tbody><tr><td>In-memory list + NumPy</td><td>&lt; ~100k memories; zero deps</td></tr><tr><td>SQLite + sqlite-vec / Chroma</td><td>Local persistence, easy start</td></tr><tr><td>Qdrant / Weaviate / pgvector</td><td>Production, filters + scale</td></tr><tr><td>Embeddings API (OpenAI, Voyage, etc.)</td><td>Quality vectors without hosting a model</td></tr></tbody></table>
+<p>Weaknesses to respect: similarity is not <i>relevance</i> ("I love dogs" ≠ useful for a food question), and pure vectors miss exact identifiers — hybrid search (Phase 5) covers that flank.</p>
+<h3>War Story</h3>
+<p>Word2vec (Mikolov et al., 2013) delivered the result that made "meaning as geometry" famous: vector arithmetic like <i>king − man + woman ≈ queen</i> falling out of unsupervised training. A decade later the same principle — scaled up through sentence encoders and contrastively trained embedding models — became the retrieval backbone of nearly every agent memory and RAG system in production.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does keyword search fail the "dog/retriever" case while vector search succeeds?</li><li>What failure mode does a similarity floor prevent in top-k recall?</li><li>Name a query type where vector memory <i>underperforms</i> keyword search.</li></ol>
+<h2 id="lesson-05"><span class="lnum">05</span> Episodic vs Semantic Memory</h2>
+<p><b>MOTTO:</b> "What happened last Tuesday" and "what is true about the user" are different databases.</p>
+<h3>The Problem</h3>
+<p>You dump everything into one memory pile: raw events ("user asked about refunds at 3pm"), and distilled facts ("user manages a Shopify store"). Retrieval turns to mush — queries about <i>facts</i> surface stale event logs; queries about <i>history</i> surface facts with no timeline. One store, two access patterns, constant interference.</p>
+<h3>The Concept</h3>
+<p>Cognitive science splits human declarative memory the same way (Tulving, 1972). Episodic memory is autobiographical — specific events, time-stamped, contextual: "On July 3 the deploy failed with a TLS error." Semantic memory is general knowledge, detached from when you learned it: "The staging server uses self-signed certs."</p>
+<pre><code>  EPISODIC (a diary)                    SEMANTIC (an encyclopedia)
+  ─ append-only event log              ─ mutable fact store
+  ─ keyed by time + session            ─ keyed by subject
+  ─ &quot;what happened when?&quot;              ─ &quot;what is true?&quot;
+  ─ grows forever, decays in value     ─ small, dense, high-value
+            │        distill (async)        ▲
+            └───────────────────────────────┘</code></pre>
+<p>The arrow is the interesting part: semantic facts are <i>derived</i> from episodes, the way you remember that a friend is vegetarian long after forgetting the dinner where you learned it.</p>
+<h3>Build It</h3>
+<ol><li>Episodic store: append-only JSONL of <code>{ts, session, role, text}</code> — cheap, complete, never edited.</li><li>Semantic store: keyed facts <code>{subject, fact, confidence, source_episode, updated}</code> — small and curated.</li><li>A distiller job (end of session, or every N turns): prompt the LLM with recent episodes → "extract stable facts worth keeping"; upsert into semantic store, updating rather than duplicating.</li><li>Retrieval routes by question shape: time-ish queries ("last time", "yesterday", "again") → episodic search; identity/preference/config queries → semantic lookup; when unsure, pull a little of both.</li></ol>
+<pre><code>def distill(episodes, semantic, llm):
+    facts = llm(f&quot;Extract durable facts about the user/project from:\n{render(episodes)}\n&quot;
+                &quot;Return JSON: [{subject, fact}]. Skip transient chit-chat.&quot;)
+    for f in json.loads(facts):
+        semantic.upsert(f[&quot;subject&quot;], f[&quot;fact&quot;], source=episodes[-1][&quot;ts&quot;])</code></pre>
+<h3>Use It</h3>
+<table><thead><tr><th>Question</th><th>Store queried</th></tr></thead><tbody><tr><td>"What did we decide yesterday?"</td><td>Episodic</td></tr><tr><td>"What's my usual deploy target?"</td><td>Semantic</td></tr><tr><td>"Have we hit this error before?"</td><td>Episodic (then distill the fix into semantic!)</td></tr><tr><td>"Who is Priya?"</td><td>Semantic (entity view — next lesson)</td></tr></tbody></table>
+<p>Generative Agents (Park et al., 2023) used exactly this layering: an event stream plus periodically synthesized higher-level "reflections."</p>
+<h3>War Story</h3>
+<p>The Generative Agents paper (Park et al., April 2023) put 25 LLM-driven characters in a simulated town, each with an episodic "memory stream" and a reflection process that distilled events into higher-level conclusions. The agents organized a Valentine's Day party from a single seeded intention — invitations spread, and several agents showed up — behavior that emerged from the memory architecture, not from scripting.</p>
+<h3>Checkpoint</h3>
+<ol><li>Which store is append-only and which is mutable, and why does that match their contents?</li><li>What does the distillation step correspond to in the human-memory analogy?</li><li>Given the query "did we already try downgrading numpy?", which store(s) do you hit and in what order?</li></ol>
+<h2 id="lesson-06"><span class="lnum">06</span> Entity Memory: Tracking People, Places, Things</h2>
+<p><b>MOTTO:</b> Memories about <i>someone</i> should be filed under that someone.</p>
+<h3>The Problem</h3>
+<p>Across sessions the user mentions "Priya" fifteen times: she's a coworker, she owns the API migration, she's out in August, she prefers Slack over email. Vector recall of "message Priya about the deadline" surfaces two of those fragments — the rest are scattered across unrelated conversations, semantically near other things. You have knowledge <i>about Priya</i>; you don't have a <i>Priya record</i>.</p>
+<h3>The Concept</h3>
+<p>Entity memory is a structured index keyed by the noun: one card per person, project, or system, accumulating facts and relations over time — a CRM your agent keeps for its own world:</p>
+<pre><code>  ENTITY: Priya (person)
+  ├─ role: coworker; owns API migration
+  ├─ prefs: Slack &gt; email
+  ├─ status: OOO August (noted 2026-07-12)
+  └─ relations: works_with → User; owns → api-migration (project)
+
+  mention detected ──► resolve (&quot;she&quot; → Priya) ──► update card
+  entity referenced ──► load whole card into context</code></pre>
+<p>Two hard sub-problems ride along: <i>extraction</i> (spotting entity mentions — LLMs are excellent at this) and <i>resolution</i> (deciding "Priya", "she", and "P. Sharma" are one entity — genuinely hard, embrace approximate).</p>
+<h3>Build It</h3>
+<ol><li>After each exchange, run an extraction prompt: "List entities mentioned and any new facts about each. JSON: <code>[{name, type, facts[]}]</code>."</li><li>Resolve against existing cards — exact name match first, then alias list, then ask-the-LLM for ambiguous cases.</li><li>Merge facts into the card; keep <code>last_updated</code> per fact (staleness matters — lesson 09).</li><li>On retrieval: scan the incoming user message for known entity names/aliases; inject matching cards into context wholesale. Cards are small; whole-card injection beats fragment recall.</li></ol>
+<pre><code>def inject_entities(user_msg, entities):
+    hits = [card for name, card in entities.items()
+            if name.lower() in user_msg.lower()
+            or any(a.lower() in user_msg.lower() for a in card[&quot;aliases&quot;])]
+    return &quot;\n&quot;.join(render_card(c) for c in hits[:5])</code></pre>
+<h3>Use It</h3>
+<table><thead><tr><th>Approach</th><th>Tradeoff</th></tr></thead><tbody><tr><td>LLM extraction per turn</td><td>Accurate, costs a call per exchange</td></tr><tr><td>Batch extraction per session</td><td>Cheaper; facts arrive late</td></tr><tr><td>LangChain-style entity memory</td><td>Convenient; resolution is naive</td></tr><tr><td>Full knowledge graph (nodes + edges)</td><td>Powerful relations; real engineering (see GraphRAG, Phase 5)</td></tr></tbody></table>
+<p>Entity cards compose beautifully with the semantic store from lesson 05 — an entity card is just semantic memory with a primary key.</p>
+<h3>War Story</h3>
+<p>When OpenAI rolled out Memory for ChatGPT (announced February 2024, broadly enabled later that year), the user-visible behavior was essentially entity memory about <i>you</i>: distilled, editable statements like your profession, preferences, and ongoing projects — not conversation transcripts. The design validated a core lesson: users want memory they can read, correct, and delete, which structured entity records make possible and raw vector stores make hard.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does whole-card injection often beat top-k fragment recall for entity questions?</li><li>What is entity resolution, and why is it harder than entity extraction?</li><li>How do entity cards make memory <i>auditable</i> in a way embedded fragments aren't?</li></ol>
+<h2 id="lesson-07"><span class="lnum">07</span> The Write Policy: What's Worth Remembering</h2>
+<p><b>MOTTO:</b> A memory that stores everything is a landfill with a search bar.</p>
+<h3>The Problem</h3>
+<p>Naive systems write every exchange to long-term memory. Within weeks: "user said thanks", "user asked to rephrase", and "user's API key is sk-..." sit alongside the three facts that matter. Retrieval quality drowns in noise, storage of secrets becomes a liability, and one sarcastic "sure, I <i>love</i> debugging YAML" becomes a permanent personality profile. Deciding what to write is as important as deciding what to read.</p>
+<h3>The Concept</h3>
+<p>A write policy is a gate between the conversation and the store, scoring each candidate memory on a few axes:</p>
+<pre><code>  candidate fact ──► [ WRITE POLICY ]──► store / skip / redact
+                        │
+        durability  ── will this matter next week?
+        specificity ── &quot;prefers pytest&quot; vs &quot;likes stuff&quot;
+        novelty     ── already stored? update instead of duplicate
+        sensitivity ── secrets, health, PII → redact or refuse
+        provenance  ── user-stated fact vs model inference</code></pre>
+<p>The librarian analogy: an archivist doesn't shelve every napkin — they select, deduplicate, label with source and date, and keep restricted material out of the open stacks.</p>
+<h3>Build It</h3>
+<ol><li>Generate candidates: after each exchange, ask the LLM "list durable facts, preferences, or decisions from this exchange worth remembering; return [] if none." An empty list must be a common, acceptable answer.</li><li>Score/filter: drop transient (weather, one-off tasks); drop low-specificity; block a sensitivity list (credentials, government IDs) outright.</li><li>Deduplicate: before insert, check similarity against existing memories — near-duplicates become <i>updates</i> (bump timestamp, merge detail) rather than new rows.</li><li>Tag provenance: <code>stated</code> (user said it) vs <code>inferred</code> (model guessed it). Inferred facts get lower confidence and earlier expiry.</li></ol>
+<pre><code>def maybe_write(exchange, store, llm):
+    cands = json.loads(llm(EXTRACT_PROMPT + render(exchange)))   # often []
+    for c in cands:
+        if is_sensitive(c[&quot;text&quot;]):        continue
+        dup = store.most_similar(c[&quot;text&quot;])
+        if dup and dup.score &gt; 0.9:        store.touch(dup.id, merge=c[&quot;text&quot;])
+        else:                              store.add(c[&quot;text&quot;], src=c[&quot;provenance&quot;])</code></pre>
+<ol><li>Let the user see and veto. "I've noted that you prefer X" with a delete affordance beats silent accumulation — for trust <i>and</i> for correctness.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Policy</th><th>Failure it prevents</th></tr></thead><tbody><tr><td>Durability filter</td><td>Landfill of trivia</td></tr><tr><td>Dedup-as-update</td><td>14 copies of "uses Python" with conflicting details</td></tr><tr><td>Sensitivity blocklist</td><td>Storing secrets you must never store</td></tr><tr><td>Provenance tags</td><td>Model inferences hardening into "facts"</td></tr><tr><td>User-visible writes</td><td>Creepy, wrong, or unwanted memories persisting</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>Both major assistants converged on selective, visible writes: ChatGPT's Memory shows "Memory updated" notices and gives users a management screen to review and delete entries, and Anthropic's memory-tool guidance similarly emphasizes storing distilled, user-relevant facts rather than transcripts. The convergence is the lesson — every team that ships write-everything memory ends up rebuilding it as write-selectively memory.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why must "nothing worth remembering" be a frequent output of the extraction step?</li><li>What goes wrong when near-duplicate memories are inserted instead of merged?</li><li>Why should model-inferred facts be stored with different metadata than user-stated ones?</li></ol>
+<h2 id="lesson-08"><span class="lnum">08</span> Memory Retrieval: When to Recall What</h2>
+<p><b>MOTTO:</b> Perfect memories are useless if they arrive in the wrong turn — or all at once.</p>
+<h3>The Problem</h3>
+<p>You have clean stores: buffer, summary, entities, vectors. Now every turn poses a routing question: should this query trigger recall at all? From which store? How much? Injecting five memories into "hi" is noise; injecting none into "email that thing to the person we discussed" is amnesia. Retrieval that's always-on pollutes; retrieval that's never-on wastes everything you built.</p>
+<h3>The Concept</h3>
+<p>Two architectures, often combined:</p>
+<pre><code>  IMPLICIT (reflex)                      EXPLICIT (deliberate)
+  before every turn:                     memory is a TOOL:
+  ┌──────────────────────┐               model decides to call
+  │ score query vs stores │               search_memory(&quot;Priya deadline&quot;)
+  │ inject hits &gt; floor   │               when it notices it&#x27;s missing info
+  └──────────────────────┘
+  + zero model effort                    + recall matches actual need
+  − recalls on &quot;hi&quot;, misses              − model must notice the gap
+    implicit references                  − costs a turn</code></pre>
+<p>Implicit retrieval is a reflex — cheap, automatic, sometimes wrong. Explicit retrieval is deliberate recall — the agent notices "the person we discussed" is unresolved and goes looking. Mature systems use a light implicit pass (entities + high-similarity hits only) plus an explicit <code>search_memory</code> tool for everything else.</p>
+<h3>Build It</h3>
+<ol><li>Implicit pass, per turn: (a) entity scan → inject matched cards; (b) vector recall with a <i>high</i> floor (only confident hits); (c) always include the running summary. Budget the whole pass (e.g., ≤ 800 tokens).</li><li>Explicit tool: register <code>search_memory(query, store=all|episodic|semantic|entities)</code> through your Phase 3 router.</li><li>Placement: inject memories into a labeled system block — <code>[Recalled memories — may be stale, verify if critical]</code> — not spliced into user turns; label affects how the model weighs them.</li><li>Skip heuristics: no implicit recall on greetings, acknowledgments, or when the buffer already contains the answer (check before searching).</li></ol>
+<pre><code>def implicit_recall(user_msg, mem, budget=800):
+    parts = [mem.summary()]
+    parts += [render_card(c) for c in mem.entity_hits(user_msg)]
+    parts += [m.text for m in mem.vector_recall(user_msg, k=3, floor=0.45)]
+    return truncate_to(&quot;\n&quot;.join(p for p in parts if p), budget)</code></pre>
+<h3>Use It</h3>
+<table><thead><tr><th>Situation</th><th>Strategy</th></tr></thead><tbody><tr><td>Named entity in query</td><td>Implicit card injection</td></tr><tr><td>Vague reference ("that bug")</td><td>Explicit search_memory — model resolves the reference</td></tr><tr><td>Every turn, always</td><td>Running summary only</td></tr><tr><td>High-stakes fact (address, config)</td><td>Explicit recall + ask user to confirm</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>MemGPT (2023) staked out the explicit end of the spectrum: the model itself issues function calls to page memories in and out of context, deciding when to recall. Retrieval-augmented systems descended from Lewis et al. (2020) staked out the implicit end: retrieve-then-generate on every query, no model decision involved. A half-decade later, production agents almost universally run both — a reflex layer and a recall tool.</p>
+<h3>Checkpoint</h3>
+<ol><li>What does implicit retrieval get wrong on the query "hi", and on "email the person we discussed"?</li><li>Why label injected memories as possibly stale rather than presenting them as ground truth?</li><li>Why does the explicit-tool approach cost more latency even when it retrieves better?</li></ol>
+<h2 id="lesson-09"><span class="lnum">09</span> Forgetting: Decay, Eviction, and Contradictions</h2>
+<p><b>MOTTO:</b> A memory system that can't forget will eventually lie to you with its own history.</p>
+<h3>The Problem</h3>
+<p>March: "user works at Acme." July: "just started at Initech!" Your store now holds both, and vector recall happily serves whichever is closer to the query. The agent congratulates the user on their job at Acme. Stale memory isn't a storage cost problem — it's a <i>correctness</i> problem: yesterday's truths become today's confident falsehoods, and unbounded stores bury good memories under dead ones.</p>
+<h3>The Concept</h3>
+<p>Three forgetting mechanisms, mirroring how human memory actually stays useful:</p>
+<pre><code>  DECAY       score = relevance × recency_weight × use_count
+              old, never-recalled memories fade from ranking
+  EVICTION    hard caps: store full → archive/delete lowest-scoring
+  SUPERSESSION new fact contradicts old ──► old marked superseded,
+              kept as history, excluded from recall
+              &quot;works at Acme&quot; ──X──► superseded_by ──► &quot;works at Initech&quot;</code></pre>
+<p>Generative Agents (2023) scored memories as relevance + recency + importance — forgetting as <i>ranking</i>, not deletion. Supersession is the subtle one: don't delete the contradicted fact (the history "user changed jobs in July" is itself informative); mark it and route recall to the current version.</p>
+<h3>Build It</h3>
+<ol><li>Metadata on every memory: <code>created</code>, <code>last_recalled</code>, <code>recall_count</code>, <code>status: active|superseded|archived</code>.</li><li>Decay in the ranking function, not the storage: <code>score = similarity <i> exp(-λ </i> days_since(last_recalled or created))</code>. Recalling a memory refreshes it — use it or lose it, literally.</li><li>On every write, check for contradictions: search for high-similarity <i>active</i> memories about the same subject; if the LLM judges them incompatible ("can both be true?"), mark the old one <code>superseded_by=new_id</code>.</li><li>Eviction job: past a store cap, archive <code>active</code> memories with the lowest decayed scores; never silently delete user-stated facts — archive is reversible.</li></ol>
+<pre><code>def write_with_supersession(new, store, llm):
+    for old in store.similar(new.text, k=5, status=&quot;active&quot;):
+        verdict = llm(f&quot;Fact A: {old.text}\nFact B: {new.text}\n&quot;
+                      &quot;Can both be true simultaneously? YES/NO, one word.&quot;)
+        if verdict.strip() == &quot;NO&quot;:
+            store.mark_superseded(old.id, by=new.id)
+    store.add(new)</code></pre>
+<h3>Use It</h3>
+<table><thead><tr><th>Mechanism</th><th>Handles</th><th>Doesn't handle</th></tr></thead><tbody><tr><td>Recency decay</td><td>Gradual staleness</td><td>Sudden contradictions</td></tr><tr><td>Recall-refresh</td><td>Keeping used memories alive</td><td>First-recall of old-but-true facts</td></tr><tr><td>Supersession</td><td>Job changes, preference flips</td><td>Facts that quietly expired with no successor</td></tr><tr><td>TTL by category</td><td>"OOO until August" auto-expiry</td><td>Choosing good TTLs</td></tr></tbody></table>
+<p>Give volatile categories (status, location, current project) short TTLs; give stable ones (name, profession) none.</p>
+<h3>War Story</h3>
+<p>The Generative Agents paper (Park et al., 2023) is the canonical demonstration that forgetting-as-ranking works: each agent scored its memory stream by recency, importance, and relevance at retrieval time, letting a bounded context surface the right slice of an ever-growing log. Meanwhile, every long-lived assistant deployment independently discovers the contradiction problem — which is why ChatGPT's memory management UI lets users delete individual memories: manual supersession, shipped as a feature.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is supersession (mark + link) better than deletion for contradicted facts?</li><li>How does "recall refreshes recency" mimic human memory, and what pathology could it cause?</li><li>Which memory categories deserve TTLs, and name two with opposite TTL needs.</li></ol>
+<h2 id="lesson-10"><span class="lnum">10</span> Build a Memory System From Scratch</h2>
+<p><b>MOTTO:</b> Buffer for now, summary for the past, index for the forever — wire all three and ship it.</p>
+<h3>The Problem</h3>
+<p>Ten lessons of parts. Time to assemble a working memory stack with zero dependencies: a windowed buffer (short-term), a rolling summary (compressed past), and keyword-vector recall over a persistent fact store (long-term) — the minimum honest implementation of everything above, in one class you fully understand.</p>
+<h3>The Concept</h3>
+<pre><code>                ┌───────────── MemoryAgent ─────────────┐
+   user msg ──► │ 1 recall(msg)  → hits from fact store │
+                │ 2 build ctx    → summary + hits + buf │──► llm() ──► reply
+                │ 3 write        → extract fact? store  │
+                │ 4 compact      → over budget? shrink  │
+                └───────────┬───────────────────────────┘
+                            ▼
+                   memory.json  (facts survive restarts)</code></pre>
+<p>For recall we use TF-IDF-style keyword vectors — real cosine similarity over sparse term vectors, no embedding API needed. It's genuinely the same math as dense vector memory, just with hand-rolled features; swap in an embeddings call later and nothing else changes.</p>
+<h3>Build It</h3>
+<pre><code>import json, math, re, os
+from collections import Counter
+
+def tokenize(t): return re.findall(r&quot;[a-z0-9]+&quot;, t.lower())
+
+class FactStore:                                   # long-term: keyword-vector recall
+    def __init__(self, path=&quot;memory.json&quot;):
+        self.path = path
+        self.facts = json.load(open(path)) if os.path.exists(path) else []
+    def add(self, text):
+        if not any(self._sim(text, f[&quot;text&quot;]) &gt; 0.8 for f in self.facts):  # dedup
+            self.facts.append({&quot;text&quot;: text}); self._save()
+    def recall(self, query, k=3, floor=0.15):
+        scored = sorted(((self._sim(query, f[&quot;text&quot;]), f) for f in self.facts),
+                        key=lambda x: x[0], reverse=True)
+        return [f[&quot;text&quot;] for s, f in scored[:k] if s &gt; floor]
+    def _sim(self, a, b):                          # cosine over term counts, IDF-weighted
+        ta, tb = Counter(tokenize(a)), Counter(tokenize(b))
+        idf = lambda w: math.log(1 + len(self.facts) / (1 + sum(w in tokenize(f[&quot;text&quot;]) for f in self.facts)))
+        dot = sum(ta[w] * tb[w] * idf(w) ** 2 for w in ta.keys() &amp; tb.keys())
+        na = math.sqrt(sum((c * idf(w)) ** 2 for w, c in ta.items()))
+        nb = math.sqrt(sum((c * idf(w)) ** 2 for w, c in tb.items()))
+        return dot / (na * nb + 1e-9)
+    def _save(self): json.dump(self.facts, open(self.path, &quot;w&quot;))
+
+class MemoryAgent:
+    def __init__(self, llm, budget=6000):
+        self.llm, self.budget = llm, budget
+        self.buffer, self.summary, self.store = [], &quot;&quot;, FactStore()
+    def chat(self, msg):
+        recalled = self.store.recall(msg)
+        system = (&quot;[Summary]: &quot; + (self.summary or &quot;none&quot;) + &quot;\n&quot;
+                  &quot;[Recalled facts — verify if critical]: &quot; + (&quot;; &quot;.join(recalled) or &quot;none&quot;))
+        reply = self.llm([{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system},
+                          *self.buffer, {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: msg}])
+        self.buffer += [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: msg},
+                        {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: reply}]
+        self._write(msg); self._compact()
+        return reply
+    def _write(self, msg):                          # crude write policy: durable statements only
+        fact = self.llm(f&quot;If this states a durable fact/preference, restate it in third &quot;
+                        f&quot;person; else reply NONE.\n---\n{msg}&quot;)
+        if fact.strip() != &quot;NONE&quot;: self.store.add(fact.strip())
+    def _compact(self):
+        if sum(len(m[&quot;content&quot;]) for m in self.buffer) // 4 &gt; self.budget:
+            old, self.buffer = self.buffer[:-6], self.buffer[-6:]
+            self.summary = self.llm(&quot;Merge into one 150-word memory summary. Keep goals, &quot;
+                                    f&quot;decisions, names.\nPrev: {self.summary}\nNew: {json.dumps(old)}&quot;)</code></pre>
+<p>Test the illusion: tell it your name, chat past the compaction threshold, restart the process, and ask "what's my name?" — the buffer is gone, the process died, and it still knows, via the store.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Component here</th><th>Production replacement</th></tr></thead><tbody><tr><td><code>FactStore</code> keyword vectors</td><td>Embeddings + Chroma/pgvector</td></tr><tr><td><code>_write</code> single-prompt policy</td><td>Lesson 07's full policy + provenance</td></tr><tr><td>String summary</td><td>Chained compaction w/ pinned facts</td></tr><tr><td><code>memory.json</code></td><td>SQLite/Postgres + per-user namespacing</td></tr><tr><td>(missing) supersession</td><td>Lesson 09's contradiction check — add it!</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>The MemGPT paper (2023) closed with the argument this lesson embodies: context limits are an architecture problem, solvable with the same hierarchy tricks operating systems have used since the 1960s. The stack you just wrote — hot buffer, compressed summary, paged-in facts — is a tiny virtual-memory manager for a conversation, and it is structurally the same design running inside every long-lived assistant shipping today.</p>
+<h3>Checkpoint</h3>
+<ol><li>Trace what happens to "my name is Sanjay" through recall, context build, write, and compact.</li><li>Why does swapping keyword vectors for embedding vectors require no change to the recall interface?</li><li>Which lesson-09 mechanism is missing from this build, and what bug will eventually appear without it?</li></ol>
+  </article>
+  <div class="pager">
+    <a href="03-tools-and-function-calling.html">← 🔧 Phase 03</a>
+    <span class="spacer"></span>
+    <a href="05-rag-for-agents.html">Phase 05 🔍 →</a>
+  </div>
+</div>
+</body>
+</html>

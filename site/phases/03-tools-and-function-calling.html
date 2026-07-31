@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tools & Function Calling — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 03</div>
+  <h1><span class="pnum">03</span> 🔧 Tools &amp; Function Calling</h1>
+  <div class="tagline">A model that can only talk is a consultant. Give it hands.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Tool schemas: describing functions to a model</a>
+<a href="#lesson-02"><span class="lnum">02</span>Tool choice: auto, required, forced, none</a>
+<a href="#lesson-03"><span class="lnum">03</span>Parallel tool calls</a>
+<a href="#lesson-04"><span class="lnum">04</span>Tool errors: retry, explain, or give up</a>
+<a href="#lesson-05"><span class="lnum">05</span>Sandboxing code execution</a>
+<a href="#lesson-06"><span class="lnum">06</span>Search tools: web, docs, and grep</a>
+<a href="#lesson-07"><span class="lnum">07</span>File tools: read, write, edit safely</a>
+<a href="#lesson-08"><span class="lnum">08</span>Browser and HTTP tools</a>
+<a href="#lesson-09"><span class="lnum">09</span>The tool router: dispatch without spaghetti</a>
+<a href="#lesson-10"><span class="lnum">10</span>Dynamic tool loading and tool search</a>
+<a href="#lesson-11"><span class="lnum">11</span>Designing tools agents actually use well</a>
+<a href="#lesson-12"><span class="lnum">12</span>Build a tool-using agent from scratch</a>
+  </div>
+  <article>
+<blockquote>A model that can only talk is a consultant. Give it hands.</blockquote>
+<p>Everything before this phase produced text. Useful text, sometimes — but text nonetheless. This phase is where your agent stops describing actions and starts taking them: calling APIs, running code, editing files, searching the web. The mechanism underneath is almost embarrassingly simple — the model emits structured JSON, your code executes it, and you feed the result back — but the engineering around that loop (schemas, dispatch, errors, sandboxing, tool design) is where real agents are won or lost.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> Tool Schemas: Describing Functions to a Model</h2>
+<p><b>MOTTO:</b> A tool schema is a job posting — write a vague one and you'll hire the wrong call.</p>
+<h3>The Problem</h3>
+<p>You have a <code>get_weather(city, units)</code> function. The model has never seen your code, can't import your module, and only consumes tokens. If you just say "you can check the weather," the model will invent a calling convention: <code>weather("Paris, please, in celsius")</code>. You need a contract, not a vibe.</p>
+<h3>The Concept</h3>
+<p>A tool schema is a machine-readable job posting: name, description, and typed parameters, almost always expressed as JSON Schema. The model reads the posting and emits a structured application (a JSON object) that your code can validate and execute.</p>
+<pre><code>  You define:                      Model emits:
+  {                                {
+    &quot;name&quot;: &quot;get_weather&quot;,           &quot;name&quot;: &quot;get_weather&quot;,
+    &quot;description&quot;: &quot;...&quot;,     ──►    &quot;arguments&quot;: {
+    &quot;parameters&quot;: {                     &quot;city&quot;: &quot;Paris&quot;,
+      &quot;city&quot;: string (req),            &quot;units&quot;: &quot;celsius&quot;
+      &quot;units&quot;: enum[c,f]             }
+    }                              }
+  }</code></pre>
+<p>The schema goes into the prompt (providers inject it into a system-level block); the model's "function call" is just constrained text generation shaped like your schema.</p>
+<h3>Build It</h3>
+<ol><li>Write your function normally in Python.</li><li>Derive a schema dict: name, description, and a JSON Schema <code>parameters</code> object with <code>type</code>, <code>enum</code>, <code>required</code>.</li><li>Serialize the schema into the request alongside the messages.</li><li>Parse the model's output as JSON; validate against the schema before executing.</li></ol>
+<pre><code>def schema_from(fn):
+    import inspect
+    sig = inspect.signature(fn)
+    props = {p: {&quot;type&quot;: &quot;string&quot;} for p in sig.parameters}
+    return {&quot;name&quot;: fn.__name__,
+            &quot;description&quot;: fn.__doc__ or &quot;&quot;,
+            &quot;parameters&quot;: {&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: props,
+                           &quot;required&quot;: list(sig.parameters)}}</code></pre>
+<p>Real frameworks do exactly this with type hints and docstrings — nothing magic.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Approach</th><th>Tradeoff</th></tr></thead><tbody><tr><td>Hand-written JSON Schema</td><td>Full control, verbose, drifts from code</td></tr><tr><td>Pydantic / <code>TypeAdapter</code></td><td>Schema auto-derived, validation free, Python-only</td></tr><tr><td>OpenAI/Anthropic tool params</td><td>Native, provider-validated; formats differ slightly</td></tr><tr><td>MCP (Model Context Protocol)</td><td>Tools as portable servers; extra moving part</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>The Toolformer paper (Meta AI, February 2023) showed a model could teach <i>itself</i> when to call APIs — calculator, search, translation — by self-annotating training data with API calls that reduced loss. Four months later, in June 2023, OpenAI shipped function calling as a first-class API feature, and hand-parsing "please respond in JSON" prompts became legacy code overnight.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does the model need a JSON Schema rather than just your function's source code?</li><li>What happens if two tools have similar descriptions and overlapping parameters?</li><li>Where does the schema physically live from the model's point of view?</li></ol>
+<h2 id="lesson-02"><span class="lnum">02</span> Tool Choice: Auto, Required, Forced, None</h2>
+<p><b>MOTTO:</b> Deciding <i>whether</i> to call a tool is a decision you can take away from the model.</p>
+<h3>The Problem</h3>
+<p>User asks "what's 2+2?" and your agent solemnly calls the calculator API. User asks "what's our refund policy?" and the agent freelances an answer instead of calling the docs search. The model's judgment about <i>when</i> to use tools is good but not free — and sometimes you know better.</p>
+<h3>The Concept</h3>
+<p>Tool choice is a dial with four positions, set per-request by <i>you</i>, not the model:</p>
+<pre><code>  none ──── auto ──── required ──── forced(&quot;get_weather&quot;)
+   │          │           │              │
+  never    model      must call       must call
+  calls    decides    some tool       THIS tool</code></pre>
+<p>Think of it as delegation levels for a new employee: "don't touch anything," "use your judgment," "you must use a tool for this," "use exactly this tool."</p>
+<h3>Build It</h3>
+<ol><li><code>none</code>: don't include tool schemas in the request (or include them but instruct text-only) — model can only answer in prose.</li><li><code>auto</code>: include schemas; model picks tool-call or text per its judgment.</li><li><code>required</code>: include schemas and reject/retry any response that isn't a tool call.</li><li><code>forced</code>: include only one schema, or constrain decoding to that tool's name.</li></ol>
+<pre><code>def enforce(response, mode, tool=None):
+    if mode == &quot;required&quot; and not response.tool_calls:
+        return retry_with_hint(&quot;You must call a tool.&quot;)
+    if mode == &quot;forced&quot; and response.tool_calls[0].name != tool:
+        return retry_with_hint(f&quot;You must call {tool}.&quot;)
+    return response</code></pre>
+<p>Forcing on the first turn is a common trick for extraction pipelines: force a <code>record_result</code> tool and you get guaranteed structured output.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Mode</th><th>Use when</th></tr></thead><tbody><tr><td><code>auto</code></td><td>General agents; default</td></tr><tr><td><code>required</code></td><td>Router turns where "just chat" is never valid</td></tr><tr><td><code>forced</code></td><td>Structured extraction; guaranteed first-step tools</td></tr><tr><td><code>none</code></td><td>Final summarization turn after tool results are in</td></tr></tbody></table>
+<p>OpenAI calls this <code>tool_choice</code>; Anthropic uses <code>tool_choice: {type: auto|any|tool}</code> — <code>any</code> is their "required."</p>
+<h3>War Story</h3>
+<p>Before native structured output existed, forced tool calling was <i>the</i> trick for reliable JSON extraction — you defined a dummy tool whose parameters were your output schema and forced it. OpenAI later formalized this pattern as Structured Outputs (August 2024) with constrained decoding that guarantees schema-valid JSON, essentially productizing what everyone was already doing with forced tools.</p>
+<h3>Checkpoint</h3>
+<ol><li>What's the difference between <code>required</code> and forcing a specific tool?</li><li>Why might you set <code>tool_choice: none</code> on the final turn of an agent loop?</li><li>How can forced tool calling give you guaranteed structured output?</li></ol>
+<h2 id="lesson-03"><span class="lnum">03</span> Parallel Tool Calls</h2>
+<p><b>MOTTO:</b> If the model asks three independent questions, don't answer them one at a time.</p>
+<h3>The Problem</h3>
+<p>Your travel agent needs weather in Paris, weather in Rome, and flight prices between them. Sequential tool calls mean three full model round-trips: call, wait, respond, call, wait, respond... Each round-trip costs a model invocation (dollars) and seconds of latency. The user watches a spinner while your agent plays twenty questions with itself.</p>
+<h3>The Concept</h3>
+<p>Modern models can emit <i>multiple</i> tool calls in a single response when the calls are independent. Your executor fans out, runs them concurrently, and returns all results in one batch:</p>
+<pre><code>  Model turn:  [call get_weather(Paris), call get_weather(Rome), call get_flights(P,R)]
+                     │                        │                       │
+                     ▼                        ▼                       ▼
+               ┌──────────┐            ┌──────────┐            ┌──────────┐
+               │ executor │            │ executor │            │ executor │   (concurrent)
+               └────┬─────┘            └────┬─────┘            └────┬─────┘
+                    └───────────┬───────────┴───────────────────────┘
+                                ▼
+               One follow-up turn with all three results</code></pre>
+<p>One model turn instead of three. The catch: results must be matched back to calls by ID, and order of completion is not order of issue.</p>
+<h3>Build It</h3>
+<ol><li>Parse <i>all</i> tool calls from the response, each with its unique <code>id</code>.</li><li>Execute concurrently (<code>asyncio.gather</code> or a thread pool for blocking I/O).</li><li>Return one result message per call, tagged with the matching <code>id</code> — providers require every call to get an answer, even if it's an error.</li></ol>
+<pre><code>import asyncio
+
+async def run_all(tool_calls, registry):
+    async def one(call):
+        try:
+            out = await registry[call.name](**call.args)
+        except Exception as e:
+            out = f&quot;ERROR: {e}&quot;
+        return {&quot;tool_call_id&quot;: call.id, &quot;content&quot;: str(out)}
+    return await asyncio.gather(*(one(c) for c in tool_calls))</code></pre>
+<ol><li>Never parallelize calls with ordering dependencies (write-then-read). If the model does it anyway, execute serially or reject.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Concern</th><th>Practice</th></tr></thead><tbody><tr><td>Blocking Python tools</td><td><code>ThreadPoolExecutor</code>, cap workers</td></tr><tr><td>Rate limits</td><td>Semaphore per external API</td></tr><tr><td>One call fails</td><td>Return error for that ID, real results for the rest</td></tr><tr><td>Side-effecting tools</td><td>Consider disabling parallel for writes</td></tr></tbody></table>
+<p>OpenAI shipped parallel function calling at DevDay in November 2023; Anthropic models emit multiple <code>tool_use</code> blocks in one message.</p>
+<h3>War Story</h3>
+<p>OpenAI introduced parallel function calling alongside GPT-4 Turbo at its first DevDay (November 6, 2023). Early adopters immediately hit the classic bug: answering only the first tool call and dropping the rest, which the API rejects — every tool_call ID in the assistant message must receive a corresponding result message.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why must every tool call ID receive a result message, even for failed calls?</li><li>When is parallel execution of tool calls actively dangerous?</li><li>What does parallel calling save compared to sequential calls — tokens, latency, or model invocations?</li></ol>
+<h2 id="lesson-04"><span class="lnum">04</span> Tool Errors: Retry, Explain, or Give Up</h2>
+<p><b>MOTTO:</b> An error message is just another observation — feed it back and let the model debug itself.</p>
+<h3>The Problem</h3>
+<p>The model calls <code>get_user(id="bob")</code> but the API wants an integer. Your executor throws, your agent crashes, and the user sees a stack trace. Or worse: you silently swallow the error, and the model confidently continues as if the call succeeded, hallucinating the data it never got.</p>
+<h3>The Concept</h3>
+<p>Errors are information. The same feedback loop that makes agents work on success makes them work on failure — return the error <i>as the tool result</i> and the model usually fixes its own call:</p>
+<pre><code>  call: get_user(id=&quot;bob&quot;)
+   └─► TOOL ERROR: &quot;id must be an integer. Got str &#x27;bob&#x27;.
+        Hint: use search_users(name=...) to find an id.&quot;
+        └─► model: calls search_users(name=&quot;bob&quot;) → gets id 42
+             └─► calls get_user(id=42) ✓</code></pre>
+<p>Three escalation levels: (1) retry silently for transient faults (network blips, 429s) — the model never needs to know; (2) explain — return a descriptive error and let the model adapt; (3) give up — after N failures, stop and tell the user honestly.</p>
+<h3>Build It</h3>
+<ol><li>Wrap every tool execution in try/except. Never let a tool exception kill the loop.</li><li>Classify: transient (timeout, 429, 503) → auto-retry with exponential backoff, invisible to the model.</li><li>Permanent (validation, 404, permission) → format a <i>helpful</i> error string: what failed, why, and what to try instead.</li><li>Count failures per tool per task. At the cap, return "this tool is unavailable, proceed without it or report failure."</li></ol>
+<pre><code>def execute(call, registry, attempts=3):
+    for i in range(attempts):
+        try:
+            return registry[call.name](**call.args)
+        except TransientError:
+            time.sleep(2 ** i)
+        except Exception as e:
+            return f&quot;ERROR calling {call.name}: {e}. Check argument types and retry, or use a different tool.&quot;
+    return f&quot;ERROR: {call.name} failed {attempts} times; treat it as unavailable.&quot;</code></pre>
+<h3>Use It</h3>
+<table><thead><tr><th>Error type</th><th>Strategy</th></tr></thead><tbody><tr><td>429 / timeout</td><td>Silent retry + backoff, never shown to model</td></tr><tr><td>Bad arguments</td><td>Explain with a hint; model self-corrects well</td></tr><tr><td>Auth / permission</td><td>Don't retry; surface to user</td></tr><tr><td>Repeated identical failure</td><td>Circuit-break: mark tool dead for this task</td></tr></tbody></table>
+<p>Good error messages are prompt engineering — "Invalid input" teaches the model nothing; "expected ISO date, got 'tomorrow'" fixes the next call.</p>
+<h3>War Story</h3>
+<p>The ReAct paper (Yao et al., 2022) demonstrated the core insight formally: interleaving reasoning with environment observations — including error observations — let models recover from failed actions instead of compounding them, beating action-only baselines on ALFWorld and WebShop. Every "feed the traceback back to the model" pattern in modern coding agents is this loop.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why should transient errors be retried <i>without</i> telling the model, while validation errors should be shown to it?</li><li>What makes a tool error message "good" from the model's perspective?</li><li>What failure mode does a per-task retry cap prevent?</li></ol>
+<h2 id="lesson-05"><span class="lnum">05</span> Sandboxing Code Execution</h2>
+<p><b>MOTTO:</b> The model writes the code; you decide what universe it runs in.</p>
+<h3>The Problem</h3>
+<p>Code execution is the most powerful tool you can give an agent — and <code>exec(model_output)</code> on your laptop is a security incident with extra steps. The code might <code>rm -rf</code> something, exfiltrate your <code>.env</code>, loop forever, or allocate 60 GB of RAM. And the model doesn't have to be malicious — prompt injection means <i>someone else's text</i> can steer what code gets written.</p>
+<h3>The Concept</h3>
+<p>A sandbox is a blast radius you choose in advance. Layers, from paper walls to bank vaults:</p>
+<pre><code>  exec() in-process        ← no wall at all
+  subprocess + rlimits     ← time/memory fences, same filesystem
+  container (Docker)       ← own filesystem, drop network, read-only mounts
+  microVM (Firecracker)    │
+  Wasm / gVisor            ← hardware-grade isolation</code></pre>
+<p>The prison-workshop analogy: the inmate can build anything with the tools inside the room, but the room has no windows, a timed door, and nothing valuable stored in it.</p>
+<h3>Build It</h3>
+<p>A minimal-but-honest subprocess sandbox:</p>
+<ol><li>Write the model's code to a temp file in an empty working directory.</li><li>Run it as a subprocess with a hard wall-clock timeout.</li><li>Apply resource limits (<code>resource.setrlimit</code> on Unix: CPU seconds, address space, file size, no core dumps).</li><li>Capture stdout/stderr (truncated), return both plus the exit code as the tool result.</li></ol>
+<pre><code>import subprocess, tempfile, os
+
+def run_code(code, timeout=10):
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, &quot;snippet.py&quot;)
+        open(path, &quot;w&quot;).write(code)
+        try:
+            p = subprocess.run([&quot;python&quot;, &quot;-I&quot;, path], cwd=d,
+                               capture_output=True, text=True, timeout=timeout)
+            return f&quot;exit={p.returncode}\nstdout:\n{p.stdout[:4000]}\nstderr:\n{p.stderr[:2000]}&quot;
+        except subprocess.TimeoutExpired:
+            return &quot;ERROR: execution timed out after 10s&quot;</code></pre>
+<p>This stops accidents, not attackers — a real adversary needs container/VM isolation and a denied-by-default network.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Option</th><th>Isolation</th><th>Cold start</th><th>Notes</th></tr></thead><tbody><tr><td>subprocess + rlimits</td><td>Weak</td><td>~0</td><td>Fine for trusted, local dev</td></tr><tr><td>Docker (no net, RO rootfs)</td><td>Good</td><td>~100ms–1s</td><td>The pragmatic default</td></tr><tr><td>Firecracker microVMs</td><td>Strong</td><td>~125ms</td><td>What serverless sandboxes build on</td></tr><tr><td>Hosted (E2B, Modal, Daytona)</td><td>Strong</td><td>varies</td><td>Someone else's blast radius</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>When OpenAI shipped Code Interpreter for ChatGPT (announced March 2023 as a plugin, broadly released to Plus users July 2023), it ran Python in a firewalled, network-disabled sandbox with an ephemeral filesystem — and users immediately probed it, listing installed packages and exploring the container from inside. The sandbox held precisely because it assumed hostile code from day one.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is prompt injection a reason to sandbox even a "trusted" model's code?</li><li>Which threats do rlimits address, and which do they not?</li><li>Why should a code sandbox's network access be denied by default?</li></ol>
+<h2 id="lesson-06"><span class="lnum">06</span> Search Tools: Web, Docs, and Grep</h2>
+<p><b>MOTTO:</b> An agent that can search doesn't need to know everything — it needs to know how to look.</p>
+<h3>The Problem</h3>
+<p>Your model's weights froze months ago. It doesn't know today's library version, your internal wiki, or which file in this repo defines <code>PaymentProcessor</code>. Without search tools it guesses — fluently, confidently, wrongly. With them, "I don't know" becomes "give me a second."</p>
+<h3>The Concept</h3>
+<p>Three search tools, three worlds, one shape (<code>query in → ranked snippets out</code>):</p>
+<pre><code>  web search   ──►  the internet     (fresh, noisy, slow, untrusted)
+  docs search  ──►  your corpus      (curated, semantic or keyword)
+  grep         ──►  the codebase     (exact, instant, regex-precise)</code></pre>
+<p>The librarian analogy: web search is asking the whole city, docs search is asking your own library, grep is <code>Ctrl+F</code> on a book you're holding. Good agents pick the right one — grep for "where is this function defined," docs for "what's our retry policy," web for "what changed in Python 3.13."</p>
+<h3>Build It</h3>
+<ol><li>Grep tool: shell out to <code>ripgrep</code> (or Python <code>re</code> over files); return <code>file:line: match</code> lines, capped at ~50 results.</li><li>Docs tool: keyword index (or embeddings — Phase 5) over your corpus; return top-k snippets with source paths.</li><li>Web tool: hit a search API, return titles + URLs + snippets — then let the model choose which URL to fetch (lesson 08).</li><li>Critical detail: truncate. A 200-result grep dump destroys the context window. Return counts + top hits + "refine your pattern."</li></ol>
+<pre><code>def grep_tool(pattern, path=&quot;.&quot;, max_results=50):
+    out = subprocess.run([&quot;rg&quot;, &quot;-n&quot;, &quot;--max-count&quot;, &quot;5&quot;, pattern, path],
+                         capture_output=True, text=True, timeout=15)
+    lines = out.stdout.splitlines()
+    body = &quot;\n&quot;.join(lines[:max_results])
+    more = f&quot;\n... {len(lines)-max_results} more (refine pattern)&quot; if len(lines) &gt; max_results else &quot;&quot;
+    return body + more if lines else &quot;No matches.&quot;</code></pre>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Backed by</th><th>Tradeoff</th></tr></thead><tbody><tr><td>Web search</td><td>Tavily, Brave, Exa, Bing APIs</td><td>Fresh but injectable (untrusted text!)</td></tr><tr><td>Docs search</td><td>BM25 / vector index</td><td>Setup cost; only as good as the corpus</td></tr><tr><td>Grep</td><td>ripgrep</td><td>Exact-match only; misses synonyms</td></tr></tbody></table>
+<p>Treat all web results as untrusted input — a search result page can contain instructions aimed at your agent.</p>
+<h3>War Story</h3>
+<p>The WebGPT paper (OpenAI, December 2021) fine-tuned GPT-3 to answer questions by operating a text-based browser — searching, clicking, quoting sources — and found its long-form answers were preferred to human demonstrators' more than half the time. It was an early, verifiable demonstration that "model + search tool" beats "bigger model alone" for factual, current questions.</p>
+<h3>Checkpoint</h3>
+<ol><li>When should an agent grep instead of doing semantic search over the same codebase?</li><li>Why is truncating search results a correctness issue, not just a cost issue?</li><li>Why must web search results be treated as untrusted input?</li></ol>
+<h2 id="lesson-07"><span class="lnum">07</span> File Tools: Read, Write, Edit Safely</h2>
+<p><b>MOTTO:</b> Give the agent a filesystem, not <i>the</i> filesystem.</p>
+<h3>The Problem</h3>
+<p>Coding agents live and die by file operations. Naive implementations fail in colorful ways: the agent overwrites a 2,000-line file with a 40-line "summary" of it, edits a file it never read, path-traverses to <code>../../.ssh/</code>, or clobbers your uncommitted changes. Files are state, and state loss is the unforgivable agent sin.</p>
+<h3>The Concept</h3>
+<p>Three primitives with guardrails, plus a fence:</p>
+<pre><code>  ┌── workspace root (jail) ─────────────────────┐
+  │  read(path, offset, limit)  → numbered lines │
+  │  write(path, content)       → whole file     │
+  │  edit(path, old, new)       → exact-match    │
+  │                                surgical swap │
+  └── everything outside: ACCESS DENIED ─────────┘</code></pre>
+<p>The key insight behind <code>edit</code>: don't ask the model to reproduce a whole file (it will drop lines); ask it for an <i>anchored diff</i> — "replace exactly this snippet with that snippet." If the anchor isn't found, or is found twice, refuse. That turns silent corruption into a loud, fixable error.</p>
+<h3>Build It</h3>
+<ol><li>Path jail: resolve every path and verify it's under the workspace root.</li><li>Read-before-edit: track read files per session; refuse to edit a file the agent hasn't read (it would be editing from imagination).</li><li>Exact-match edit: require <code>old</code> to appear exactly once; error otherwise.</li></ol>
+<pre><code>from pathlib import Path
+ROOT = Path(&quot;/workspace&quot;).resolve()
+
+def safe(p):
+    full = (ROOT / p).resolve()
+    if not full.is_relative_to(ROOT):
+        raise ValueError(f&quot;Path escapes workspace: {p}&quot;)
+    return full
+
+def edit(path, old, new):
+    f = safe(path); text = f.read_text()
+    n = text.count(old)
+    if n == 0: return &quot;ERROR: old_string not found. Re-read the file.&quot;
+    if n &gt; 1:  return f&quot;ERROR: old_string appears {n} times. Add context to make it unique.&quot;
+    f.write_text(text.replace(old, new, 1)); return &quot;OK&quot;</code></pre>
+<ol><li>Safety nets: back up before overwrite, or better — require a git repo and let commits be your undo.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Guardrail</th><th>Prevents</th></tr></thead><tbody><tr><td>Path jail</td><td>Reading secrets, writing outside project</td></tr><tr><td>Read-before-edit</td><td>Editing hallucinated file contents</td></tr><tr><td>Unique-anchor edits</td><td>Silent wrong-location patches</td></tr><tr><td>Git as undo</td><td>Irreversible destruction</td></tr><tr><td>Numbered-line reads</td><td>Off-by-N confusion in edits</td></tr></tbody></table>
+<p>Claude Code, Aider, and Cursor all converged on variants of anchored/search-replace edits over whole-file rewrites — independently, because whole-file rewrites truncate.</p>
+<h3>War Story</h3>
+<p>Aider, the open-source coding agent, publicly benchmarked edit formats and found models are dramatically more reliable emitting search/replace-style diff blocks than regenerating whole files — its leaderboard tracks "correct edit format" as its own metric precisely because malformed edits, not bad reasoning, were a dominant failure mode. Tool format <i>is</i> capability.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is "replace exactly-once-matching snippet" safer than "write the whole updated file"?</li><li>What bug does the read-before-edit rule prevent?</li><li>How does a path jail differ from running the agent as a low-privilege user, and why might you want both?</li></ol>
+<h2 id="lesson-08"><span class="lnum">08</span> Browser and HTTP Tools</h2>
+<p><b>MOTTO:</b> The web is the biggest API ever built — and the most hostile input your agent will ever eat.</p>
+<h3>The Problem</h3>
+<p>Search gives you URLs; now the agent needs contents. Raw <code>requests.get</code> returns 400 KB of HTML where 2 KB of it is the article — nav bars, cookie banners, and script tags devour your context window. And some pages don't exist until JavaScript runs. Meanwhile, any page you fetch might contain text written to manipulate your agent.</p>
+<h3>The Concept</h3>
+<p>Two tiers, escalate only when needed:</p>
+<pre><code>  HTTP fetch (requests + HTML→text)      Headless browser (Playwright)
+  ─ fast, cheap, stateless               ─ runs JS, clicks, types, screenshots
+  ─ fails on JS-rendered SPAs            ─ slow, heavy, stateful, fragile
+        │                                       │
+        └──── try this first ────► escalate ────┘</code></pre>
+<p>The librarian vs. the intern: an HTTP fetch is asking a librarian to photocopy a page; a browser session is sending an intern to physically operate the website. Send the intern only when the photocopier fails.</p>
+<h3>Build It</h3>
+<ol><li>Fetch with a timeout, a size cap, and a real User-Agent; verify content-type.</li><li>Strip HTML to readable text: drop <code>script</code>/<code>style</code>/<code>nav</code>, keep headings, paragraphs, links.</li><li>Truncate to a token budget with a "content continues" marker and offset-based pagination.</li></ol>
+<pre><code>from html.parser import HTMLParser
+
+class TextExtract(HTMLParser):
+    skip = {&quot;script&quot;, &quot;style&quot;, &quot;nav&quot;, &quot;footer&quot;}
+    def __init__(self): super().__init__(); self.out = []; self.depth = 0
+    def handle_starttag(self, tag, attrs): self.depth += tag in self.skip
+    def handle_endtag(self, tag): self.depth -= tag in self.skip
+    def handle_data(self, data):
+        if not self.depth and data.strip(): self.out.append(data.strip())</code></pre>
+<ol><li>Browser tier: expose <i>actions</i> (<code>goto</code>, <code>click(selector)</code>, <code>type</code>, <code>read_page</code>), not raw Playwright — the model operates a remote control, your code owns the browser object.</li><li>Security: block internal IP ranges (SSRF), never auto-execute instructions found in page text.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Good for</th><th>Cost</th></tr></thead><tbody><tr><td><code>requests</code>/<code>httpx</code> + readability</td><td>Articles, docs, APIs</td><td>Milliseconds</td></tr><tr><td>Jina Reader / Firecrawl-style APIs</td><td>Clean markdown from any URL</td><td>Per-call fee</td></tr><tr><td>Playwright / Puppeteer</td><td>SPAs, logins, forms</td><td>Seconds + RAM</td></tr><tr><td>Accessibility-tree browsing</td><td>Agent-friendly page structure</td><td>Playwright + parsing</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>ChatGPT plugins launched in March 2023 as "the app store moment" — Browsing, Code Interpreter, and third-party plugins via OpenAPI manifests. Within months the browsing plugin was briefly pulled (July 2023) after users bypassed paywalls with it, and plugins were deprecated in 2024 in favor of GPTs and built-in tools. Lesson: web-facing tools attract abuse cases their designers never listed.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why fetch-then-strip instead of passing raw HTML to the model?</li><li>What is SSRF, and why does an HTTP tool need an IP blocklist?</li><li>When does a headless browser justify its cost over plain HTTP fetch?</li></ol>
+<h2 id="lesson-09"><span class="lnum">09</span> The Tool Router: Dispatch Without Spaghetti</h2>
+<p><b>MOTTO:</b> Every tool call passes through one door — validation, execution, and logging live at that door.</p>
+<h3>The Problem</h3>
+<p>Your agent has 12 tools and your loop has become an <code>if name == "get_weather": ... elif name == "search": ...</code> ladder. Adding a tool means editing four places. Validation is copy-pasted, logging is inconsistent, and one tool's typo crashes another's dispatch. This is how agent codebases rot.</p>
+<h3>The Concept</h3>
+<p>A tool router is a registry plus a pipeline — the same pattern as a web framework's URL router:</p>
+<pre><code>  tool_call ──► [lookup] ──► [validate args] ──► [policy check] ──► [execute] ──► [format result]
+                   │              │                   │                 │
+                unknown        schema err          denied            exception
+                   └──────────────┴─── all become tool-result errors ──┘</code></pre>
+<p>Tools register themselves; the router owns everything cross-cutting: argument validation, permissions, timeouts, logging, result truncation. The loop code never mentions a specific tool by name.</p>
+<h3>Build It</h3>
+<ol><li>Registry: dict of name → <code>(fn, schema)</code>. A decorator populates it.</li><li>Dispatch: look up, validate required args and types against the schema, call, catch, format.</li><li>Cross-cutting hooks in ONE place: timing, truncation, audit log.</li></ol>
+<pre><code>REGISTRY = {}
+
+def tool(fn):
+    REGISTRY[fn.__name__] = {&quot;fn&quot;: fn, &quot;schema&quot;: schema_from(fn)}
+    return fn
+
+def dispatch(call):
+    entry = REGISTRY.get(call.name)
+    if not entry:
+        return f&quot;ERROR: unknown tool &#x27;{call.name}&#x27;. Available: {list(REGISTRY)}&quot;
+    missing = [p for p in entry[&quot;schema&quot;][&quot;parameters&quot;][&quot;required&quot;] if p not in call.args]
+    if missing:
+        return f&quot;ERROR: missing required args {missing}&quot;
+    try:
+        result = entry[&quot;fn&quot;](**call.args)
+        return str(result)[:8000]          # truncation lives HERE, once
+    except Exception as e:
+        return f&quot;ERROR: {type(e).__name__}: {e}&quot;</code></pre>
+<ol><li>The unknown-tool error listing available tools is deliberate — models recover from hallucinated tool names when told what actually exists.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Pattern</th><th>Where you've seen it</th></tr></thead><tbody><tr><td>Decorator registry</td><td>LangChain <code>@tool</code>, most Python frameworks</td></tr><tr><td>Schema-validated dispatch</td><td>Pydantic-based agents</td></tr><tr><td>Middleware pipeline</td><td>MCP servers, enterprise gateways</td></tr><tr><td>Central truncation/logging</td><td>Every production agent, eventually</td></tr></tbody></table>
+<p>The test of a good router: adding tool #13 touches exactly one file and zero lines of loop code.</p>
+<h3>War Story</h3>
+<p>This is the exact problem the Model Context Protocol (announced by Anthropic, November 2024) standardizes at the ecosystem level: instead of every app hand-rolling M×N integrations between models and tools, tools live behind a common registry-and-dispatch protocol. MCP is a tool router with a wire format — the pattern you just built, promoted to an open standard.</p>
+<h3>Checkpoint</h3>
+<ol><li>What cross-cutting concerns belong in the router rather than in individual tools?</li><li>Why return "unknown tool, here's what exists" instead of raising an exception?</li><li>How does a registry-with-decorator design keep the agent loop tool-agnostic?</li></ol>
+<h2 id="lesson-10"><span class="lnum">10</span> Dynamic Tool Loading and Tool Search</h2>
+<p><b>MOTTO:</b> Don't hand the model a 40-page menu — hand it a waiter who knows the menu.</p>
+<h3>The Problem</h3>
+<p>Every tool schema you register costs prompt tokens on <i>every single turn</i> — hundreds of tokens each, forever. Worse, accuracy degrades: with 50+ similar tools in context, models confuse <code>search_orders</code> with <code>search_order_items</code>, pick plausible-but-wrong tools, and burn turns. Connect three MCP servers and you can have 100 tools eating tens of thousands of tokens before the user says hello.</p>
+<h3>The Concept</h3>
+<p>Treat tools like a library treats books — a catalog in front, the stacks in back:</p>
+<pre><code>  Static loading:                   Dynamic loading:
+  ┌────────────────────┐            ┌────────────────────┐
+  │ all 80 schemas,    │            │ 5 core schemas     │
+  │ every turn,        │            │ + search_tools()   │  ← the meta-tool
+  │ ~25k tokens        │            │ ~2k tokens         │
+  └────────────────────┘            └────────────────────┘
+                                      model: search_tools(&quot;send slack message&quot;)
+                                      → schema for slack_send loaded into context
+                                      → model calls slack_send</code></pre>
+<p>The model gets a small always-on core plus a <i>meta-tool</i> that searches the full catalog by keyword or similarity and injects matching schemas on demand. Discovery becomes a tool call.</p>
+<h3>Build It</h3>
+<ol><li>Split tools: <code>core</code> (always in context) vs <code>deferred</code> (name + short description in a searchable index).</li><li>Implement <code>search_tools(query)</code>: rank the deferred catalog (keyword or embedding match), return the top schemas, and add them to the active set for subsequent turns.</li><li>Optionally evict: drop loaded-but-unused schemas after N turns to reclaim tokens.</li></ol>
+<pre><code>def search_tools(query, catalog, active, k=3):
+    scored = sorted(catalog.values(),
+                    key=lambda t: overlap(query, t[&quot;name&quot;] + &quot; &quot; + t[&quot;description&quot;]),
+                    reverse=True)[:k]
+    for t in scored:
+        active[t[&quot;name&quot;]] = t          # now callable next turn
+    return &quot;Loaded: &quot; + &quot;, &quot;.join(t[&quot;name&quot;] for t in scored)</code></pre>
+<ol><li>The two-phase dance matters: turn N discovers, turn N+1 calls. Your router must accept calls only to <i>active</i> tools and suggest <code>search_tools</code> for the rest.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Approach</th><th>Tradeoff</th></tr></thead><tbody><tr><td>All tools static</td><td>Simple; fine under ~15 tools</td></tr><tr><td>Grouped namespaces (<code>slack.*</code>)</td><td>Cheap disambiguation, still all loaded</td></tr><tr><td>Tool search / deferred loading</td><td>Scales to hundreds; adds a discovery turn</td></tr><tr><td>Code-execution-as-tools</td><td>Model writes code against APIs; max flexibility, max sandbox burden</td></tr></tbody></table>
+<p>Anthropic's Tool Search Tool (2025) reported large token savings and accuracy gains on many-tool benchmarks with exactly this defer-and-discover design.</p>
+<h3>War Story</h3>
+<p>Anthropic's engineering write-ups on MCP at scale describe the problem bluntly: agents wired to multiple MCP servers could see hundreds of tool definitions consuming tens of thousands of tokens before any work began, and they reported that moving from loading all tools up front to on-demand discovery (tool search / code execution with MCP, 2025) cut that overhead dramatically. The many-tool problem is a context-budget problem wearing a tools costume.</p>
+<h3>Checkpoint</h3>
+<ol><li>What are the <i>two</i> costs of registering many static tools (not just the token one)?</li><li>Why does dynamic loading require two turns before a deferred tool actually runs?</li><li>When is plain static loading still the right call?</li></ol>
+<h2 id="lesson-11"><span class="lnum">11</span> Designing Tools Agents Actually Use Well</h2>
+<p><b>MOTTO:</b> Tools are prompts — every name, description, and parameter is instruction text the model reads.</p>
+<h3>The Problem</h3>
+<p>Your tool works perfectly in unit tests and the agent still fumbles it: calls <code>search</code> when it should call <code>lookup</code>, passes a city name where an airport code goes, or ignores the tool entirely. You blame the model. But the model only knows what your schema <i>says</i> — and your schema says <code>"q": string. Description: the query</code>.</p>
+<h3>The Concept</h3>
+<p>The model experiences your tool exactly the way a new hire experiences an internal API with only its docs — no source, no Slack, no tribal knowledge. Tool design is therefore prompt engineering with a type system:</p>
+<pre><code>  BAD                                GOOD
+  name: &quot;proc_data&quot;                  name: &quot;search_customer_orders&quot;
+  desc: &quot;processes data&quot;             desc: &quot;Search a customer&#x27;s order history
+  args: {d: string}                   by keyword. Returns up to 10 orders as
+                                      JSON. Use get_order_details for line
+                                      items. Example: query=&#x27;refund&#x27;, last_90d&quot;</code></pre>
+<p>Rules of thumb: names state verb + object; descriptions say what it returns, when to use it, when NOT to (point to the sibling tool); enums beat free strings; and granularity should match <i>intent</i> — one <code>book_meeting(person, time)</code> beats four calendar micro-calls the model must choreograph.</p>
+<h3>Build It</h3>
+<ol><li>Name for disambiguation: if two tools could be confused, the difference belongs in both names.</li><li>Description = contract + routing hint + example. Three sentences minimum for non-trivial tools.</li><li>Constrain arguments: enums, formats ("ISO 8601"), defaults. Every constraint you encode is a mistake the model can't make.</li><li>Return <i>for the model</i>: structured, compact, labeled — <code>{"orders": [...], "total": 4, "hint": "use get_order_details(id) for line items"}</code> beats a raw DB dump.</li><li>Close the loop: run the agent, read transcripts, find where it fumbled, fix the <i>schema text</i>, rerun. Evaluate tools like you evaluate prompts — because they are prompts.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Smell</th><th>Fix</th></tr></thead><tbody><tr><td>Model picks wrong sibling tool</td><td>Contrastive descriptions ("use X for..., use THIS for...")</td></tr><tr><td>Malformed argument values</td><td>Enum / format spec / example in description</td></tr><tr><td>Model chains 4 calls for 1 intent</td><td>Consolidate into one intent-level tool</td></tr><tr><td>Model ignores a useful tool</td><td>Description doesn't say <i>when</i> to use it</td></tr><tr><td>Huge raw results</td><td>Return summaries + IDs; add a detail tool</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>Anthropic's "Writing tools for agents" engineering post (2025) describes improving tool performance substantially without touching the tools' code — by rewriting names, descriptions, and output formats, then measuring on agent evals; they even used Claude to optimize its own tool descriptions. The implementation was never the bottleneck. The prose was.</p>
+<h3>Checkpoint</h3>
+<ol><li>In what sense are tool definitions "prompts," and what follows from that for how you iterate on them?</li><li>Why do enums and format constraints reduce agent errors more than better instructions in the system prompt?</li><li>What signals in an agent transcript tell you a tool's <i>granularity</i> is wrong?</li></ol>
+<h2 id="lesson-12"><span class="lnum">12</span> Build a Tool-Using Agent From Scratch</h2>
+<p><b>MOTTO:</b> If you can't build the loop in 100 lines, you don't understand the loop yet.</p>
+<h3>The Problem</h3>
+<p>You've now seen schemas, choice, parallelism, errors, routing, and design — as parts. Frameworks bundle them so thoroughly you can ship an agent without ever seeing the loop. Then it misbehaves, and you're debugging a black box. Time to build the whole thing with no framework and a mock LLM, so every moving part is yours.</p>
+<h3>The Concept</h3>
+<p>The complete anatomy, nothing hidden:</p>
+<pre><code>  ┌────────────────────────────────────────────────┐
+  │  messages = [system, user]                     │
+  │  loop:                                         │
+  │    response = llm(messages, tools)             │
+  │    if response.tool_calls:                     │
+  │        results = [dispatch(c) for c in calls]  │
+  │        messages += [assistant_msg, *results]   │
+  │    else:                                       │
+  │        return response.text      ← done        │
+  └────────────────────────────────────────────────┘</code></pre>
+<p>A mock LLM (scripted responses) makes the loop testable and deterministic — the same trick you'll use forever in agent unit tests.</p>
+<h3>Build It</h3>
+<pre><code>import json
+from dataclasses import dataclass, field
+
+@dataclass
+class ToolCall:
+    id: str; name: str; args: dict
+
+REGISTRY = {}
+def tool(fn): REGISTRY[fn.__name__] = fn; return fn
+
+@tool
+def calculator(expression: str) -&gt; str:
+    &quot;&quot;&quot;Evaluate an arithmetic expression, e.g. &#x27;17*23&#x27;.&quot;&quot;&quot;
+    allowed = set(&quot;0123456789+-*/(). &quot;)
+    if not set(expression) &lt;= allowed: return &quot;ERROR: arithmetic only&quot;
+    return str(eval(expression))          # sandboxed by the whitelist
+
+@tool
+def lookup_capital(country: str) -&gt; str:
+    &quot;&quot;&quot;Return the capital city of a country.&quot;&quot;&quot;
+    return {&quot;france&quot;: &quot;Paris&quot;, &quot;japan&quot;: &quot;Tokyo&quot;}.get(country.lower(), &quot;ERROR: unknown country&quot;)
+
+def dispatch(call):
+    fn = REGISTRY.get(call.name)
+    if not fn: return f&quot;ERROR: unknown tool {call.name}&quot;
+    try: return fn(**call.args)
+    except Exception as e: return f&quot;ERROR: {e}&quot;
+
+class MockLLM:                             # scripted brain: swap for a real API later
+    def __init__(self, script): self.script = iter(script)
+    def __call__(self, messages, tools): return next(self.script)
+
+llm = MockLLM([
+    {&quot;tool_calls&quot;: [ToolCall(&quot;1&quot;, &quot;lookup_capital&quot;, {&quot;country&quot;: &quot;France&quot;})]},
+    {&quot;tool_calls&quot;: [ToolCall(&quot;2&quot;, &quot;calculator&quot;, {&quot;expression&quot;: &quot;17*23&quot;})]},
+    {&quot;text&quot;: &quot;The capital of France is Paris, and 17*23 = 391.&quot;},
+])
+
+def run_agent(user_msg, llm, max_turns=10):
+    messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;Use tools when helpful.&quot;},
+                {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_msg}]
+    for _ in range(max_turns):
+        r = llm(messages, REGISTRY)
+        if &quot;tool_calls&quot; in r:
+            messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;tool_calls&quot;: r[&quot;tool_calls&quot;]})
+            for c in r[&quot;tool_calls&quot;]:
+                messages.append({&quot;role&quot;: &quot;tool&quot;, &quot;tool_call_id&quot;: c.id,
+                                 &quot;content&quot;: dispatch(c)})
+        else:
+            return r[&quot;text&quot;]
+    return &quot;ERROR: max turns exceeded&quot;
+
+print(run_agent(&quot;Capital of France, and what&#x27;s 17*23?&quot;, llm))</code></pre>
+<p>Run it. Then break it on purpose: script a call to a nonexistent tool, a bad argument, an infinite tool-call script — and watch your error handling and <code>max_turns</code> earn their keep.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Upgrade path</th><th>Replaces</th></tr></thead><tbody><tr><td>Real API (OpenAI/Anthropic SDK)</td><td><code>MockLLM</code></td></tr><tr><td><code>schema_from()</code> + JSON Schema</td><td>Bare registry</td></tr><tr><td><code>asyncio.gather</code></td><td>Sequential dispatch loop</td></tr><tr><td>Persisted <code>messages</code></td><td>In-memory list (→ Phase 4)</td></tr></tbody></table>
+<p>The scripted-LLM test harness stays. Deterministic agent tests are how production teams sleep at night.</p>
+<h3>War Story</h3>
+<p>The virality of tiny from-scratch implementations — Simon Willison's ~100-line Python agent posts, countless "an agent is just a loop" write-ups from 2024–2025 — made a once-contrarian point mainstream: production agents like Claude Code are, at their core, a while-loop over an LLM call and a tool dispatcher. The value is in the tools, the prompts, and the guardrails. You've now built all three.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does a mock LLM make agent behavior <i>testable</i> in a way real API calls can't?</li><li>What two safety mechanisms in this loop prevent it from running forever or crashing on bad tool calls?</li><li>Which single components would you swap to turn this mock agent into a real one?</li></ol>
+  </article>
+  <div class="pager">
+    <a href="02-the-agent-loop.html">← 🔄 Phase 02</a>
+    <span class="spacer"></span>
+    <a href="04-memory.html">Phase 04 📚 →</a>
+  </div>
+</div>
+</body>
+</html>

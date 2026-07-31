@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capstone Projects — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 19</div>
+  <h1><span class="pnum">19</span> 🏆 Capstone Projects</h1>
+  <div class="tagline">Stop reading about agents. Ship one. Then ship a team of them.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Capstone: your own agent framework in 500 lines</a>
+<a href="#lesson-02"><span class="lnum">02</span>Capstone: a coding agent that passes its own tests</a>
+<a href="#lesson-03"><span class="lnum">03</span>Capstone: a deep-research agent with citations</a>
+<a href="#lesson-04"><span class="lnum">04</span>Capstone: an MCP server suite</a>
+<a href="#lesson-05"><span class="lnum">05</span>Capstone: a local agent on an open model</a>
+<a href="#lesson-06"><span class="lnum">06</span>Capstone: a multi-agent research team</a>
+<a href="#lesson-07"><span class="lnum">07</span>Capstone: an eval harness with a leaderboard</a>
+<a href="#lesson-08"><span class="lnum">08</span>Capstone: the grand agent (your design, defended)</a>
+  </div>
+  <article>
+<blockquote>Stop reading about agents. Ship one. Then ship a team of them.</blockquote>
+<p>Eighteen phases of concepts are worth exactly one working repo. Each capstone below is a complete project spec: pick one (or run them in order — they compound), build it end to end, and hold yourself to the Definition of Done like a reviewer who doesn't like you. No tutorials from here on. Just you, a terminal, and a model.</p>
+<hr>
+<h2 id="lesson-01"><span class="lnum">01</span> Capstone: Your Own Agent Framework in 500 Lines</h2>
+<p><b>GOAL:</b> Rebuild the core of every agent framework — loop, tools, context, state — small enough to hold in your head, good enough to build the other capstones on.</p>
+<h3>What You'll Build</h3>
+<p>A Python (or TypeScript) package — call it <code>microagent</code> — providing: an agent loop with streaming, tool registration via decorators with auto-generated JSON schemas, context management with compaction, session persistence, retries with idempotency awareness, and tracing to JSONL. Hard limit: 500 lines of core library code (tests and examples don't count). The constraint is the curriculum: every line must earn its place.</p>
+<h3>Requirements</h3>
+<ul><li><code>@tool</code> decorator derives name/description/schema from the function signature and docstring; readonly vs. effectful is declared, and the executor treats them differently (auto-retry reads only — Phase 16-04).</li><li>Agent loop supports: streaming output, parallel tool execution, turn caps, cost caps, and a stop-and-summarize graceful exit.</li><li>Context manager compacts oldest turns past a token budget; sessions serialize to disk and resume mid-run.</li><li>Every run emits a trace (spans with inputs/outputs/tokens/cost) replayable by a <code>microagent replay &lt;trace&gt;</code> command.</li><li>Provider-agnostic: at least two model providers behind one interface.</li></ul>
+<h3>Milestones</h3>
+<ol><li>Bare loop: model + one tool + while-loop; a task completes end to end.</li><li>Tool system: decorator, schema generation, parallel execution, retry policy.</li><li>Context + state: compaction, session save/resume, kill the process mid-run and recover.</li><li>Tracing: JSONL spans, cost accounting, the replay command.</li><li>Second provider + a 3-example gallery (calculator agent, file agent, research-lite agent).</li><li>The audit: count lines, cut to ≤500, write the "what I left out and why" doc.</li></ol>
+<h3>Stretch Goals</h3>
+<ul><li>Hooks API (pre/post tool-call interceptors) — then implement the permission gate as a hook, proving the abstraction.</li><li>Publish it (PyPI/npm) with docs; get one person you don't know to use it.</li></ul>
+<h3>Definition of Done</h3>
+<ul><li>[ ] Core library ≤500 lines, no framework dependencies (HTTP client and stdlib only)</li><li>[ ] All three gallery agents run successfully with streaming</li><li>[ ] Mid-run process kill → session resumes and completes</li><li>[ ] A trace from a gallery run replays deterministically to the divergence point</li><li>[ ] Turn cap and cost cap each trigger the graceful-exit path in tests</li><li>[ ] README explains every design decision in one paragraph each</li></ul>
+<h3>Concepts You'll Cement</h3>
+<p>The agent loop (Phase 2), tool schemas and execution (Phase 3), context management (Phase 5), persistence, retries, tracing, and cost control (Phase 16) — by owning every line instead of importing them.</p>
+<hr>
+<h2 id="lesson-02"><span class="lnum">02</span> Capstone: A Coding Agent That Passes Its Own Tests</h2>
+<p><b>GOAL:</b> Build a terminal coding agent that, given a repo and an issue, produces a patch that makes the tests pass — then prove it on a benchmark you didn't write.</p>
+<h3>What You'll Build</h3>
+<p>A CLI coding agent (on your Capstone-01 framework or from scratch) implementing the case-study-01 design: file navigation tools, search/replace editing, sandboxed command execution, a permission gate, and a stuck detector. Then an evaluation run against SWE-bench Lite (or a 25-task slice of it) with honest reporting.</p>
+<h3>Requirements</h3>
+<ul><li>Tools: <code>read_file</code>, <code>grep</code>, <code>glob</code>, <code>edit</code> (exact-match search/replace with unique-match validation), <code>bash</code> (sandboxed, allowlisted), <code>run_tests</code>.</li><li>Never loads whole repos: navigation-first context strategy with a repo map.</li><li>Stuck detection: same test failing 3× with similar edits → stop with a summary of attempts.</li><li>Benchmark harness: containerized per-task environments, patch extraction, official test-based scoring — no self-graded success.</li><li>Full cost/latency accounting per task; a results table in the README.</li></ul>
+<h3>Milestones</h3>
+<ol><li>Agent fixes a planted bug in a toy repo you wrote (walk before benchmark).</li><li>Edit reliability hardening: 50-edit stress test across gnarly cases (unicode, indentation, near-duplicate blocks) at &gt;95% apply rate.</li><li>Harness: run one SWE-bench Lite task end to end in a container, scored by the repo's own tests.</li><li>Full slice run (≥25 tasks); collect traces for every failure.</li><li>Failure autopsy: categorize every miss (wrong file? bad edit? wrong understanding? gave up?), fix the top category, re-run.</li><li>Write the report: score, cost/task, failure taxonomy, before/after of your one improvement.</li></ol>
+<h3>Stretch Goals</h3>
+<ul><li>Add a plan-then-execute mode and measure whether it actually helps on this benchmark (the answer is less obvious than you think).</li><li>Try a cheap-model routing tier for read/search turns; report the cost delta at equal score.</li></ul>
+<h3>Definition of Done</h3>
+<ul><li>[ ] ≥20% resolved on your SWE-bench Lite slice (honest, test-scored) — or a documented autopsy explaining every point below it</li><li>[ ] Mean cost per attempted task ≤$1.50 with per-task breakdown</li><li>[ ] Zero unsandboxed command executions (audit the traces)</li><li>[ ] Failure taxonomy with counts, and one data-driven improvement with before/after scores</li><li>[ ] Another person can run the whole eval from your README</li></ul>
+<h3>Concepts You'll Cement</h3>
+<p>Tool design under adversity (Phase 3), context strategy for large codebases (Phase 5), sandboxing (safety phases), and — above all — honest benchmark-driven iteration (Phase 9): the loop of run, autopsy, fix, re-run is the actual skill.</p>
+<hr>
+<h2 id="lesson-03"><span class="lnum">03</span> Capstone: A Deep-Research Agent with Citations</h2>
+<p><b>GOAL:</b> Build an orchestrator-plus-subagents research system whose reports you'd stake your name on — every claim traceable to a source that really says it.</p>
+<h3>What You'll Build</h3>
+<p>The case-study-02 design, running: a lead agent that scopes and decomposes questions, parallel search subagents on a cheap model, a synthesis pass, and a mechanical citation verifier that fetches every cited source and confirms the supporting quote exists. Delivered as an async job (queue, progress events, notification) with a markdown report artifact.</p>
+<h3>Requirements</h3>
+<ul><li>Lead emits subagent briefs with objective, output schema, and exclusions; subagents run in parallel with a fetch budget.</li><li>Subagents record (url, exact quote) pairs at read time; findings are compressed and source-linked.</li><li>Citation verifier: re-fetch, fuzzy-match quotes, mark each claim verified/unverified; unverified claims are cut or flagged in the report — never silently kept.</li><li>Async delivery: job API, progress events ("subagent B: reading source 4/7"), resumable via checkpoints on worker death.</li><li>Budget enforcement: max fetches and max dollars per report, graceful summarize-and-stop.</li></ul>
+<h3>Milestones</h3>
+<ol><li>Single-agent researcher: search, fetch, synthesize with citations — no verification yet.</li><li>The verifier: quote-matching against fetched sources; measure the pre-verifier fabrication rate on 10 reports (this number will motivate you).</li><li>Multi-agent: lead + 3 parallel subagents with briefs; compare quality and wall-clock vs. milestone 1 on the same questions.</li><li>Async job wrapper with progress and checkpoint-resume.</li><li>Evaluation: a 15-question suite with a quality rubric (coverage, accuracy, citation integrity, structure), scored by LLM judge + your spot audits.</li></ol>
+<h3>Stretch Goals</h3>
+<ul><li>Contradiction handling: when sources disagree, the report presents both with sourcing rather than picking silently.</li><li>Add source-quality weighting (primary &gt; secondary &gt; SEO sludge) and measure the effect on your rubric scores.</li></ul>
+<h3>Definition of Done</h3>
+<ul><li>[ ] Zero unverified-claims-presented-as-fact across the 15-question eval suite</li><li>[ ] Parallel subagents beat single-agent wall-clock by ≥2× on multi-facet questions</li><li>[ ] Worker killed mid-run resumes and delivers the report</li><li>[ ] Cost per report ≤$1.00 with the two-tier model split, itemized in the trace</li><li>[ ] Rubric scores reported per question, including the failures</li></ul>
+<h3>Concepts You'll Cement</h3>
+<p>Multi-agent orchestration (Phase on multi-agent), context isolation and compression between agents, async deployment patterns (16-07), budget enforcement (16-02), and the deepest one: verification as architecture — designing so trust is checked, not assumed.</p>
+<hr>
+<h2 id="lesson-04"><span class="lnum">04</span> Capstone: An MCP Server Suite</h2>
+<p><b>GOAL:</b> Build three production-quality MCP servers and experience the other side of the tool-call boundary — where tool design quality directly becomes agent capability.</p>
+<h3>What You'll Build</h3>
+<p>Three Model Context Protocol servers exercising different capability classes: (1) a <b>knowledge server</b> exposing search/read over a document corpus (resources + tools), (2) an <b>effectful server</b> wrapping a real system with writes — e.g., a task/todo database — with idempotency keys and a dry-run mode, (3) a <b>long-running server</b> wrapping a slow operation (e.g., a site crawler or your Capstone-03 researcher) with job-style start/status/result tools. Plus a shared test harness that exercises all three through a real client (Claude Desktop, or any MCP-capable client).</p>
+<h3>Requirements</h3>
+<ul><li>Spec-compliant MCP over stdio (and HTTP/SSE for one of the three); tools, resources, and at least one prompt template exposed.</li><li>Tool descriptions written for a model consumer: what it does, when to use it, error semantics, examples — then <i>tested</i> by measuring an agent's tool-selection accuracy against a 20-task suite.</li><li>Effectful server: idempotency keys on writes, dry-run mode, input validation with actionable error messages (the model must be able to self-correct from your errors).</li><li>Long-running server: start returns a job id; status streams progress; results retrievable after client reconnect.</li><li>Auth/config via environment; no secrets in code; graceful degradation when the backing system is down.</li></ul>
+<h3>Milestones</h3>
+<ol><li>Knowledge server: search + read tools over a corpus; wire into a client and query it interactively.</li><li>Tool-description iteration: run the 20-task selection suite, rewrite descriptions, re-run — record the accuracy delta (this is the heart of the capstone).</li><li>Effectful server with idempotency + dry-run; adversarial tests (duplicate calls, garbage inputs, mid-write crash).</li><li>Long-running server with the job pattern; kill and reconnect the client mid-job.</li><li>Package the suite: install docs, config reference, the test harness, and a demo script.</li></ol>
+<h3>Stretch Goals</h3>
+<ul><li>Add OAuth-style scoped tokens to the effectful server: a read-only token demonstrably cannot write.</li><li>Publish one server publicly and incorporate one external user's feedback.</li></ul>
+<h3>Definition of Done</h3>
+<ul><li>[ ] All three servers pass the shared harness through a real MCP client</li><li>[ ] Tool-selection accuracy ≥90% on the 20-task suite, with the before/after description experiment documented</li><li>[ ] Duplicate effectful calls with the same idempotency key produce exactly one write (tested)</li><li>[ ] Client disconnect/reconnect during a long job retrieves the result</li><li>[ ] Malformed inputs return errors an agent demonstrably self-corrects from (show a trace)</li></ul>
+<h3>Concepts You'll Cement</h3>
+<p>Tool schemas and ergonomics (Phase 3), MCP itself (Phase on MCP), idempotent effectful design (16-04), async job patterns (16-07) — and tool-description-as-prompt-engineering, the most underrated skill in the agent stack.</p>
+<hr>
+<h2 id="lesson-05"><span class="lnum">05</span> Capstone: A Local Agent on an Open Model</h2>
+<p><b>GOAL:</b> Run the full agent stack — model included — on your own hardware, and learn what the frontier labs' polish has been hiding from you.</p>
+<h3>What You'll Build</h3>
+<p>A fully local agent: an open-weights model (7–14B class, e.g., a Qwen or Llama instruct variant) served locally (llama.cpp/Ollama/vLLM), driving your Capstone-01 framework with tool calling, on tasks a local agent is actually good for — file organization, local document Q&amp;A, scripted automations — with zero bytes leaving the machine.</p>
+<h3>Requirements</h3>
+<ul><li>Local serving with an OpenAI-compatible endpoint; your framework talks to it with zero cloud fallback in local mode.</li><li>Tool calling that works <i>despite the model</i>: robust parsing of imperfect tool-call output, re-prompting on malformed calls, format few-shots — measure and report tool-call validity rate.</li><li>A model-selection study: ≥3 models / quantization levels compared on your own 20-task agent suite (success rate, tokens/sec, memory) — not on vibes.</li><li>Honest capability boundary: a written comparison of the same 20 tasks against a frontier API model, with per-task analysis of where the local model breaks (long context? multi-step planning? tool syntax?).</li><li>Practical UX: streaming, and first token &lt;2s on your hardware for typical prompts.</li></ul>
+<h3>Milestones</h3>
+<ol><li>Serve a model locally; raw chat works; measure tokens/sec.</li><li>Wire into your framework; get one tool call working end to end (budget a full day for tool-call parsing pain — it's the lesson).</li><li>Hardening: malformed-call recovery, format few-shots, validity rate ≥90% on the task suite.</li><li>The bake-off: 3+ models/quants × 20 tasks, results table.</li><li>Ship one genuinely useful daily automation (e.g., downloads-folder organizer, local notes Q&amp;A) you actually keep using.</li></ol>
+<h3>Stretch Goals</h3>
+<ul><li>Fine-tune the local model on trajectories from a frontier model doing your 20 tasks (17-01) and re-run the bake-off — quantify the distillation gain.</li><li>Speculative decoding or a draft model for latency; report the speedup.</li></ul>
+<h3>Definition of Done</h3>
+<ul><li>[ ] 20-task suite: ≥60% success locally, with the frontier-model comparison table and failure analysis</li><li>[ ] Tool-call validity ≥90% after hardening (before/after numbers reported)</li><li>[ ] Airplane-mode demo: the full agent works with networking disabled</li><li>[ ] Model bake-off table: success, speed, memory across ≥3 configurations</li><li>[ ] One daily-use automation running for ≥1 week (show the logs)</li></ul>
+<h3>Concepts You'll Cement</h3>
+<p>What the model actually contributes vs. the harness (Phases 1–3), tool-calling internals you never see behind polished APIs, quantization/serving tradeoffs, and capability-boundary judgment — knowing <i>when</i> a small model is enough is a superpower for cost engineering everywhere else.</p>
+<hr>
+<h2 id="lesson-06"><span class="lnum">06</span> Capstone: A Multi-Agent Research Team</h2>
+<p><b>GOAL:</b> Coordinate specialist agents into a team that produces something none of them could alone — and prove the coordination earns its token bill.</p>
+<h3>What You'll Build</h3>
+<p>A team that takes a hard open question ("Should our startup build on stack A or B?", "What's the strongest case for and against X?") and produces a decision document via specialist roles: a <b>planner</b> decomposing the problem, two <b>researchers</b> working opposing sides (your Capstone-03 machinery, reused), a <b>critic</b> attacking drafts for weak evidence and logical gaps, and a <b>synthesizer</b> producing the final recommendation with explicit uncertainty. An orchestrator owns state, budgets, and the workflow; agents exchange typed artifacts, not chat.</p>
+<h3>Requirements</h3>
+<ul><li>Typed artifact handoffs (research pack, critique with severity-tagged items, draft versions) — no shared free-form transcript between agents.</li><li>The critic is adversarial by construction: separate context, cannot edit, must produce falsifiable objections tied to specific claims; drafts iterate until critic severity drops below threshold or the round budget (≤3) is hit.</li><li>Opposing-side research: the two researchers get explicitly opposed briefs; the synthesizer must address the strongest version of both.</li><li>Global budget enforcement across all agents (dollars and wall-clock) with graceful early synthesis on exhaustion.</li><li>The ablation: the same questions run through (a) single agent, same total budget, (b) the team without the critic, (c) the full team — scored blind on a rubric.</li></ul>
+<h3>Milestones</h3>
+<ol><li>Orchestrator + typed artifacts working with stub agents (deterministic fakes) — test the machine before adding minds.</li><li>Planner + two researchers integrated; opposing briefs produce genuinely different evidence.</li><li>Critic loop: measure draft quality before/after critique rounds on 5 questions.</li><li>Synthesizer with explicit uncertainty sections ("what would change this recommendation").</li><li>The ablation study across 10 questions; write up which configuration wins where, at what cost.</li></ol>
+<h3>Stretch Goals</h3>
+<ul><li>Dynamic team sizing: the planner decides how many researchers a question needs; measure cost/quality vs. fixed topology.</li><li>Human-in-the-loop checkpoint: a human can redirect after the research phase; measure how often redirection changes the conclusion.</li></ul>
+<h3>Definition of Done</h3>
+<ul><li>[ ] Full team beats the equal-budget single agent on blind rubric scores across 10 questions (or you report honestly that it didn't, and why)</li><li>[ ] Critic ablation quantified: rubric delta with and without</li><li>[ ] No agent ever sees another's raw transcript — artifacts only (verify in traces)</li><li>[ ] Budget exhaustion mid-run produces a coherent early synthesis, not a crash</li><li>[ ] Total cost per document ≤$3 with per-agent breakdown</li></ul>
+<h3>Concepts You'll Cement</h3>
+<p>Orchestration topologies and context isolation (multi-agent phase), artifact-based handoffs (case 18-10), adversarial verification, budget governance across agents (16-02) — and the discipline of <i>proving</i> multi-agent value with ablations instead of assuming it, because the single strong agent is a brutal baseline.</p>
+<hr>
+<h2 id="lesson-07"><span class="lnum">07</span> Capstone: An Eval Harness with a Leaderboard</h2>
+<p><b>GOAL:</b> Build the measurement infrastructure every other capstone secretly depends on — task suites, graders, statistical honesty, and a leaderboard that updates itself.</p>
+<h3>What You'll Build</h3>
+<p>A general agent-eval harness: define task suites in YAML/JSON (setup, task, grading spec), run any agent configuration against them in isolated environments with N repetitions, grade with programmatic checkers and calibrated LLM judges, store every run, and serve a static leaderboard site with scores, confidence intervals, cost, and latency — regenerated on every run. Then dogfood it: put your other capstone agents (and 2–3 model/prompt variants) on the board.</p>
+<h3>Requirements</h3>
+<ul><li>Task format supports three grader types: exact/programmatic check, rubric-scored LLM judge, and trajectory assertions (e.g., "must not call effectful tools", "≤15 turns").</li><li>Judge calibration: a 30-item human-labeled set; report judge-human agreement and don't ship a judge below your agreement bar (e.g., 85%).</li><li>Statistical honesty: N≥5 runs per (agent, task); report mean ± bootstrap confidence interval; the leaderboard visually flags non-significant differences between neighbors.</li><li>Isolation: each run in a fresh sandbox; full trace captured per run, linked from the leaderboard (click a score → see the trajectories).</li><li>Regression mode: <code>harness gate --baseline &lt;run-id&gt;</code> exits nonzero on significant regression — usable in CI (16-06).</li></ul>
+<h3>Milestones</h3>
+<ol><li>Task format + runner: one suite (10 tasks), one agent, programmatic grading, repetitions.</li><li>LLM judge + the calibration study (this will humble your judge prompt).</li><li>Storage + static leaderboard generation with CIs and cost columns.</li><li>Trace linking: every cell on the board drills down to real trajectories.</li><li>Dogfood: ≥3 agent configurations across ≥2 suites; write up one surprising result the numbers exposed.</li><li>CI gate mode wired into one of your other capstone repos.</li></ol>
+<h3>Stretch Goals</h3>
+<ul><li>Pairwise-preference mode (judge compares two agents' outputs head-to-head, Bradley-Terry ranking) alongside absolute scores; note where the two rankings disagree.</li><li>Public deployment with a submission format so someone else can add their agent.</li></ul>
+<h3>Definition of Done</h3>
+<ul><li>[ ] 2+ suites, 25+ total tasks, all three grader types in use</li><li>[ ] Judge-human agreement ≥85% on the calibration set, documented</li><li>[ ] Every leaderboard score shows N, CI, cost, and links to traces</li><li>[ ] The gate command correctly passes a no-change run and fails a deliberately sabotaged one (test both)</li><li>[ ] A documented surprising finding from dogfooding — evidence the harness sees what eyeballs missed</li></ul>
+<h3>Concepts You'll Cement</h3>
+<p>Everything from Phase 9 (evals, judges, calibration) made industrial; variance and statistical rigor most people skip; observability integration (16-01); regression gating (16-06). Measurement infrastructure is the highest-leverage code in the whole field — labs win with it, and so will you.</p>
+<hr>
+<h2 id="lesson-08"><span class="lnum">08</span> Capstone: The Grand Agent (Your Design, Defended)</h2>
+<p><b>GOAL:</b> Design and ship an agent of your own conception, end to end — then defend it like a staff engineer: design doc, review, honest evaluation, postmortem.</p>
+<h3>What You'll Build</h3>
+<p>Your call — that's the point. Pick a real problem you personally have (the best forcing function for honesty), design it with the Phase 18 method, build it with production discipline, and run it on real usage for at least two weeks. Scope bar: it must involve tools with real effects, some form of memory or state, and at least one hard sub-problem you can name in advance. Examples for calibration (don't copy them): an agent that manages your open-source repo's issue triage; a personal finance analyst over your actual statements; an agent that maintains your home lab.</p>
+<h3>Requirements</h3>
+<ul><li>A design doc <i>before code</i>, in the Phase 18 format: requirements, napkin math (with arithmetic someone can check), architecture diagram, deep dives on the 2–3 hardest problems, tradeoffs table with rejected alternatives.</li><li>A design review: present the doc to at least one other person (or a rigorous red-team session with a frontier model playing hostile reviewer); log the objections and your responses; change something because of it.</li><li>Production discipline, actually applied: traces on every run, budgets enforced, effectful tools idempotent and gated, a golden-set regression gate, and the 16-12 readiness checklist completed with evidence.</li><li>Two weeks of real operation: real tasks, real failures, a maintained incident log.</li><li>The defense: a final report — what you predicted vs. what happened, eval results, cost reality vs. napkin math, the worst failure and its fix, and what you'd redesign.</li></ul>
+<h3>Milestones</h3>
+<ol><li>Problem selection + design doc (the napkin math will kill half your ideas — good).</li><li>Design review; revise the doc; commit to scope.</li><li>Build the core loop and tools; first real task completed.</li><li>Production hardening: pass your own readiness checklist (16-12), no waived items without written justification.</li><li>Two-week operation window; incident log; at least one prompt/design revision driven by the golden set.</li><li>Final report + defense presentation.</li></ol>
+<h3>Stretch Goals</h3>
+<ul><li>Ship it to one real user who isn't you and survive their first week.</li><li>Open-source it with docs good enough that a stranger files a useful issue.</li></ul>
+<h3>Definition of Done</h3>
+<ul><li>[ ] Design doc predates the code (commit history proves it) and includes checkable napkin math</li><li>[ ] Review objections logged, with at least one design change traced to them</li><li>[ ] Readiness checklist complete with evidence links (traces, test runs, chaos test)</li><li>[ ] ≥2 weeks of real usage: ≥20 real tasks, incident log, cost actuals vs. estimate compared</li><li>[ ] Final report names the worst failure honestly and shows the fix's before/after evals</li><li>[ ] You can answer "why is this an agent and not a script?" convincingly — or you've written the braver conclusion that a script would have done fine</li></ul>
+<h3>Concepts You'll Cement</h3>
+<p>All of it — but especially the meta-skills no single phase teaches: scoping under napkin math, defending design decisions under challenge, operating what you built, and telling the truth about the results. That last one is the difference between someone who has read about agents and someone you'd trust to ship one.</p>
+  </article>
+  <div class="pager">
+    <a href="18-case-studies.html">← 🏗️ Phase 18</a>
+    <span class="spacer"></span>
+    <a href="../index.html#curriculum">Back to curriculum ↩</a>
+  </div>
+</div>
+</body>
+</html>

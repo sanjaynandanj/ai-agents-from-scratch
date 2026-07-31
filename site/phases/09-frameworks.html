@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Frameworks Tour — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 09</div>
+  <h1><span class="pnum">09</span> 🤖 The Frameworks Tour</h1>
+  <div class="tagline">Learn what they abstract, then decide if you need the abstraction.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Raw SDK first: agents without frameworks</a>
+<a href="#lesson-02"><span class="lnum">02</span>LangChain: the kitchen sink, examined</a>
+<a href="#lesson-03"><span class="lnum">03</span>LangGraph: agents as state graphs</a>
+<a href="#lesson-04"><span class="lnum">04</span>CrewAI: role-playing crews</a>
+<a href="#lesson-05"><span class="lnum">05</span>AutoGen: conversational multi-agent</a>
+<a href="#lesson-06"><span class="lnum">06</span>OpenAI Agents SDK and handoffs</a>
+<a href="#lesson-07"><span class="lnum">07</span>Claude Agent SDK: the harness approach</a>
+<a href="#lesson-08"><span class="lnum">08</span>smolagents and code-acting agents</a>
+<a href="#lesson-09"><span class="lnum">09</span>Pydantic AI: types as guardrails</a>
+<a href="#lesson-10"><span class="lnum">10</span>Orchestration vs library vs platform</a>
+<a href="#lesson-11"><span class="lnum">11</span>Framework lock-in and escape hatches</a>
+<a href="#lesson-12"><span class="lnum">12</span>When to use no framework at all</a>
+  </div>
+  <article>
+<blockquote>Learn what they abstract, then decide if you need the abstraction.</blockquote>
+<p>You've built agents from raw parts, so you're now qualified to judge the frameworks that package those parts. This phase is a fair tour, not a takedown: every framework here solves a real problem for someone, and every one of them charges rent in indirection, dependencies, and churn. The goal is to be able to read any framework's docs and say "ah, that's just a while loop with checkpointing" — and then decide whether you want to maintain that while loop yourself. By the end you'll have a decision procedure, not a favorite logo.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> Raw SDK First: Agents Without Frameworks</h2>
+<p><b>MOTTO:</b> You can't evaluate an abstraction you've never lived without.</p>
+<h3>The Problem</h3>
+<p>Most people meet agents <i>through</i> a framework, so they can't tell which behaviors come from the model, which from the loop, and which from the framework's opinions. When something breaks — and it will — they're debugging three layers they never saw assembled.</p>
+<h3>The Concept</h3>
+<p>An agent is a while loop around a chat API: send messages, check for tool calls, execute them, append results, repeat until the model stops asking. That's it. Think of a framework as a pre-built kitchen: convenient, but you should cook on a camp stove once so you know what a stove actually does.</p>
+<pre><code>messages ──&gt; LLM ──&gt; tool_calls? ──yes──&gt; run tools ──&gt; append results ──┐
+                        │no                                              │
+                        └──&gt; final answer                &lt;───────────────┘</code></pre>
+<h3>Build It</h3>
+<pre><code>while True:
+    resp = client.chat(model=MODEL, messages=messages, tools=TOOLS)
+    if not resp.tool_calls:
+        break
+    for call in resp.tool_calls:
+        result = TOOL_IMPLS[call.name](**call.arguments)
+        messages.append(tool_result(call.id, result))</code></pre>
+<p>Twelve lines. Everything else in this phase is decoration on this loop.</p>
+<h3>Use It</h3>
+<p>The raw SDKs: <code>openai</code>, <code>anthropic</code>, <code>google-genai</code>. Add <code>litellm</code> or an OpenAI-compatible endpoint if you want one call signature across providers. This is the baseline every framework must beat.</p>
+<h3>War Story</h3>
+<p>Anthropic's "Building Effective Agents" post (December 2024) reported that the most successful agent implementations they saw used "simple, composable patterns" rather than frameworks, and explicitly advised starting with LLM APIs directly. The people selling you a harness told you to try the camp stove first.</p>
+<h3>Checkpoint</h3>
+<ol><li>What are the four steps of the minimal agent loop?</li><li>Which parts of an agent's behavior come from the model versus the loop code?</li><li>Why does building raw-SDK first make you a better framework consumer?</li></ol>
+<h2 id="lesson-02"><span class="lnum">02</span> LangChain: The Kitchen Sink, Examined</h2>
+<p><b>MOTTO:</b> Six hundred integrations is a feature and a liability — often in the same afternoon.</p>
+<h3>The Problem</h3>
+<p>Real applications need loaders, splitters, vector stores, retrievers, output parsers, and model clients from a dozen vendors. Writing glue for each combination is tedious, and everyone writes the same glue slightly differently.</p>
+<h3>The Concept</h3>
+<p>LangChain's core abstraction is the <code>Runnable</code>: anything with <code>invoke</code>/<code>stream</code>/<code>batch</code>, composable with a pipe operator (LCEL — LangChain Expression Language). It's Unix pipes for LLM components: <code>prompt | model | parser</code>. The value is the enormous integration catalog behind one interface; the cost is that a five-line API call can become a stack trace through eight layers of composed Runnables.</p>
+<h3>Build It</h3>
+<pre><code>from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+chain = ChatPromptTemplate.from_template(&quot;Summarize: {text}&quot;) | model | StrOutputParser()
+chain.invoke({&quot;text&quot;: doc})</code></pre>
+<p>Now write the same three lines with a raw SDK and compare stack traces when the model errors.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Strength</th><th>Weakness</th></tr></thead><tbody><tr><td>Vast integration catalog (models, stores, loaders)</td><td>Deep call stacks, hard debugging</td></tr><tr><td>One interface: invoke/stream/batch everywhere</td><td>Historically fast-churning APIs</td></tr><tr><td>LangSmith tracing plugs in cleanly</td><td>Abstractions can obscure the actual prompt sent</td></tr></tbody></table>
+<p>Best when you genuinely need many integrations. Worst as a thin wrapper over one model call.</p>
+<h3>War Story</h3>
+<p>LangChain launched in October 2022 and became one of the fastest-growing open-source projects of 2023 — and then a lightning rod: in July 2024, dev-tools company Octomind published "Why we no longer use LangChain for building our AI agents," arguing its abstractions made simple code harder to write and change. Both the growth and the backlash were about the same thing: abstraction density.</p>
+<h3>Checkpoint</h3>
+<ol><li>What is a Runnable, and what three methods define it?</li><li>Name a scenario where LangChain's integration catalog clearly pays for its indirection.</li><li>Why do deep abstraction stacks specifically hurt <i>prompt</i> debugging?</li></ol>
+<h2 id="lesson-03"><span class="lnum">03</span> LangGraph: Agents as State Graphs</h2>
+<p><b>MOTTO:</b> When your agent is a loop with branches, draw the branches.</p>
+<h3>The Problem</h3>
+<p>Linear chains can't express real agent control flow: retry this node, branch on that condition, pause for human approval, resume from a crash. Encoding that in nested callbacks is how you get unmaintainable spaghetti.</p>
+<h3>The Concept</h3>
+<p>LangGraph models an agent as a state machine: nodes are functions that read and update a shared typed state; edges (including conditional edges) decide what runs next. Because the graph is explicit, you get checkpointing (persist state after each node), time travel (rewind to a prior state), and human-in-the-loop (interrupt at an edge) almost for free. It's a flowchart that executes.</p>
+<pre><code>        ┌──────────┐  needs_tools   ┌────────┐
+START ─&gt;│  agent   │───────────────&gt;│ tools  │──┐
+        └──────────┘                └────────┘  │
+             │ done          ▲__________________│
+             ▼
+            END</code></pre>
+<h3>Build It</h3>
+<pre><code>graph = StateGraph(AgentState)
+graph.add_node(&quot;agent&quot;, call_model)
+graph.add_node(&quot;tools&quot;, run_tools)
+graph.add_conditional_edges(&quot;agent&quot;, route)   # -&gt; &quot;tools&quot; or END
+graph.add_edge(&quot;tools&quot;, &quot;agent&quot;)
+app = graph.compile(checkpointer=MemorySaver())</code></pre>
+<p>Note: this <i>is</i> Lesson 01's while loop, reified as data. That's the whole trick.</p>
+<h3>Use It</h3>
+<p>LangGraph (Python/JS) is the "agents got serious" tier of the LangChain ecosystem — durable execution, streaming, human approval gates. Comparable ideas: state machines in Temporal, or hand-rolled loops with a checkpoint table.</p>
+<h3>War Story</h3>
+<p>LangChain shipped LangGraph in early 2024, partly a concession that chains were the wrong abstraction for cyclic, stateful agents — the flagship framework rebuilding its own foundation. LangChain's published case studies (Klarna's support assistant among them) lean on LangGraph plus LangSmith tracing rather than classic chains.</p>
+<h3>Checkpoint</h3>
+<ol><li>What do nodes and conditional edges correspond to in the raw agent loop?</li><li>What does checkpointing after every node buy you that a plain loop lacks?</li><li>Where exactly would you interrupt the graph for human approval?</li></ol>
+<h2 id="lesson-04"><span class="lnum">04</span> CrewAI: Role-Playing Crews</h2>
+<p><b>MOTTO:</b> Give each agent a job title and a to-do list, then let HR sort it out.</p>
+<h3>The Problem</h3>
+<p>You want multiple specialized agents — a researcher, a writer, a reviewer — without hand-writing the orchestration that passes work between them.</p>
+<h3>The Concept</h3>
+<p>CrewAI's mental model is a small company: an <code>Agent</code> has a role, goal, and backstory (all compiled into its system prompt); a <code>Task</code> has a description and expected output; a <code>Crew</code> executes tasks via a <code>Process</code> — sequential (assembly line) or hierarchical (a manager agent delegates). The analogy is literal: you're writing job descriptions, and the framework writes the meetings.</p>
+<h3>Build It</h3>
+<pre><code>researcher = Agent(role=&quot;Researcher&quot;, goal=&quot;Find facts on {topic}&quot;, backstory=&quot;...&quot;)
+writer = Agent(role=&quot;Writer&quot;, goal=&quot;Draft a brief&quot;, backstory=&quot;...&quot;)
+crew = Crew(agents=[researcher, writer],
+            tasks=[research_task, write_task],
+            process=Process.sequential)
+crew.kickoff(inputs={&quot;topic&quot;: &quot;GGUF quantization&quot;})</code></pre>
+<p>Print the compiled prompts. Notice: role/goal/backstory are just system-prompt templating.</p>
+<h3>Use It</h3>
+<p>CrewAI is fast to demo and genuinely pleasant for sequential pipelines. Tradeoffs: the role-play framing burns tokens on persona text, and fine-grained control flow means fighting the abstraction. Compare with LangGraph (explicit control, more code) before committing.</p>
+<h3>War Story</h3>
+<p>CrewAI was created by João Moura and open-sourced in early 2024; it became one of GitHub's fastest-growing agent frameworks that year, riding the accessibility of its "agents as coworkers" metaphor. The same metaphor drew criticism from practitioners who found that backstories are decoration and the hard part — reliable task handoff — still needed engineering.</p>
+<h3>Checkpoint</h3>
+<ol><li>What do role, goal, and backstory actually compile down to?</li><li>When does sequential process suffice, and what does hierarchical add?</li><li>What's the token cost of persona-heavy prompting, and when is it worth it?</li></ol>
+<h2 id="lesson-05"><span class="lnum">05</span> AutoGen: Conversational Multi-Agent</h2>
+<p><b>MOTTO:</b> Everything is a conversation — even the code execution.</p>
+<h3>The Problem</h3>
+<p>Some workflows are naturally a dialogue: a coder agent proposes code, an executor runs it, a critic reviews, and they iterate until tests pass. You need infrastructure for agents that talk <i>to each other</i>, not just to a user.</p>
+<h3>The Concept</h3>
+<p>AutoGen (Microsoft Research) models everything as conversable agents exchanging messages. An <code>AssistantAgent</code> (LLM-backed) chats with a <code>UserProxyAgent</code> (which can execute code and stand in for a human); a <code>GroupChat</code> adds a manager that picks the next speaker. The analogy is a Slack channel with bots: the transcript <i>is</i> the shared state, and termination is "someone says TERMINATE."</p>
+<h3>Build It</h3>
+<pre><code>assistant = AssistantAgent(&quot;coder&quot;, llm_config=cfg)
+executor = UserProxyAgent(&quot;executor&quot;, code_execution_config={&quot;work_dir&quot;: &quot;wd&quot;},
+                          human_input_mode=&quot;NEVER&quot;)
+executor.initiate_chat(assistant, message=&quot;Plot NVDA vs TSLA YTD and save png&quot;)</code></pre>
+<p>The assistant writes Python; the executor runs it and replies with output or the traceback; the loop continues until it works.</p>
+<h3>Use It</h3>
+<p>Strong for code-generation-and-execution loops and research prototyping. Watch for: conversations that circle without converging, and speaker-selection in group chats being its own prompt-engineering problem. Sandbox the executor — Phase 4 rules apply double when the agent writes the code.</p>
+<h3>War Story</h3>
+<p>AutoGen came out of Microsoft Research (Wu et al., 2023) and won a best-paper award at an ICLR 2024 workshop. In late 2024 the project famously forked: original creators launched AG2 to continue the classic API, while Microsoft rewrote AutoGen 0.4 (January 2025) as an event-driven, actor-model system — one codebase, two philosophies about what the abstraction should be.</p>
+<h3>Checkpoint</h3>
+<ol><li>In AutoGen, what serves as the shared state between agents?</li><li>Why is the UserProxyAgent's code execution a security-critical component?</li><li>What goes wrong with LLM-driven speaker selection in group chats?</li></ol>
+<h2 id="lesson-06"><span class="lnum">06</span> OpenAI Agents SDK and Handoffs</h2>
+<p><b>MOTTO:</b> Small surface, sharp edges filed down: agents, tools, handoffs, guardrails.</p>
+<h3>The Problem</h3>
+<p>Heavy frameworks impose their worldview; raw SDKs leave you rebuilding the same loop, tracing, and multi-agent transfer logic every project. There's a market for a thin, opinionated middle.</p>
+<h3>The Concept</h3>
+<p>The OpenAI Agents SDK has four primitives: an <code>Agent</code> (instructions + tools + model), <code>function_tool</code> (a decorated Python function), <i>handoffs</i> (an agent transfers the conversation to another agent — implemented as a tool call whose "result" is a change of ownership), and <i>guardrails</i> (validators that run alongside). A handoff is a call-center transfer: the conversation history moves; the person answering changes.</p>
+<h3>Build It</h3>
+<pre><code>triage = Agent(name=&quot;Triage&quot;, instructions=&quot;Route to the right specialist.&quot;,
+               handoffs=[billing_agent, support_agent])
+result = Runner.run_sync(triage, &quot;I was double-charged last month&quot;)</code></pre>
+<p>Under the hood, the model sees a <code>transfer_to_billing_agent</code> tool. Handoff = tool call with control-flow side effects. Demystified.</p>
+<h3>Use It</h3>
+<p>Thin loop, built-in tracing, provider-pluggable via OpenAI-compatible APIs (though it defaults home to OpenAI — that's the gravity to price in). Compare: LangGraph is a graph you draw; Agents SDK is a relay race you staff.</p>
+<h3>War Story</h3>
+<p>OpenAI shipped Swarm in October 2024 explicitly labeled experimental and educational — a few hundred lines demonstrating handoffs. In March 2025 they replaced it with the production Agents SDK, keeping the handoff primitive. An "educational demo" becoming the flagship abstraction six months later tells you the simple version was the right version.</p>
+<h3>Checkpoint</h3>
+<ol><li>Mechanically, what is a handoff in this SDK?</li><li>What's the difference between a handoff and just calling another agent as a tool?</li><li>What lock-in consideration comes with an SDK "defaulting home" to one provider?</li></ol>
+<h2 id="lesson-07"><span class="lnum">07</span> Claude Agent SDK: The Harness Approach</h2>
+<p><b>MOTTO:</b> Don't ship a loop; ship the whole workbench.</p>
+<h3>The Problem</h3>
+<p>Even with a good loop, production agents need the boring parts: file and shell tools, permission gates, context compaction, subagent spawning, session management. Rebuilding that per project is where teams actually bleed time.</p>
+<h3>The Concept</h3>
+<p>The Claude Agent SDK inverts the usual deal. Instead of a library you assemble, it's a <i>harness</i> — the same agent runtime that powers Claude Code, exposed programmatically. You get file editing, bash, and search tools out of the box; hooks that fire on tool events; a permission system (allow/deny/ask per tool); subagents with isolated contexts; automatic context compaction; and MCP for external tools. Think renting a fully equipped workshop versus buying a toolbox: less to build, more to accept as-is.</p>
+<h3>Build It</h3>
+<pre><code>from claude_agent_sdk import query, ClaudeAgentOptions
+opts = ClaudeAgentOptions(allowed_tools=[&quot;Read&quot;, &quot;Grep&quot;, &quot;Bash&quot;],
+                          permission_mode=&quot;acceptEdits&quot;, cwd=&quot;/repo&quot;)
+async for msg in query(prompt=&quot;Find and fix the failing test&quot;, options=opts):
+    print(msg)</code></pre>
+<p>Note what you did <i>not</i> write: no loop, no tool schemas, no executor. That's the harness trade.</p>
+<h3>Use It</h3>
+<p>Strongest when your agent's job resembles "operate on a computer/codebase." The tradeoff is the inverse of Lesson 01: maximal leverage, minimal control over the inner loop — and it's Anthropic-models-only, the vendor-neutrality caveat to state plainly.</p>
+<h3>War Story</h3>
+<p>Anthropic released this as the Claude Code SDK, then renamed it the Claude Agent SDK in late 2025 — an explicit signal that the coding-agent harness (loop, tools, permissions, compaction) generalizes to non-coding agents. The rename was the thesis: the harness, not the model call, is the product.</p>
+<h3>Checkpoint</h3>
+<ol><li>What does a "harness" provide that a library-style framework doesn't?</li><li>Which control do you give up in exchange, and when does that hurt?</li><li>Why do permission modes matter more in a harness with built-in bash access?</li></ol>
+<h2 id="lesson-08"><span class="lnum">08</span> smolagents and Code-Acting Agents</h2>
+<p><b>MOTTO:</b> Why emit JSON describing an action when you can just write the action?</p>
+<h3>The Problem</h3>
+<p>JSON tool calling is one action per round trip. Composing tools — "search three terms, dedupe, take the top result of each" — takes many turns of expensive, error-prone back-and-forth.</p>
+<h3>The Concept</h3>
+<p>CodeAct flips the output format: the model writes a Python snippet as its action, and the runtime executes it. Tools become plain functions the code can call, and the model gets loops, variables, and composition natively — LLMs have seen far more Python than bespoke JSON dialects. It's the difference between mailing someone one instruction at a time and handing them a script.</p>
+<pre><code>JSON agent:  think -&gt; {&quot;tool&quot;: &quot;search&quot;, ...} -&gt; result -&gt; think -&gt; ... (N round trips)
+CodeAct:     think -&gt; for q in queries: hits[q] = search(q)          (1 round trip)</code></pre>
+<h3>Build It</h3>
+<pre><code>from smolagents import CodeAgent, WebSearchTool, InferenceClientModel
+agent = CodeAgent(tools=[WebSearchTool()], model=InferenceClientModel())
+agent.run(&quot;Compare the release dates of Llama 2 and Mistral 7B&quot;)</code></pre>
+<p>Inspect the logs: the "tool call" is a code block, executed in a sandboxed interpreter.</p>
+<h3>Use It</h3>
+<p>Hugging Face's smolagents is the flagship CodeAct library — deliberately tiny, model-agnostic (open models via HF, or any API). The catch is obvious: the agent writes arbitrary code, so sandboxing (restricted interpreter, E2B/Docker) is not optional. Phase 4 was the rehearsal for this.</p>
+<h3>War Story</h3>
+<p>The CodeAct paper ("Executable Code Actions Elicit Better LLM Agents," Wang et al., 2024) reported up to ~20% higher success rates for code actions over JSON/text actions across agent benchmarks. Hugging Face released smolagents around the end of 2024, advertising that its core agent logic fits in roughly a thousand lines of code — a pointed contrast in a field of heavyweight frameworks.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does code-as-action reduce round trips versus JSON tool calls?</li><li>Why are LLMs often <i>better</i> at emitting Python than custom JSON schemas?</li><li>What security requirement does CodeAct make absolutely mandatory?</li></ol>
+<h2 id="lesson-09"><span class="lnum">09</span> Pydantic AI: Types as Guardrails</h2>
+<p><b>MOTTO:</b> If the output doesn't parse, the run didn't happen.</p>
+<h3>The Problem</h3>
+<p>Agents return strings; your program needs structs. Validating LLM output by hand — and deciding what to do when it's malformed — is repetitive, and most frameworks bolt it on as an afterthought.</p>
+<h3>The Concept</h3>
+<p>Pydantic AI makes the type the contract: you declare an <code>output_type</code> (a Pydantic model), and the framework validates every response against it — and here's the good part — feeds validation errors <i>back to the model</i> for a retry. It's FastAPI's trick applied to agents: the schema isn't documentation, it's enforcement. Dependency injection (<code>deps_type</code>) gives tools typed access to your DB connections and config instead of globals.</p>
+<h3>Build It</h3>
+<pre><code>class Verdict(BaseModel):
+    approved: bool
+    risk_score: float = Field(ge=0, le=1)
+    reasons: list[str]
+
+agent = Agent(&quot;openai:gpt-4o&quot;, output_type=Verdict, deps_type=Database)
+result = agent.run_sync(&quot;Assess invoice INV-3021&quot;, deps=db)
+result.output.risk_score  # a float, guaranteed, or the run raised</code></pre>
+<p>Malformed output triggers an automatic retry with the validation error in context.</p>
+<h3>Use It</h3>
+<p>Model-agnostic (OpenAI, Anthropic, Gemini, local via OpenAI-compatible endpoints). Best fit: agents embedded in typed production codebases where "probably JSON" is not an acceptable return type. Pairs naturally with the structured-output techniques from Phase 10, Lesson 08.</p>
+<h3>War Story</h3>
+<p>Pydantic AI was announced in December 2024 by the Pydantic team itself (Samuel Colvin) — notable because Pydantic is already a dependency of essentially every framework in this phase, including the OpenAI SDK and LangChain. The validation layer everyone was using decided to come upstairs and run the show.</p>
+<h3>Checkpoint</h3>
+<ol><li>What happens in Pydantic AI when the model's output fails validation?</li><li>Why is dependency injection preferable to globals for tool implementations?</li><li>How does "types as contract" change how you write evals for an agent?</li></ol>
+<h2 id="lesson-10"><span class="lnum">10</span> Orchestration vs Library vs Platform</h2>
+<p><b>MOTTO:</b> Know whether you're buying a hammer, a scaffold, or a landlord.</p>
+<h3>The Problem</h3>
+<p>"Framework" hides three different products with different costs. Teams compare LangGraph to Pydantic AI to LangSmith as if they were peers; they aren't, and category confusion is how you end up owning infrastructure you meant to rent.</p>
+<h3>The Concept</h3>
+<p>Three tiers, by what they want to own:</p>
+<pre><code>Library        -&gt;  owns some FUNCTIONS   (you call it)        e.g. Pydantic AI, smolagents
+Orchestrator   -&gt;  owns the CONTROL FLOW (it calls you)       e.g. LangGraph, AutoGen, Temporal-style runtimes
+Platform       -&gt;  owns the RUNTIME/DATA (you deploy into it) e.g. LangSmith/LangGraph Platform, Bedrock Agents, hosted assistant APIs</code></pre>
+<p>The rent rises as you go down: libraries cost an import, orchestrators cost your architecture, platforms cost your deployment story and observability data. Inversion of control is the dividing line — who calls whom.</p>
+<h3>Build It</h3>
+<p>Audit any framework in one sitting: (1) Where does the main loop live — your file or theirs? (2) Where does state persist — your DB or their service? (3) Can you run it offline in a plain test? Score each 0–2 toward "library." Do this for two frameworks from this phase and compare totals.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Question</th><th>Library</th><th>Orchestrator</th><th>Platform</th></tr></thead><tbody><tr><td>Who owns the loop?</td><td>You</td><td>It</td><td>It</td></tr><tr><td>Where's the state?</td><td>Yours</td><td>Configurable</td><td>Theirs</td></tr><tr><td>Exit cost</td><td>Low</td><td>Medium</td><td>High</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>LangChain's own v0.1 restructuring (January 2024) split the monolith into <code>langchain-core</code> and per-integration packages precisely because users wanted library-sized dependencies, not framework-sized ones — a public admission that one package had been straddling all three tiers at once.</p>
+<h3>Checkpoint</h3>
+<ol><li>What does "inversion of control" mean, and which tier introduces it?</li><li>Why does the platform tier have the highest exit cost specifically?</li><li>Run the three-question audit on any framework you use today — what tier is it?</li></ol>
+<h2 id="lesson-11"><span class="lnum">11</span> Framework Lock-In and Escape Hatches</h2>
+<p><b>MOTTO:</b> The best time to plan your exit is before you move in.</p>
+<h3>The Problem</h3>
+<p>Frameworks accumulate around your code: their message format in your DB, their trace format in your dashboards, their prompt templates in your git history. When the framework churns — or you outgrow it — migration cost is proportional to how deep those formats sank.</p>
+<h3>The Concept</h3>
+<p>Lock-in isn't binary; it's a set of surfaces, each with an escape hatch:</p>
+<pre><code>Surface              Escape hatch
+──────────────────   ─────────────────────────────────────────
+Message format       Store a neutral transcript (role/content/tool_call) you own
+Model client         OpenAI-compatible APIs / litellm as lingua franca
+Prompts              Keep prompts as versioned text files, not framework objects
+Traces               Emit OpenTelemetry, not vendor-only formats
+Tools                Plain functions + JSON schema; adapt at the edge</code></pre>
+<p>The pattern is hexagonal architecture: your domain (prompts, tools, transcripts) in the middle; the framework as a replaceable adapter at the boundary.</p>
+<h3>Build It</h3>
+<p>Write <code>to_neutral(framework_msgs) -&gt; list[dict]</code> and <code>from_neutral(...)</code> for one framework you use. Persist only neutral transcripts. Now swap the framework in a test and replay a stored conversation through the new one. If that works, you're renting; if not, you're owned.</p>
+<h3>Use It</h3>
+<p>Practical anchors: OpenAI-compatible endpoints (served by vLLM, Ollama, most providers) as the portability layer for model calls; MCP for portable tool servers; OpenTelemetry GenAI conventions for traces.</p>
+<h3>War Story</h3>
+<p>OpenAI announced in March 2025 that the Assistants API would be deprecated in favor of the new Responses API, with a migration window into 2026. Teams that had persisted OpenAI-hosted threads and assistant objects as their source of truth got a live-fire migration drill; teams that kept neutral transcripts changed an adapter.</p>
+<h3>Checkpoint</h3>
+<ol><li>Name the five lock-in surfaces and one escape hatch for each.</li><li>Why is the <i>stored message format</i> the highest-stakes surface?</li><li>What does the replay test prove about your architecture?</li></ol>
+<h2 id="lesson-12"><span class="lnum">12</span> When to Use No Framework at All</h2>
+<p><b>MOTTO:</b> The framework you don't adopt never breaks in production.</p>
+<h3>The Problem</h3>
+<p>After eleven lessons of frameworks, the honest question: your agent is a loop, three tools, and a system prompt. Is a dependency with weekly releases and eight abstraction layers actually buying anything?</p>
+<h3>The Concept</h3>
+<p>A decision procedure, not a vibe:</p>
+<pre><code>Need durable state / human gates / complex branching? ──&gt; orchestrator (or DIY + a DB table)
+Need many vendor integrations fast?                   ──&gt; integration-heavy framework
+Need typed outputs in a typed codebase?               ──&gt; thin library (or 30 lines of retry logic)
+Need &quot;operate a computer&quot; out of the box?             ──&gt; a harness
+None of the above?                                    ──&gt; raw SDK. Stop. You&#x27;re done.</code></pre>
+<p>The null hypothesis is Lesson 01's loop. A framework must reject the null with evidence: features you'd otherwise build <i>and maintain</i>, minus the cost of churn, debugging depth, and lock-in from Lesson 11.</p>
+<h3>Build It</h3>
+<p>Take one agent you built this phase with a framework and port it to a raw SDK. Count: lines added, dependencies removed, and — the honest metric — which version you can fully explain to a colleague in five minutes.</p>
+<h3>Use It</h3>
+<p>Rules of thumb: prototypes and single-agent tools rarely justify a framework; long-running, resumable, multi-actor systems often do; and everything in between deserves the audit from Lesson 10 plus the escape hatches from Lesson 11 <i>before</i> adoption, not after.</p>
+<h3>War Story</h3>
+<p>The strongest no-framework argument came from framework vendors themselves: Anthropic's December 2024 "Building Effective Agents" post found the most successful implementations used simple composable patterns over frameworks, and OpenAI's Swarm shipped as a deliberately tiny teaching artifact before graduating to an SDK. The people with the most agent traffic keep rediscovering the while loop.</p>
+<h3>Checkpoint</h3>
+<ol><li>What is the "null hypothesis" a framework must beat, and with what evidence?</li><li>Which two workload properties most strongly justify an orchestrator?</li><li>For your current project: which branch of the decision tree applies, and why?</li></ol>
+  </article>
+  <div class="pager">
+    <a href="08-protocols.html">← 🌐 Phase 08</a>
+    <span class="spacer"></span>
+    <a href="10-open-models.html">Phase 10 🦙 →</a>
+  </div>
+</div>
+</body>
+</html>

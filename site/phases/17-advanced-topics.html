@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Topics — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 17</div>
+  <h1><span class="pnum">17</span> 🧪 Advanced Topics</h1>
+  <div class="tagline">Where research papers become next year&#x27;s baseline.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Fine-tuning agents: SFT on trajectories</a>
+<a href="#lesson-02"><span class="lnum">02</span>RL for agents: from RLHF to GRPO</a>
+<a href="#lesson-03"><span class="lnum">03</span>Self-improvement: agents that write their own tools</a>
+<a href="#lesson-04"><span class="lnum">04</span>Memory consolidation and sleep-time compute</a>
+<a href="#lesson-05"><span class="lnum">05</span>World models and simulation-based planning</a>
+<a href="#lesson-06"><span class="lnum">06</span>Voice agents: latency, barge-in, and duplex</a>
+<a href="#lesson-07"><span class="lnum">07</span>Embodied agents and robotics-lite</a>
+<a href="#lesson-08"><span class="lnum">08</span>Test-time learning and in-context adaptation</a>
+<a href="#lesson-09"><span class="lnum">09</span>Agent economies and machine payments</a>
+<a href="#lesson-10"><span class="lnum">10</span>The research frontier: what to read next</a>
+  </div>
+  <article>
+<blockquote>Where research papers become next year's baseline.</blockquote>
+<p>Everything so far has been engineering with a fixed model: prompt it, tool it, orchestrate it. This phase changes the model itself, the agent's relationship with time, and even the economy it operates in. Some of this is production-ready today; some is six months from it; all of it is worth understanding now, because "advanced" in this field has a half-life of about a year.</p>
+<hr>
+<h2 id="lesson-01"><span class="lnum">01</span> Fine-Tuning Agents: SFT on Trajectories</h2>
+<p><b>MOTTO:</b> Stop prompting the behavior in. Train it in.</p>
+<h3>The Problem</h3>
+<p>Your system prompt is 4,000 tokens of "always check before writing", "use the search tool first", "format like this" — and the model still forgets under pressure. You're paying for those tokens on every call, and the behavior is still probabilistic.</p>
+<h3>The Concept</h3>
+<p>Supervised fine-tuning (SFT) on <b>trajectories</b>: instead of (question, answer) pairs, train on full agent runs — system state, tool calls, tool results, reasoning, final action — so the model <i>learns the loop</i>, not just the answers. Like moving from giving a new hire a laminated instruction card to actually training them on recorded expert sessions. Your traces from Phase 16 are the raw material: filter to successful runs, clean them, and they're a dataset.</p>
+<h3>Build It</h3>
+<ul><li>Export successful traces (high feedback scores, task completed, no retries) into the provider's chat format with tool-call turns intact.</li><li>Curate hard: dedupe near-identical trajectories, remove lucky successes (right answer, wrong process), balance across task types. 500 excellent beats 50,000 mediocre.</li><li>Fine-tune a small model (7–8B class) with LoRA; evaluate on your Phase 9 harness against the prompted baseline — same tasks, measure success rate, token cost, and how much system prompt you can now delete.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Role</th></tr></thead><tbody><tr><td>Unsloth / Axolotl / LLaMA-Factory</td><td>Open-model SFT + LoRA</td></tr><tr><td>Hugging Face TRL</td><td><code>SFTTrainer</code>, chat/tool templates</td></tr><tr><td>OpenAI fine-tuning API</td><td>Hosted SFT incl. function-calling formats</td></tr><tr><td>Together / Fireworks</td><td>Hosted tuning of open models</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>Alongside DeepSeek-R1 (January 2025), DeepSeek released distilled models: they generated ~800k reasoning-heavy training samples with R1 and ran plain SFT — no RL at all — on Qwen and Llama bases from 1.5B to 70B. The distilled 14B model outperformed much larger open baselines on reasoning benchmarks. The headline was the RL; the sleeper result was how far pure SFT on good trajectories goes when the trajectories are good enough.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why train on full trajectories rather than (input, final answer) pairs for an agent?</li><li>What makes a "lucky success" trace poisonous in a training set?</li><li>What did you have to build in Phases 9 and 16 before fine-tuning was even possible?</li></ol>
+<hr>
+<h2 id="lesson-02"><span class="lnum">02</span> RL for Agents: From RLHF to GRPO</h2>
+<p><b>MOTTO:</b> SFT copies the demonstrator. RL surpasses it.</p>
+<h3>The Problem</h3>
+<p>SFT caps you at the quality of your demonstrations. If no trace in your dataset solves the hard case, the fine-tuned model won't either. You want the model to <i>discover</i> better strategies — which means rewarding outcomes, not imitating steps.</p>
+<h3>The Concept</h3>
+<p>RLHF's classic pipeline (SFT → reward model → PPO) is heavy: PPO needs a separate value network and careful tuning. <b>GRPO</b> (Group Relative Policy Optimization, from DeepSeekMath) simplifies it: sample a <i>group</i> of responses per prompt, score them, and use each response's advantage relative to the group mean as the training signal — no value model at all. For agents, the key enabler is <b>verifiable reward</b>: code passes tests, math checks out, task provably completed. Where a checker exists, you don't need a learned reward model — and reward hacking gets much harder.</p>
+<pre><code>prompt ─▶ sample G responses ─▶ score each ─▶ advantage = (score − group mean)
+                                                 └─▶ push up above-avg, push down below-avg</code></pre>
+<h3>Build It</h3>
+<ul><li>Pick a task with a programmatic checker (e.g., your agent's SQL tasks: does the query run and return the fixture answer?).</li><li>Wire GRPO with TRL's <code>GRPOTrainer</code> or the <code>verifiers</code> ecosystem on a small model: reward = task check + format check (penalize malformed tool calls).</li><li>Watch for reward hacking — inspect trajectories, not just curves. If reward climbs while transcripts get weird, your checker has a loophole.</li></ul>
+<h3>Use It</h3>
+<p>TRL (<code>GRPOTrainer</code>), veRL, OpenRLHF, <code>verifiers</code>/prime-rl for RL environments over tool-using tasks.</p>
+<h3>War Story</h3>
+<p>DeepSeek-R1 (January 2025) showed pure RL with GRPO and verifiable rewards — no SFT stage at all for R1-Zero — teaching a base model to reason: response lengths grew as it learned to think longer, and mid-training the model exhibited what the paper called an "aha moment," spontaneously re-examining its own work. R1-Zero's transcripts were messy (language mixing, poor readability), so the released R1 added a small SFT "cold start" before RL. The one-two punch — a little SFT for form, RL against verifiable rewards for capability — is now the standard recipe.</p>
+<h3>Checkpoint</h3>
+<ol><li>What does GRPO remove from the PPO pipeline, and what makes that removal work?</li><li>Why do verifiable rewards suit agent tasks better than learned reward models?</li><li>Reward is climbing but spot-checked trajectories look degenerate. What happened and what do you fix?</li></ol>
+<hr>
+<h2 id="lesson-03"><span class="lnum">03</span> Self-Improvement: Agents That Write Their Own Tools</h2>
+<p><b>MOTTO:</b> The best tool for the job is the one the agent wrote last Tuesday.</p>
+<h3>The Problem</h3>
+<p>You hand-author every tool. Each new task type means a developer writing a function, a schema, tests. The agent's capabilities are capped by your backlog.</p>
+<h3>The Concept</h3>
+<p>Let the agent close the loop: encounter a task → write code to solve it → verify it works → <b>store the verified code as a named, reusable skill</b> → retrieve it next time. The skill library becomes compound interest: complex skills compose simpler ones, and capability curves bend upward. Like a craftsman's jig wall — every tricky job leaves behind a jig that makes the next one faster. The critical ingredient is verification: only code that provably worked gets promoted, or the library fills with confident garbage.</p>
+<h3>Build It</h3>
+<ul><li>Add three meta-tools to your agent: <code>write_skill(name, code)</code>, <code>test_skill(name)</code> (runs in a sandbox against the current task), <code>search_skills(query)</code> (embedding retrieval over skill descriptions).</li><li>Promotion rule: a skill enters the library only after passing execution in the sandbox; store code + docstring + example call.</li><li>Run it on a task family (e.g., CSV wrangling challenges) and chart tasks-solved-per-hour over time. Flat means your retrieval or verification is broken; rising means the flywheel is turning.</li></ul>
+<h3>Use It</h3>
+<p>Sandboxed execution (Docker, E2B, Modal) is non-negotiable; embedding store for skill retrieval; your Phase 9 evals to measure whether the library actually helps.</p>
+<h3>War Story</h3>
+<p>Voyager (Wang et al., May 2023) put a GPT-4 agent in Minecraft with exactly this loop: an automatic curriculum proposed goals, the agent wrote JavaScript skills against the Mineflayer API, verified them in-game, and banked them in a skill library. Results vs. prior methods: 3.3× more unique items discovered, 2.3× longer travel distances, and key tech-tree milestones unlocked up to 15.3× faster — it was the only method to reach diamond tools. The skill library even transferred to a fresh world. It remains the cleanest demonstration that verified self-written tools compound.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is verification-before-promotion the load-bearing step in a skill library?</li><li>How does skill composition change the shape of the capability curve?</li><li>What are the security implications of executing agent-written code, and how does your sandbox address them?</li></ol>
+<hr>
+<h2 id="lesson-04"><span class="lnum">04</span> Memory Consolidation and Sleep-Time Compute</h2>
+<p><b>MOTTO:</b> Thinking is too important to do only while the user waits.</p>
+<h3>The Problem</h3>
+<p>Your agent's memory (Phase on memory) is an append-only junk drawer: raw conversation chunks, redundant facts, stale preferences. Retrieval gets noisier as it grows. And every second of "thinking" happens on the user's clock.</p>
+<h3>The Concept</h3>
+<p>Biological memory doesn't just record — it consolidates offline. Do the same: schedule <b>sleep-time compute</b>, background jobs where the agent processes its own memory with no user waiting: deduplicate and merge facts, resolve contradictions (keep the newer preference), promote episodic details into semantic summaries ("user prefers concise answers" from 30 examples), pre-compute likely-useful context for tomorrow. The user-facing agent then starts each session with a curated brief instead of a haystack.</p>
+<pre><code>awake:  user ⇄ agent ──writes──▶ raw memory
+asleep: consolidator agent: dedupe → resolve → summarize → index → brief</code></pre>
+<h3>Build It</h3>
+<ul><li>Nightly job: load a user's raw memory entries; an LLM pass clusters, merges duplicates, flags contradictions, and emits a structured profile + episodic summaries. Keep raw entries archived (never destroy the source of truth).</li><li>Add provenance: every consolidated fact links back to the raw entries that support it, so bad consolidations are debuggable.</li><li>Measure it: retrieval precision on a probe set, and time-to-first-useful-token in fresh sessions, before vs. after consolidation.</li></ul>
+<h3>Use It</h3>
+<p>Letta (nee MemGPT — sleep-time agents are a first-class feature), Mem0, Zep (temporal knowledge graph memory), or a cron job + your own memory store.</p>
+<h3>War Story</h3>
+<p>The "Sleep-time Compute" paper (Lin et al., April 2025, from the Letta/UC Berkeley group) formalized the idea: let a model process context offline, before queries arrive, producing a distilled representation. On their reasoning benchmarks, sleep-time compute reduced the test-time compute needed to reach a given accuracy by roughly 5×, and amortized well when multiple questions hit the same context. The economics are the point: offline tokens are batchable, cacheable, and off the latency path.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why keep raw memory archived after consolidation instead of replacing it?</li><li>Which memory operations belong offline vs. must happen in-session?</li><li>How would you detect that a consolidation run made things worse?</li></ol>
+<hr>
+<h2 id="lesson-05"><span class="lnum">05</span> World Models and Simulation-Based Planning</h2>
+<p><b>MOTTO:</b> Rehearse where mistakes are free; act where they aren't.</p>
+<h3>The Problem</h3>
+<p>Your agent learns by acting in the real environment — where actions are slow, cost money, and can't be undone. Ten thousand practice runs against a production CRM is not a plan.</p>
+<h3>The Concept</h3>
+<p>A <b>world model</b> predicts what the environment will do next given a state and an action. With one, an agent can plan by <i>simulation</i>: imagine candidate action sequences, score predicted outcomes, act out only the winner. This is model-based planning (the family behind MuZero's learned-model search). For software agents you rarely need a neural world model — a <b>staged replica</b> (seeded database, mocked APIs, recorded website) is a perfectly good world model with 100% fidelity on the parts you copied. The frontier is <i>learned</i> world models for environments too rich to replicate.</p>
+<pre><code>real env:   act ──────────────▶ consequence (slow, costly, irreversible)
+world model: propose → simulate → score → pick best ──▶ act once, for real</code></pre>
+<h3>Build It</h3>
+<ul><li>Build a simulator for one of your agent's environments: e.g., a fixture e-commerce API with deterministic inventory and orders. Cover the effectful operations especially.</li><li>Add a <code>simulate: bool</code> flag to your tool layer; a planning wrapper runs K candidate plans in simulation, scores terminal states, executes the best plan live.</li><li>Track sim-to-real gap: log every case where the live outcome diverged from the simulated prediction; that list is your simulator's backlog.</li></ul>
+<h3>Use It</h3>
+<p>WebArena / BrowserGym (simulated web environments for browser agents), gym-style custom environments, Docker-composed staging stacks, and record-replay proxies (VCR-style) for third-party APIs.</p>
+<h3>War Story</h3>
+<p>DeepMind's Genie 2 (December 2024) is a foundation world model that generates playable, action-controllable 3D environments from a single prompt image — and DeepMind explicitly positioned it as a way to create unlimited training and evaluation environments for embodied agents, demonstrating their SIMA agent following instructions inside worlds Genie 2 dreamed up. The provocative idea: when environments are the bottleneck for agent training, generate the environments too.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is a staged replica "a world model" in the useful sense, and where does it stop being one?</li><li>What is the sim-to-real gap and why must you measure it rather than assume it?</li><li>When does simulation-based planning justify its extra inference cost?</li></ol>
+<hr>
+<h2 id="lesson-06"><span class="lnum">06</span> Voice Agents: Latency, Barge-In, and Duplex</h2>
+<p><b>MOTTO:</b> In voice, 500 milliseconds is an awkward silence.</p>
+<h3>The Problem</h3>
+<p>Text users tolerate a two-second pause; a phone caller hears two seconds of silence and says "hello?…" Voice also breaks turn-taking: humans interrupt, backchannel ("mm-hm"), and talk over each other. A half-duplex request/response agent sounds like a phone tree.</p>
+<h3>The Concept</h3>
+<p>Voice agents live or die on three things. <b>Latency budget</b>: the pipeline (ASR → LLM → TTS) must land under ~800 ms voice-to-voice, so you stream every stage and start TTS on the first sentence, not the full reply. <b>Barge-in</b>: detect user speech during agent playback, stop the audio instantly, and — harder — cancel the in-flight generation and reconcile state ("I said half of that sentence"). <b>Duplex</b>: full-duplex systems listen while speaking; speech-to-speech models collapse the pipeline entirely, cutting latency and keeping prosody, at the cost of less control and harder tool integration.</p>
+<pre><code>pipeline:  mic → VAD → ASR ──stream──▶ LLM ──first sentence──▶ TTS → speaker
+                 └── barge-in: user speaks → kill playback + cancel LLM</code></pre>
+<h3>Build It</h3>
+<ul><li>Assemble a pipeline agent: streaming ASR (Deepgram or Whisper-streaming) → your agent loop → streaming TTS (Cartesia/ElevenLabs). Measure voice-to-voice p95 latency; itemize where the milliseconds go.</li><li>Implement barge-in: VAD monitors during playback; on speech, stop TTS, abort the LLM stream, and truncate the assistant turn in history to what was actually spoken.</li><li>Handle tool calls that take seconds: generate a spoken filler ("let me check that…") while the tool runs — dead air is a bug.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Role</th></tr></thead><tbody><tr><td>OpenAI Realtime API</td><td>Hosted speech-to-speech with tool calls</td></tr><tr><td>Pipecat / LiveKit Agents</td><td>OSS voice-agent orchestration frameworks</td></tr><tr><td>Deepgram / Whisper</td><td>Streaming ASR</td></tr><tr><td>Cartesia / ElevenLabs</td><td>Low-latency streaming TTS</td></tr><tr><td>Vapi / Retell</td><td>Managed voice-agent platforms + telephony</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>OpenAI's numbers for ChatGPT voice tell the whole story: the pre-2024 pipeline averaged 2.8 s (GPT-3.5) to 5.4 s (GPT-4) per response because audio→text→LLM→text→audio crossed three models, losing tone and interruptibility along the way. GPT-4o's single natively-audio model brought average response time to ~320 ms, and the subsequent Realtime API (late 2024) exposed the same trick to developers — server-side VAD, barge-in support, and function calling over a WebSocket. The capability that made voice agents viable wasn't smarter; it was faster.</p>
+<h3>Checkpoint</h3>
+<ol><li>Where does each chunk of latency come from in a pipeline voice agent, and which stage benefits most from streaming?</li><li>What state reconciliation does barge-in require beyond stopping audio?</li><li>What do you give up when moving from a pipeline to a speech-to-speech model?</li></ol>
+<hr>
+<h2 id="lesson-07"><span class="lnum">07</span> Embodied Agents and Robotics-Lite</h2>
+<p><b>MOTTO:</b> The physical world doesn't have a retry button.</p>
+<h3>The Problem</h3>
+<p>Everything in this course acts through APIs, where actions are cheap, fast, and mostly reversible. A robot arm is none of those. What survives the jump from tokens to torque — and what breaks?</p>
+<h3>The Concept</h3>
+<p>The modern bridge is the <b>vision-language-action (VLA)</b> model: take a vision-language model pretrained on the internet, then fine-tune it to output robot actions as tokens — perception, language understanding, and control in one policy. Around it sits a familiar shape: a slow deliberate planner (the LLM/VLA, ~1 Hz thinking) and a fast reactive controller (~100 Hz reflexes) — exactly your agent loop, except tool calls take seconds, feedback is noisy sensors, and "undo" doesn't exist. Safety moves from prompt-injection defense to workspace limits, force caps, and e-stops.</p>
+<h3>Build It</h3>
+<p>No robot required for the concepts:</p>
+<ul><li>In MuJoCo (or any physics sim), wire an LLM planner that decomposes "put the block in the bowl" into primitive calls (<code>move_to(x,y,z)</code>, <code>grip()</code>, <code>release()</code>) executed by a scripted controller. Note the failure classes: the plan was right but the grasp slipped — a category APIs never gave you.</li><li>Add perception noise (jittered object positions) and watch pure open-loop plans fail; add a re-observe-and-replan step and watch closed-loop recover. That loop <i>is</i> embodiment in miniature.</li><li>Optional hardware: Hugging Face's LeRobot + an SO-100 arm kit (~$100-class) runs imitation-learning policies on real hardware.</li></ul>
+<h3>Use It</h3>
+<p>LeRobot (HF's OSS robotics stack), MuJoCo / Isaac Sim (simulation), OpenVLA (open 7B VLA model), ROS 2 for real integration.</p>
+<h3>War Story</h3>
+<p>Google DeepMind's RT-2 (July 2023) demonstrated the VLA thesis: co-fine-tuning a vision-language model on web data plus robot trajectories, emitting actions as text tokens, roughly doubled success on unseen objects and instructions versus the robotics-data-only predecessor RT-1 — including semantic leaps like picking the improvised hammer (a rock) or choosing a drink for a tired person, behaviors present nowhere in the robot data. Internet-scale pretraining transferred to the physical world; the paper marks the moment robotics and LLM agents became one field with two speeds.</p>
+<h3>Checkpoint</h3>
+<ol><li>Which parts of your software agent loop survive contact with hardware, and which assumptions break?</li><li>Why do embodied stacks split into slow planners and fast controllers?</li><li>How does the safety model differ between an API agent and a physical one?</li></ol>
+<hr>
+<h2 id="lesson-08"><span class="lnum">08</span> Test-Time Learning and In-Context Adaptation</h2>
+<p><b>MOTTO:</b> The weights are frozen. The behavior doesn't have to be.</p>
+<h3>The Problem</h3>
+<p>Your agent faces a task family it wasn't trained on — a proprietary DSL, a quirky internal API. Fine-tuning takes days and a dataset you don't have. You need the model to get better <i>during</i> the task.</p>
+<h3>The Concept</h3>
+<p>Three escalating mechanisms, all without touching weights. <b>Many-shot in-context learning</b>: with long contexts, hundreds of examples in the prompt approach fine-tuning quality. <b>Test-time compute scaling</b>: spend more inference on hard problems — longer reasoning, N samples with a verifier picking the winner, budget-forcing ("wait, let me reconsider"). <b>In-context adaptation loops</b>: the agent tries, observes the error, writes the lesson into its own working context, and retries — Reflexion's insight, "learning" as accumulation of verbal experience in context. The weights are the instincts; the context is the notebook.</p>
+<h3>Build It</h3>
+<ul><li>Take a task your agent fails ~50% of (e.g., queries in a made-up DSL you define). Measure baseline, then: (a) 3-shot vs. 50-shot vs. 300-shot examples in context; (b) best-of-8 sampling with a programmatic verifier; (c) a retry loop where error messages and the agent's own post-mortem notes persist across attempts.</li><li>Chart accuracy vs. tokens spent for all three. You're drawing the test-time scaling curve for your own task — and finding where it flattens.</li></ul>
+<h3>Use It</h3>
+<p>Long-context models + prompt caching (many-shot is only affordable cached), verifier functions from your eval harness, reasoning-effort controls on o-series/Claude extended thinking.</p>
+<h3>War Story</h3>
+<p>In December 2024, OpenAI's o3 scored 75.7% on ARC-AGI's semi-private eval in its standard configuration and 87.5% with high test-time compute — on a benchmark designed to resist memorization, where GPT-4o managed single digits. Same weights across both o3 scores; the difference was purely how much inference-time search the model was allowed. ARC Prize's own analysis of the cost spread (lesson 16-02 covered the dollars) framed the new reality: capability is now partly a <i>purchasing decision made at inference time</i>.</p>
+<h3>Checkpoint</h3>
+<ol><li>When does many-shot ICL beat fine-tuning as an engineering choice, and what makes it affordable?</li><li>Why does best-of-N need a verifier, and what happens without one?</li><li>What is the difference between Reflexion-style adaptation and simply retrying?</li></ol>
+<hr>
+<h2 id="lesson-09"><span class="lnum">09</span> Agent Economies and Machine Payments</h2>
+<p><b>MOTTO:</b> An agent that can't pay is an agent that always needs you.</p>
+<h3>The Problem</h3>
+<p>Your research agent hits a paywalled API: $0.002 per call. A human would just pay it. Your agent stops dead, because the entire payments stack — cards, checkouts, CAPTCHAs, 3-D Secure — assumes a human with thumbs. And giving an autonomous loop your raw Visa number is a lesson-16 war story waiting to happen.</p>
+<h3>The Concept</h3>
+<p>Two real building blocks exist today. <b>Pay-per-request protocols</b>: x402 (Coinbase, 2025) revives HTTP status 402 "Payment Required" — a server answers a request with a price, the client (an agent) pays in stablecoins, retries with payment proof, and gets the resource; no accounts, no sessions, machine-speed micropayments. <b>Scoped credentials</b>: virtual cards and mandates issued per-agent with hard limits — single merchant, spend cap, expiry — from Stripe's agent tooling and the card networks' 2025 programs (Visa Intelligent Commerce, Mastercard Agent Pay), so an agent's purchasing power is a capability token, not a wallet. The design rules are your Phase 16 lessons wearing a money hat: hard budgets, idempotency keys on every charge, and a human-approval gate above a threshold. Beyond this, agent-to-agent commerce at scale is early and unproven — treat vision decks accordingly.</p>
+<pre><code>agent ──GET /api/data──▶ server
+      ◀── 402 + price ──
+      ──payment payload─▶  (stablecoin via facilitator)
+      ◀── 200 + data ────</code></pre>
+<h3>Build It</h3>
+<ul><li>Build a toy x402 flow: a Flask API returns 402 with <code>{price, pay_to}</code>; your agent checks the price against its budget policy, "pays" against a mock ledger, retries with the receipt header. Enforce a per-session spend cap and a per-call price ceiling.</li><li>Add the human gate: purchases over $X pause the run and request approval (your async patterns from 16-07).</li><li>Log every payment as a span with idempotency key — a double-charged retry is the same bug as lesson 16-04, now with real money.</li></ul>
+<h3>Use It</h3>
+<p>x402 (protocol + SDKs), Coinbase AgentKit, Stripe's agent toolkit and issuing (single-use virtual cards), Skyfire, Visa Intelligent Commerce / Mastercard Agent Pay (network-level agent credentials), Google's AP2 agent-payments protocol.</p>
+<h3>War Story</h3>
+<p>When Coinbase launched x402 in May 2025, the pitch was precisely the dormant corner of HTTP/1.1: status code 402, reserved since the 1990s for a payment future that never arrived because card fees made micropayments absurd. Stablecoin rails made per-request payments of fractions of a cent viable, and the launch drew collaborators including AWS, Cloudflare, and Circle; Cloudflare's related 2025 "pay per crawl" experiments applied the same 402 pattern to charging AI crawlers for content. It is genuinely early — but it's the first payments primitive designed for software as the customer.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why do traditional card checkouts fail agents both technically and on a risk basis?</li><li>How do scoped credentials change the blast radius of a compromised or buggy agent?</li><li>Which Phase 16 disciplines apply directly to agent payments, and how?</li></ol>
+<hr>
+<h2 id="lesson-10"><span class="lnum">10</span> The Research Frontier: What to Read Next</h2>
+<p><b>MOTTO:</b> The gap between arXiv and production is your career opportunity.</p>
+<h3>The Problem</h3>
+<p>This course ends; the field doesn't. You need the short list of papers that built the ideas you've been using — read in order, they're the origin story of everything in Phases 1–17 — plus the reflexes to keep up without drowning.</p>
+<h3>The Concept</h3>
+<p>Read primary sources. Blog summaries decay; the papers tell you what was actually measured, on what, with what caveats — and the caveats are where the next project lives.</p>
+<h3>The Reading List</h3>
+<p><b>ReAct</b> (Yao et al., 2022) — The paper behind your Phase 2 agent loop. Interleaves reasoning traces with actions so each informs the other, beating act-only and reason-only baselines on knowledge and interaction tasks. Notable for how little machinery it needs: it's prompting, and it started everything.</p>
+<p><b>Reflexion</b> (Shinn et al., 2023) — Agents that learn from failure without weight updates: after an unsuccessful attempt, the agent writes a verbal self-critique into memory and retries with that lesson in context. Substantial gains on coding and decision tasks; the foundation of every self-correction loop you've built.</p>
+<p><b>Tree of Thoughts</b> (Yao et al., 2023) — Generalizes chain-of-thought into search: maintain multiple candidate reasoning branches, self-evaluate, backtrack. Its headline result (Game of 24: 4% → 74% over CoT with GPT-4) made deliberate search-over-thoughts a standard tool, prefiguring test-time compute scaling.</p>
+<p><b>Voyager</b> (Wang et al., 2023) — Lesson 03's hero: lifelong learning in Minecraft via an automatic curriculum, self-written and verified code skills, and a compounding skill library. Read it for the promotion-gate design; the numbers (3.3× items, 15.3× faster milestones) follow from it.</p>
+<p><b>Generative Agents</b> (Park et al., 2023) — The "Smallville" paper: 25 LLM agents in a simulated town with observation, reflection, and retrieval-based memory produce emergent social behavior — famously, agents spreading word of a Valentine's party and showing up. The memory-stream architecture (recency × importance × relevance) shaped every agent-memory system since, including your Phase memory work.</p>
+<p><b>SWE-bench</b> (Jimenez et al., 2023) — The benchmark that made coding agents measurable: 2,294 real GitHub issues from 12 Python repos, scored by whether the agent's patch passes the repo's own tests. Early models resolved under 2%; the subsequent climb (and the Verified subset's creation after quality audits) is the cleanest capability curve in the field. Read it to understand what your Phase 9 evals aspire to.</p>
+<p><b>MemGPT</b> (Packer et al., 2023) — Memory management as an operating system: the context window is RAM, external storage is disk, and the LLM itself pages data between tiers via function calls. The conceptual ancestor of production memory systems (and of lesson 04's sleep-time compute, from the same lineage).</p>
+<p><b>DeepSeek-R1</b> (DeepSeek, 2025) — Reasoning via pure RL with GRPO and verifiable rewards (R1-Zero), then the practical recipe: SFT cold-start + RL + distillation into small models. Read it for what emerged without supervision (longer thinking, self-checking) and for the training economics that startled the industry in January 2025.</p>
+<h3>Build It</h3>
+<p>Pick one paper, reproduce its core result at toy scale on your own harness, and write up where your numbers diverged from the paper's. That workflow — read, reproduce, note the gap — is how you stay current for the next decade.</p>
+<h3>War Story</h3>
+<p>AutoGPT (March 2023) became one of the fastest repositories in GitHub history to pass 100k stars — an autonomous GPT-4 loop that captured the imagination and then, in practice, wandered, looped, and burned API budgets on most real tasks. Meanwhile the quieter papers above supplied the actual load-bearing ideas. The field's hype and its substance are usually published the same month; the reading list is how you tell them apart.</p>
+<h3>Checkpoint</h3>
+<ol><li>Which three papers on this list most directly explain your own Phase 2–5 architecture, and how?</li><li>Why did SWE-bench change coding-agent research more than any model release?</li><li>What's your personal system for tracking this field a year from now? (Wrong answer: "Twitter.")</li></ol>
+  </article>
+  <div class="pager">
+    <a href="16-production.html">← 🏭 Phase 16</a>
+    <span class="spacer"></span>
+    <a href="18-case-studies.html">Phase 18 🏗️ →</a>
+  </div>
+</div>
+</body>
+</html>

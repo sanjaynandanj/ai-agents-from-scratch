@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Agent Fundamentals — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 11</div>
+  <h1><span class="pnum">11</span> 👥 Multi-Agent Fundamentals</h1>
+  <div class="tagline">One agent is a worker. Many agents are an organization — with org problems.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Why multi-agent: parallelism, specialization, context isolation</a>
+<a href="#lesson-02"><span class="lnum">02</span>When multi-agent is worse: the coordination tax</a>
+<a href="#lesson-03"><span class="lnum">03</span>Orchestrator-worker: the boss pattern</a>
+<a href="#lesson-04"><span class="lnum">04</span>Handoffs: passing the conversation</a>
+<a href="#lesson-05"><span class="lnum">05</span>Routing: the right agent for the job</a>
+<a href="#lesson-06"><span class="lnum">06</span>Shared state and blackboards</a>
+<a href="#lesson-07"><span class="lnum">07</span>Message passing between agents</a>
+<a href="#lesson-08"><span class="lnum">08</span>Sub-agent context: what to tell the intern</a>
+<a href="#lesson-09"><span class="lnum">09</span>Result synthesis: merging parallel work</a>
+<a href="#lesson-10"><span class="lnum">10</span>Debate and critique: adversarial collaboration</a>
+<a href="#lesson-11"><span class="lnum">11</span>Delegation depth: agents spawning agents</a>
+<a href="#lesson-12"><span class="lnum">12</span>Build an orchestrator-worker system from scratch</a>
+  </div>
+  <article>
+<blockquote>One agent is a worker. Many agents are an organization — with org problems.</blockquote>
+<p>You know how to build one good agent; this phase is about what happens when you hire several. Multi-agent systems buy you parallelism, specialization, and clean context boundaries — and charge you coordination overhead, duplicated work, and a whole taxonomy of communication failures that will feel suspiciously like your last job. We'll treat the patterns as organizational design: bosses, handoffs, routing desks, shared whiteboards, and interns who need better briefs. By the end you'll build a working orchestrator-worker system from scratch and know when a single agent was the right answer all along.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> Why Multi-Agent: Parallelism, Specialization, Context Isolation</h2>
+<p><b>MOTTO:</b> You don't hire a second employee to think twice as hard — you hire them to think about something else.</p>
+<h3>The Problem</h3>
+<p>One agent, one context window, one thread of attention. Wide tasks — research twenty sources, review forty files — force a single agent to serialize the work and cram every intermediate finding into one context until quality collapses under its own transcript.</p>
+<h3>The Concept</h3>
+<p>Three distinct payoffs, often conflated:</p>
+<pre><code>Parallelism        N agents explore simultaneously   -&gt; wall-clock wins
+Specialization     each agent: narrow prompt + tools -&gt; quality wins
+Context isolation  each agent: own clean window      -&gt; the sleeper win</code></pre>
+<p>Context isolation is the one people miss: a sub-agent can burn 100k tokens of messy exploration and return a 500-token summary, keeping the parent's context pristine. It's not about intelligence — it's about attention hygiene.</p>
+<h3>Build It</h3>
+<p>Take a task with three independent sub-questions. Run it (a) as one agent sequentially, (b) as three agents with isolated contexts whose summaries feed a finalizer. Compare wall-clock, total tokens, and parent-context size at the end. Notice (b) costs <i>more</i> tokens while the parent context stays <i>smaller</i> — that trade is this entire phase.</p>
+<h3>Use It</h3>
+<p>Frameworks with first-class sub-agents: Claude Agent SDK subagents, OpenAI Agents SDK, LangGraph subgraphs, AutoGen/AG2. But every pattern in this phase is implementable with the raw loop from Phase 9 — and this phase will do exactly that.</p>
+<h3>War Story</h3>
+<p>Anthropic's June 2025 post on its multi-agent research system reported that an orchestrator (Opus 4) directing parallel Sonnet 4 workers beat a single-agent Opus 4 baseline by 90.2% on their internal research eval — with token usage roughly 15x a normal chat. Both numbers are the lesson: big wins on parallelizable breadth, at a very real price.</p>
+<h3>Checkpoint</h3>
+<ol><li>Which of the three payoffs applies even when sub-tasks <i>can't</i> run in parallel?</li><li>Why does context isolation improve the parent agent's output quality?</li><li>What class of task gets the least benefit from multiple agents?</li></ol>
+<h2 id="lesson-02"><span class="lnum">02</span> When Multi-Agent Is Worse: The Coordination Tax</h2>
+<p><b>MOTTO:</b> Every agent you add is another employee who wasn't in the meeting.</p>
+<h3>The Problem</h3>
+<p>Multi-agent demos look great on read-only research tasks, then faceplant on tasks with tight coupling: two agents each make reasonable local decisions that are jointly incoherent — one names the module <code>auth/</code>, the other imports from <code>login/</code>.</p>
+<h3>The Concept</h3>
+<p>Actions carry <i>implicit decisions</i>, and parallel agents can't see each other's. Cognition's "Don't Build Multi-Agents" essay (June 2025) makes the case bluntly: agents that don't share full context will make conflicting assumptions, so for tightly coupled work (like coding) you want one agent with full history, not a committee. Anthropic's research post — published the same month — isn't actually a rebuttal: their system wins on <i>read-heavy, parallelizable, loosely coupled</i> research, and they document the coordination effort it took. Read together, the two posts agree on the variable:</p>
+<pre><code>Coupling between sub-tasks:  low ──────────────────── high
+Verdict:                     parallelize          single agent</code></pre>
+<h3>Build It</h3>
+<p>Deliberately trigger the failure: give two parallel agents halves of one coding task with a shared interface, no communication. Diff their outputs and catalog the conflicting implicit decisions (naming, error handling, data shapes). Then re-run with a shared spec document and count what survives.</p>
+<h3>Use It</h3>
+<p>Decision test before going multi-agent: Can sub-tasks be verified independently? Is the shared state small enough to serialize into each brief? Is the task read-heavy? Three yeses, proceed. Any hard no — especially write-heavy coupling — stay single-agent and buy a bigger context window instead.</p>
+<h3>War Story</h3>
+<p>Cognition (makers of Devin) published "Don't Build Multi-Agents" in June 2025, arguing from production coding-agent experience that context-sharing failures make parallel agents fragile, and distilling principles like "share full context" and "actions carry implicit decisions." That it landed the same month as Anthropic's pro-multi-agent research post gave the field its clearest matched pair of evidence — different task structures, different verdicts.</p>
+<h3>Checkpoint</h3>
+<ol><li>What is an "implicit decision," and why do parallel agents collide on them?</li><li>Why does coding stress multi-agent systems more than research does?</li><li>State the three-question test for whether a task can afford the coordination tax.</li></ol>
+<h2 id="lesson-03"><span class="lnum">03</span> Orchestrator-Worker: The Boss Pattern</h2>
+<p><b>MOTTO:</b> The boss's job is to plan, delegate, and synthesize — not to do the work twice.</p>
+<h3>The Problem</h3>
+<p>Someone must decompose the task, decide how many workers to spawn, give each a brief, and merge results. Without a designated coordinator, you get either duplicated effort or orphaned sub-tasks nobody owns.</p>
+<h3>The Concept</h3>
+<p>One orchestrator agent owns the goal; N workers own sub-tasks; results flow back up. The org chart is the architecture:</p>
+<pre><code>              ┌──────────────┐
+   user ────&gt; │ ORCHESTRATOR │ plan -&gt; spawn -&gt; wait -&gt; synthesize
+              └──┬────┬────┬─┘
+                 ▼    ▼    ▼
+              ┌────┐┌────┐┌────┐
+              │ W1 ││ W2 ││ W3 │   isolated contexts, scoped tools
+              └────┘└────┘└────┘</code></pre>
+<p>Key design decisions: does the orchestrator fix the plan upfront or adapt as results return; how many workers per task (effort scaling); and do workers ever talk to each other (in the pure pattern: never — all communication routes through the boss).</p>
+<h3>Build It</h3>
+<p>Prototype the control flow with functions before LLMs: <code>plan(goal) -&gt; briefs</code>, <code>run_worker(brief) -&gt; result</code>, <code>synthesize(results) -&gt; answer</code>, with workers in a thread pool. Lesson 12 fills in real prompts; the skeleton here is what you'll reuse.</p>
+<h3>Use It</h3>
+<p>This is the pattern behind Anthropic's research system and Claude Code's subagents, and it's LangGraph's canonical "supervisor" example. Rule of thumb from practice: scale worker count to task complexity — one for a lookup, several for breadth — and cap it, because workers are the cost multiplier.</p>
+<h3>War Story</h3>
+<p>Anthropic's June 2025 write-up describes exactly this shape: a lead agent plans and spawns parallel subagents, each searching independently and returning findings for synthesis. Among their published lessons: the orchestrator had to be explicitly taught effort scaling — how many subagents and tool calls a query deserves — or it over-hired for simple questions.</p>
+<h3>Checkpoint</h3>
+<ol><li>In the pure pattern, why don't workers communicate directly?</li><li>What is effort scaling, and what failure happens without it?</li><li>Which two responsibilities must the orchestrator never delegate?</li></ol>
+<h2 id="lesson-04"><span class="lnum">04</span> Handoffs: Passing the Conversation</h2>
+<p><b>MOTTO:</b> A handoff changes who's answering, not what's been said.</p>
+<h3>The Problem</h3>
+<p>Some conversations outgrow their agent mid-stream: triage realizes this is a billing dispute; billing realizes it's actually fraud. Restarting the conversation with a new agent loses everything the user already said.</p>
+<h3>The Concept</h3>
+<p>A handoff transfers <i>ownership of the ongoing conversation</i>: the transcript stays, the system prompt and tools swap. Mechanically (the Swarm/Agents SDK convention) it's a tool call — <code>transfer_to_billing</code> — whose effect is control flow: the loop continues with a different agent reading the same history. Contrast with delegation:</p>
+<pre><code>Delegation (Lesson 03): boss ──ask──&gt; worker ──result──&gt; boss   (boss keeps the mic)
+Handoff:                agent A ──passes the mic──&gt; agent B     (A exits the call)</code></pre>
+<p>Design tensions: does B see A's full transcript or a filtered version? Can B hand back? What stops triage ping-pong (A→B→A→B)?</p>
+<h3>Build It</h3>
+<p>In your raw loop, register <code>transfer_to_&lt;name&gt;</code> tools per peer agent. On such a call: swap the active system prompt and tool list, append a handoff marker to the transcript, continue the same loop. Add a hop counter that halts after N transfers — you'll need it sooner than you think.</p>
+<h3>Use It</h3>
+<p>OpenAI Agents SDK has handoffs as a first-class primitive (with input filters to shape what the receiver sees); the pattern ports to any loop. Best for sequential ownership transfer — support triage, escalation tiers — not for parallel work, which is Lesson 03's job.</p>
+<h3>War Story</h3>
+<p>OpenAI's Swarm (October 2024) was essentially a teaching artifact for this one idea — handoffs as tool calls returning the next agent — and when the production Agents SDK replaced it in March 2025, handoffs survived as a core primitive. A pattern that outlived its own framework is a pattern worth learning framework-free.</p>
+<h3>Checkpoint</h3>
+<ol><li>Mechanically, what two things change at a handoff and what one thing persists?</li><li>When is a handoff wrong and delegation right?</li><li>What guardrail prevents infinite transfer loops?</li></ol>
+<h2 id="lesson-05"><span class="lnum">05</span> Routing: The Right Agent for the Job</h2>
+<p><b>MOTTO:</b> The receptionist doesn't fix your problem — they make sure the right person does.</p>
+<h3>The Problem</h3>
+<p>One agent with every tool and a kitchen-sink prompt degrades: instructions dilute, wrong tools tempt, and every request pays for capabilities it doesn't need. But making users pick a specialist is worse.</p>
+<h3>The Concept</h3>
+<p>A router classifies the request <i>before</i> real work starts, then dispatches to a specialist — and, unlike a handoff, the router never does domain work itself. Routers come in ascending cost: keyword rules, embedding similarity, a small classifier LLM, or a full agent that can ask one clarifying question first.</p>
+<pre><code>request ──&gt; ROUTER ──┬──&gt; refunds agent
+  (classify only)    ├──&gt; tech-support agent
+                     ├──&gt; sales agent
+                     └──&gt; fallback/human   &lt;- always have this arm</code></pre>
+<p>Routing also picks <i>models</i>, not just prompts: cheap model for easy intents, frontier model for hard ones.</p>
+<h3>Build It</h3>
+<p>Build a two-stage router: rules first (regex on obvious intents), LLM classifier for the remainder, emitting <code>{"route": ..., "confidence": ...}</code> — below a confidence floor, route to fallback. Evaluate as the classifier it is: a labeled set of 50 requests and a confusion matrix, before any downstream agent runs.</p>
+<h3>Use It</h3>
+<p>Anthropic's "Building Effective Agents" (December 2024) lists routing among its core workflow patterns for exactly this reason: separation of concerns lets each downstream prompt stay sharp. For model-level routing, the RouteLLM work (LMSYS, 2024) is the reference point.</p>
+<h3>War Story</h3>
+<p>RouteLLM (from the LMSYS group, 2024) showed that a learned router sending easy queries to a weak model and hard ones to a strong model could cut costs dramatically — by more than 85% on some benchmarks — while retaining most of the strong model's quality. Routing is the rare pattern that improves the bill and the latency at the same time.</p>
+<h3>Checkpoint</h3>
+<ol><li>What distinguishes a router from a handoff agent?</li><li>Why must a router be evaluated like a classifier, and with what artifact?</li><li>What belongs in the fallback arm, and why is it non-optional?</li></ol>
+<h2 id="lesson-06"><span class="lnum">06</span> Shared State and Blackboards</h2>
+<p><b>MOTTO:</b> Stop forwarding emails; get a whiteboard.</p>
+<h3>The Problem</h3>
+<p>With N agents, point-to-point sharing means N² conversations, and each message re-serializes state that three other agents also need. Meanwhile no one holds the current best picture of the task.</p>
+<h3>The Concept</h3>
+<p>The blackboard pattern — borrowed from 1970s AI — inverts the flow: a shared store holds the evolving solution; agents read it, contribute what their specialty allows, and write findings back for others to build on. Detectives around an evidence board, not a group chat.</p>
+<pre><code>        ┌───────────────────────────┐
+        │        BLACKBOARD         │  facts / hypotheses / open questions
+        └───┬────────┬─────────┬────┘
+      read/write  read/write  read/write
+        ┌───┴──┐  ┌──┴───┐  ┌──┴───┐
+        │ Agt A│  │ Agt B│  │ Agt C│
+        └──────┘  └──────┘  └──────┘</code></pre>
+<p>Modern incarnations: a scratchpad file agents edit, a shared task list, a keyed dict in your graph state. The hard problems are the write rules: who may overwrite whom, how conflicts resolve, and what stops the board becoming a landfill of stale notes.</p>
+<h3>Build It</h3>
+<p>Implement a blackboard as a JSON file with sections (<code>facts</code>, <code>open_questions</code>, <code>draft</code>) and write-discipline: agents append to facts, claim questions before working them, and only a designated agent edits the draft. Run three agents against it round-robin and watch for the two classic failures: lost updates and stale reads.</p>
+<h3>Use It</h3>
+<p>LangGraph's shared typed state <i>is</i> a blackboard with reducers as write rules; MetaGPT's shared message pool is the same idea; Claude-style agents using a <code>NOTES.md</code> file are the folk version. Use blackboards when many agents need the same evolving picture; use messages (next lesson) for directed requests.</p>
+<h3>War Story</h3>
+<p>The blackboard architecture predates LLMs by half a century: CMU's Hearsay-II speech-understanding system (1970s) coordinated independent specialist modules through exactly this shared-hypothesis store. Multi-agent LLM systems rediscovered it because the org problem it solves — many specialists, one evolving solution — didn't change, only the specialists did.</p>
+<h3>Checkpoint</h3>
+<ol><li>What communication problem does a blackboard solve that point-to-point messaging doesn't?</li><li>Name the two classic concurrent-write failures and one mitigation for each.</li><li>When are directed messages the better choice than shared state?</li></ol>
+<h2 id="lesson-07"><span class="lnum">07</span> Message Passing Between Agents</h2>
+<p><b>MOTTO:</b> If it's not addressed, typed, and answerable, it's not a message — it's a vibe.</p>
+<h3>The Problem</h3>
+<p>Agents that communicate by dumping prose into each other's prompts create untraceable systems: no record of who asked whom for what, no way to retry a lost request, no way to run agents on separate machines.</p>
+<h3>The Concept</h3>
+<p>Treat inter-agent communication like a distributed system, because it is one. A message has an envelope and a typed payload:</p>
+<pre><code>{&quot;id&quot;: &quot;m-042&quot;, &quot;from&quot;: &quot;researcher&quot;, &quot;to&quot;: &quot;writer&quot;,
+ &quot;type&quot;: &quot;FINDINGS&quot;, &quot;reply_to&quot;: &quot;m-039&quot;,
+ &quot;payload&quot;: {&quot;claims&quot;: [...], &quot;sources&quot;: [...]}}</code></pre>
+<p>This buys you the actor model's virtues — agents as isolated processes reacting to mail — plus auditability (the message log is your trace) and topology freedom (in-process queue today, Redis or a real broker tomorrow). The LLM-specific catch: payloads get <i>interpreted</i> by the receiver's model, so schema discipline on payloads matters as much as on tool calls.</p>
+<h3>Build It</h3>
+<p>Refactor Lesson 03's skeleton onto <code>queue.Queue</code> mailboxes: each agent is a loop of <code>receive -&gt; think -&gt; send</code>. Define three message types (<code>TASK</code>, <code>RESULT</code>, <code>ERROR</code>), log every envelope to a JSONL file, and replay the log to reconstruct any run. That log is also your eval dataset later.</p>
+<h3>Use It</h3>
+<p>AutoGen's conversation transcripts, AG2, and actor frameworks generally; LangGraph edges carry state rather than messages, which is the other valid answer. Escalate infrastructure only with need: in-process queues → Redis streams → a proper broker. Most systems die before needing Kafka.</p>
+<h3>War Story</h3>
+<p>Microsoft's AutoGen 0.4 rewrite (January 2025) rebuilt the framework around an event-driven, actor-style architecture with asynchronous message passing — replacing the original's more tightly coupled conversation model. When a framework's 1.0-scale rewrite converges on forty-year-old distributed-systems patterns, take the hint about where multi-agent plumbing ends up.</p>
+<h3>Checkpoint</h3>
+<ol><li>What belongs in a message envelope, and what does each field enable?</li><li>Why does schema discipline matter <i>more</i> when the receiver is an LLM?</li><li>What can you reconstruct from a complete message log?</li></ol>
+<h2 id="lesson-08"><span class="lnum">08</span> Sub-Agent Context: What to Tell the Intern</h2>
+<p><b>MOTTO:</b> A sub-agent knows exactly what you told it — and will improvise the rest.</p>
+<h3>The Problem</h3>
+<p>Context isolation cuts both ways: the sub-agent that can't see the parent's clutter also can't see the parent's <i>intent</i>. Underspecified workers return the wrong thing confidently; overspecified ones inherit the bloated context you spawned them to avoid.</p>
+<h3>The Concept</h3>
+<p>Writing a worker brief is delegating to a smart intern with amnesia. The load-bearing sections:</p>
+<pre><code>OBJECTIVE   the sub-goal, plus one line of parent intent (&quot;this feeds a pricing memo&quot;)
+OUTPUT      exact format and length of what to return
+TOOLS       which tools, with any usage guidance
+BOUNDARIES  what NOT to do, when to stop, budget (calls/tokens/time)
+CONTEXT     the minimal excerpt of parent state that&#x27;s actually relevant</code></pre>
+<p>The craft is the CONTEXT line: too little and the worker re-derives (or contradicts) parent decisions — Lesson 02's implicit-decision collision; too much and you've re-created the monolith.</p>
+<h3>Build It</h3>
+<p>Take one worker from your Lesson 03 skeleton and write three brief variants: minimal (one sentence), structured (the template above), and full-dump (entire parent transcript). Run each five times; score correctness, relevance of what came back, and tokens spent. The structured brief should win — but <i>see</i> the failure shapes of the other two.</p>
+<h3>Use It</h3>
+<p>Claude Agent SDK subagents (each defined by its own scoped prompt and tool list), OpenAI Agents SDK handoff input filters, and CrewAI task descriptions are all this template wearing different syntax. The template is portable; write it once as a function, <code>brief(objective, output_spec, tools, boundaries, context)</code>.</p>
+<h3>War Story</h3>
+<p>Anthropic's June 2025 multi-agent post reports this lesson from production: early subagents given vague instructions duplicated each other's work and wandered off-task, and the fix was orchestrator prompts that spell out each subagent's objective, output format, tool guidance, and task boundaries. The intern brief isn't a nicety; it was one of their headline engineering lessons.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does a worker need a line of parent <i>intent</i>, not just its sub-goal?</li><li>What failure modes do the too-little and too-much context extremes produce?</li><li>Why do budgets belong in the brief rather than only in the runtime?</li></ol>
+<h2 id="lesson-09"><span class="lnum">09</span> Result Synthesis: Merging Parallel Work</h2>
+<p><b>MOTTO:</b> Ten good reports stapled together is not one good report.</p>
+<h3>The Problem</h3>
+<p>Parallel workers return overlapping, partially contradictory, differently formatted results. Naive concatenation produces a document with three introductions and two answers; naive summarization silently drops the one finding that mattered.</p>
+<h3>The Concept</h3>
+<p>Synthesis is its own job with its own steps — deduplicate, reconcile conflicts, weigh evidence, restructure around the original question, and preserve attribution:</p>
+<pre><code>worker outputs ──&gt; DEDUPE ──&gt; CONFLICT CHECK ──&gt; WEIGH ──&gt; COMPOSE ──&gt; ATTRIBUTE
+                    same claim    A says X,        source     answer the   which worker/
+                    twice? drop   B says ¬X:       quality,   QUESTION,    source backs
+                                  flag, don&#x27;t      recency    not the      each claim?
+                                  average          count      task list</code></pre>
+<p>Two structural choices: a dedicated synthesizer agent reading structured worker outputs (clean contexts, extra hop) versus the orchestrator synthesizing inline (fewer hops, context pressure). Conflicts deserve special respect — surfacing "sources disagree" is synthesis; averaging disagreement into mush is malpractice.</p>
+<h3>Build It</h3>
+<p>Have workers return a fixed schema — <code>claims: [{statement, evidence, confidence, source}]</code> — never prose. Write the synthesizer prompt to (1) answer the <i>original</i> question, (2) list conflicts explicitly, (3) cite the contributing worker per claim. Test it on manufactured disagreement: plant contradictory claims and verify they surface rather than vanish.</p>
+<h3>Use It</h3>
+<p>Anthropic's research system routes subagent findings through the lead agent for exactly this compose step, with citation handling as a distinct concern. Structured worker outputs (Phase 10, Lesson 08 techniques) are what make synthesis tractable — prose in, mush out.</p>
+<h3>War Story</h3>
+<p>Together AI's Mixture-of-Agents work (2024) made synthesis itself the architecture: layers of open-source models propose answers and an aggregator synthesizes them, and the ensemble outperformed GPT-4o on AlpacaEval 2.0 (65.1% vs 57.5% reported). The aggregation step wasn't overhead — it was where the quality came from.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why must conflicts be surfaced rather than averaged?</li><li>What does requiring a claims schema from workers buy the synthesizer?</li><li>When does inline orchestrator synthesis beat a dedicated synthesizer, and vice versa?</li></ol>
+<h2 id="lesson-10"><span class="lnum">10</span> Debate and Critique: Adversarial Collaboration</h2>
+<p><b>MOTTO:</b> If everyone in the room agrees instantly, the room is too small.</p>
+<h3>The Problem</h3>
+<p>A single model grading its own work inherits its own blind spots; ask it to double-check and it mostly congratulates itself. Errors that survive one forward pass tend to survive self-review too.</p>
+<h3>The Concept</h3>
+<p>Split the roles so incentives differ: a <i>critic</i> agent is prompted to find flaws (and only that); <i>debate</i> runs multiple agents proposing answers, reading each other's reasoning, and revising over rounds. It's peer review versus proofreading your own paper.</p>
+<pre><code>PROPOSE ──&gt; agents answer independently
+EXCHANGE ─&gt; each reads the others&#x27; answers + reasoning
+REVISE ───&gt; each updates (or defends) its position
+JUDGE ────&gt; converge, vote, or a judge agent decides</code></pre>
+<p>Honest limits: debaters drift toward consensus (sycophancy) rather than truth; confident-wrong agents can drag the group; and rounds multiply cost. Critique works best on <i>checkable</i> claims — code, math, citations — and worst on matters of taste.</p>
+<h3>Build It</h3>
+<p>Add a critic to any earlier pipeline: producer emits work plus claimed properties; critic gets <i>only</i> the work and a rubric (no producer reasoning — avoid anchoring); producer revises once against specific objections. Measure pass-rate delta on your eval versus the single-pass baseline, and the token multiple you paid for it.</p>
+<h3>Use It</h3>
+<p>Reviewer/critic roles in AutoGen and CrewAI ship this pattern off-the-shelf; reflection loops (Phase 3) are its single-agent cousin. Spend the critique budget where errors are expensive and verifiable — generated code before execution, claims before publication — not on every step.</p>
+<h3>War Story</h3>
+<p>Du et al. (MIT and Google, 2023) showed in "Improving Factuality and Reasoning in Language Models through Multiagent Debate" that multiple LLM instances debating over rounds improved accuracy on math and reasoning benchmarks and reduced hallucinated facts versus single-model baselines. Follow-up work has mapped the limits — convergence isn't truth — but the core effect established critique as a legitimate accuracy tool, not theater.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is a separate critic more effective than asking the producer to self-check?</li><li>What is the sycophancy failure in debate, and what design choices dampen it?</li><li>On what kinds of claims does critique pay best, and why?</li></ol>
+<h2 id="lesson-11"><span class="lnum">11</span> Delegation Depth: Agents Spawning Agents</h2>
+<p><b>MOTTO:</b> Middle management multiplies — cost, latency, and blame all compound with depth.</p>
+<h3>The Problem</h3>
+<p>If an orchestrator can spawn workers, a worker can spawn its own workers — and now you have recursion with an API bill. Depth amplifies everything: each level adds latency, multiplies tokens, garbles intent like a game of telephone, and blurs who's accountable for the final answer.</p>
+<h3>The Concept</h3>
+<p>Treat delegation like stack depth — legal, useful, and in need of hard limits:</p>
+<pre><code>depth 0  orchestrator          budget: 100 units
+depth 1  ├─ worker A           gets 30, may sub-delegate
+depth 2  │   └─ sub-worker A1  gets 10, MAY NOT delegate
+         └─ worker B           gets 30</code></pre>
+<p>Three disciplines: a <i>depth cap</i> (2 is almost always enough; the orchestrator plans, workers execute, sub-workers fetch); <i>budget inheritance</i> (children draw from the parent's allowance, so total cost is bounded by construction); and <i>provenance</i> (every result carries its path — <code>orchestrator/A/A1</code> — so you can debug the tree). Intent decay is the quiet killer: each re-briefing loses parent context, so deep leaves optimize for goals nobody actually has.</p>
+<h3>Build It</h3>
+<p>Add <code>depth</code> and <code>budget</code> to Lesson 08's brief function. Enforce in the spawn path: refuse spawns beyond the cap, deduct child budgets from the parent, and tag results with the full delegation path. Then write the test that tries to blow the stack — an agent whose task says "delegate this" — and confirm the runtime, not the model's good manners, stops it.</p>
+<h3>Use It</h3>
+<p>Real systems are conservative here: Claude Code's subagents don't spawn their own subagents (depth 1 by construction), and Anthropic's research system runs a lead agent over one layer of parallel subagents. When you're tempted by depth 3+, the usual right answer is a better plan at depth 0.</p>
+<h3>War Story</h3>
+<p>AutoGPT (March 2023) became one of the fastest repositories ever to 100k GitHub stars on the promise of recursive, self-directed task decomposition — and became equally famous for spinning in loops, re-deriving its own sub-tasks, and burning users' API credits without converging. It remains the canonical demonstration that unbounded delegation is an outage, not an architecture.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does budget inheritance bound total cost "by construction"?</li><li>What is intent decay, and which discipline mitigates it?</li><li>Why must the depth cap live in the runtime rather than the prompt?</li></ol>
+<h2 id="lesson-12"><span class="lnum">12</span> Build an Orchestrator-Worker System From Scratch</h2>
+<p><b>MOTTO:</b> If you can build it with a mock LLM, you actually understand the pattern.</p>
+<h3>The Problem</h3>
+<p>Final exam. Every pattern in this phase — decomposition, briefs, parallel workers, budgets, synthesis — assembled into one runnable system, with a mock LLM so the <i>coordination logic</i> is what's under test, deterministic and free.</p>
+<h3>The Concept</h3>
+<p>The mock returns scripted responses per role, which forces an honest architecture: if your system only works because a frontier model papers over sloppy coordination, the mock will expose it. Swapping the mock for a real client at the end should change one function.</p>
+<h3>Build It</h3>
+<pre><code>import json
+from concurrent.futures import ThreadPoolExecutor
+
+class MockLLM:                                # swap for a real client later
+    def complete(self, role, prompt):
+        if role == &quot;planner&quot;:
+            return json.dumps([
+                {&quot;id&quot;: &quot;T1&quot;, &quot;objective&quot;: &quot;gather facts on topic A&quot;},
+                {&quot;id&quot;: &quot;T2&quot;, &quot;objective&quot;: &quot;gather facts on topic B&quot;}])
+        if role == &quot;worker&quot;:
+            task = prompt.split(&quot;OBJECTIVE: &quot;)[1].splitlines()[0]
+            return json.dumps({&quot;claims&quot;: [{&quot;statement&quot;: f&quot;finding for {task}&quot;,
+                                           &quot;confidence&quot;: 0.9, &quot;source&quot;: task}]})
+        return &quot;SYNTHESIS: &quot; + prompt[:120]   # synthesizer
+
+LLM = MockLLM()
+
+def brief(task):                              # Lesson 08&#x27;s template
+    return (f&quot;OBJECTIVE: {task[&#x27;objective&#x27;]}\n&quot;
+            &quot;OUTPUT: JSON {claims:[{statement,confidence,source}]}\n&quot;
+            &quot;BOUNDARIES: budget 10 units, no sub-delegation&quot;)
+
+def run_worker(task):
+    return json.loads(LLM.complete(&quot;worker&quot;, brief(task)))
+
+def orchestrate(goal, max_workers=4):
+    tasks = json.loads(LLM.complete(&quot;planner&quot;, f&quot;Decompose: {goal}&quot;))
+    assert len(tasks) &lt;= max_workers, &quot;effort scaling cap (Lesson 03)&quot;
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        results = list(pool.map(run_worker, tasks))         # parallel, isolated
+    merged = [c for r in results for c in r[&quot;claims&quot;]]      # dedupe/conflict-check here
+    return LLM.complete(&quot;synthesizer&quot;,
+                        f&quot;Question: {goal}\nClaims: {json.dumps(merged)}&quot;)
+
+print(orchestrate(&quot;Compare topic A and topic B&quot;))</code></pre>
+<p>Extensions, in order: real dedupe and conflict flagging in the merge; per-worker budgets with deduction; a <code>MockLLM</code> that returns malformed JSON 20% of the time (now your retry logic matters); a JSONL message log per Lesson 07; and finally the real-client swap.</p>
+<h3>Use It</h3>
+<p>This ~50-line skeleton is structurally what LangGraph supervisors, Agents SDK orchestration, and Claude Agent SDK subagents give you with more polish. Having built it, you can now read any of their docs and name each component — which was the point of the phase.</p>
+<h3>War Story</h3>
+<p>The "Generative Agents" paper (Park et al., 2023) dropped 25 LLM-driven agents into a simulated town — Smallville — and watched coordination emerge: one agent, prompted to plan a Valentine's Day party, spread invitations agent-to-agent until others autonomously showed up. It was a landmark for what multi-agent coordination <i>can</i> do, and its cost profile (continuous simulation of 25 agents) was an early preview of Lesson 01's token bill.</p>
+<h3>Checkpoint</h3>
+<ol><li>What does the mock LLM prove about your system that a real model would hide?</li><li>Where in the code do Lessons 03, 08, and 09 each appear?</li><li>What must change — and what must not — when you swap in a real LLM client?</li></ol>
+  </article>
+  <div class="pager">
+    <a href="10-open-models.html">← 🦙 Phase 10</a>
+    <span class="spacer"></span>
+    <a href="12-swarms-and-patterns.html">Phase 12 🐝 →</a>
+  </div>
+</div>
+</body>
+</html>

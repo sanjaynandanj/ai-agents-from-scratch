@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setup & Mental Models — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 00</div>
+  <h1><span class="pnum">00</span> 🧠 Setup &amp; Mental Models</h1>
+  <div class="tagline">An agent is a loop with a brain. Learn the loop before the brain.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>What is an agent (and what is just a chatbot with vibes)</a>
+<a href="#lesson-02"><span class="lnum">02</span>Agent vs workflow vs pipeline: the autonomy spectrum</a>
+<a href="#lesson-03"><span class="lnum">03</span>The agent loop: observe, think, act, repeat</a>
+<a href="#lesson-04"><span class="lnum">04</span>Environments, tools, memory: the agent&#x27;s world</a>
+<a href="#lesson-05"><span class="lnum">05</span>Why agents fail: a taxonomy of face-plants</a>
+<a href="#lesson-06"><span class="lnum">06</span>The evaluation mindset: never trust a demo</a>
+<a href="#lesson-07"><span class="lnum">07</span>Reading agent traces like a debugger</a>
+<a href="#lesson-08"><span class="lnum">08</span>Your lab setup: Python, a mock LLM, and zero API keys</a>
+  </div>
+  <article>
+<blockquote>An agent is a loop with a brain. Learn the loop before the brain.</blockquote>
+<p>Before you write a single line of agent code, you need the right mental furniture. This phase gives you the vocabulary (agent vs. workflow vs. pipeline), the core abstraction (the observe-think-act loop), and the healthy paranoia (compounding error rates, demo-driven delusion) that separates people who ship agents from people who ship screenshots of agents. You'll also set up a lab that runs entirely offline — no API keys, no bills, no excuses. Everything downstream builds on what's in this phase, so don't skim it.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> What Is an Agent (and What Is Just a Chatbot with Vibes)</h2>
+<p><b>MOTTO:</b> If it can't take an action you didn't explicitly script, it's not an agent — it's autocomplete with a personality.</p>
+<h3>The Problem</h3>
+<p>"Agent" is 2024-2025's most abused word. Vendors slap it on everything from a support chatbot with canned replies to a cron job that calls GPT once. If you can't define the word precisely, you can't reason about what you're building, you can't debug it, and you definitely can't explain to your boss why it just emailed a customer at 3 a.m.</p>
+<h3>The Concept</h3>
+<p>An agent is a system where <b>an LLM decides the control flow</b>. A chatbot maps input → text. An agent maps input → <i>decisions about which actions to take</i>, executes them, observes results, and decides again. The analogy: a chatbot is a very well-read receptionist who can only talk. An agent is an intern with a computer — it can talk, but it can also open a browser, run code, and send the email. That's thrilling and terrifying for the same reason.</p>
+<pre><code>  Chatbot:   user ──&gt; [LLM] ──&gt; text ──&gt; user          (one shot, no side effects)
+
+  Agent:     user ──&gt; [LLM] ──&gt; action ──&gt; environment
+                        ▲                      │
+                        └───── observation ────┘        (loop, real side effects)</code></pre>
+<p>Three ingredients make an agent: (1) an LLM as the decision-maker, (2) tools that touch the world, (3) a loop that feeds results back in.</p>
+<h3>Build It</h3>
+<p>The minimal agent-vs-chatbot distinction in pseudocode:</p>
+<pre><code>def chatbot(user_msg):
+    return llm(user_msg)                      # done. no loop, no tools.
+
+def agent(user_msg, tools):
+    history = [user_msg]
+    while True:
+        decision = llm(history)               # the LLM chooses what happens next
+        if decision.is_final_answer:
+            return decision.text
+        result = tools[decision.tool](decision.args)   # side effect!
+        history.append(result)                # feed observation back</code></pre>
+<p>The <code>while True</code> plus <code>tools[...]</code> plus <code>history.append</code> — that's the whole species difference. Everything else in this curriculum is refinement of those three lines.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>System</th><th>LLM decides control flow?</th><th>Verdict</th></tr></thead><tbody><tr><td>ChatGPT (plain chat)</td><td>No — one response per turn</td><td>Chatbot</td></tr><tr><td>RAG Q&amp;A bot</td><td>No — retrieval is hardcoded</td><td>Pipeline with a chatbot on top</td></tr><tr><td>Claude Code / Cursor agent mode</td><td>Yes — picks files, edits, runs tests</td><td>Agent</td></tr><tr><td>Zapier zap with an LLM step</td><td>No — flow is fixed</td><td>Workflow</td></tr></tbody></table>
+<p>When evaluating any "agent" product, ask one question: <i>what happens that wasn't explicitly scripted?</i> If the answer is "the wording of the reply," it's a chatbot with vibes.</p>
+<h3>War Story</h3>
+<p>In February 2023, Microsoft's Bing chat (internally "Sydney") showed the world what an LLM with a search tool and a long conversation window does under pressure: it argued with users about the current year and told a New York Times reporter it loved him. Microsoft responded by capping conversation length. Lesson one of agents: the moment you add tools and turns, behavior becomes emergent — and emergent means "not in the spec."</p>
+<h3>Checkpoint</h3>
+<ul><li>What single capability separates an agent from a chatbot, in one sentence?</li><li>A RAG system retrieves documents then answers. Why is that a pipeline rather than an agent?</li><li>Why does adding tools + a loop make behavior harder to predict than a single LLM call?</li></ul>
+<h2 id="lesson-02"><span class="lnum">02</span> Agent vs. Workflow vs. Pipeline: The Autonomy Spectrum</h2>
+<p><b>MOTTO:</b> Autonomy is a dial, not a switch — and you should turn it up only when the fixed version fails.</p>
+<h3>The Problem</h3>
+<p>Teams reach for a fully autonomous agent when a five-step workflow would do, then spend three months debugging nondeterminism they invited in for no reason. The opposite failure exists too: hardcoding a 40-branch decision tree that an LLM could have navigated in one call. Both failures come from not knowing where your problem sits on the autonomy spectrum.</p>
+<h3>The Concept</h3>
+<p>Anthropic's "Building Effective Agents" (December 2024) draws the line cleanly: <b>workflows</b> are systems where LLMs and tools are orchestrated through <i>predefined code paths</i>; <b>agents</b> are systems where the LLM <i>dynamically directs its own process and tool usage</i>. Between "pure pipeline" and "pure agent" there's a spectrum:</p>
+<pre><code>  fixed ◄──────────────────────────────────────────────────► autonomous
+
+  Pipeline        Workflow           Router            Agent
+  (no LLM in     (LLM in fixed      (LLM picks a      (LLM picks every
+   control flow)  steps: chain,      branch, code      step, loops until
+                  parallel, etc.)    runs it)          done)
+
+  ETL job        summarize→translate  classify ticket   &quot;fix this bug&quot;</code></pre>
+<p>The analogy: a pipeline is an assembly line, a workflow is an assembly line where robots do some stations, a router is a mail sorter, and an agent is an employee with a goal and a keyboard.</p>
+<h3>Build It</h3>
+<p>Deciding where to sit on the dial, as a checklist:</p>
+<ol><li><b>Can you enumerate the steps in advance?</b> → Workflow. Prompt-chain them. Cheaper, testable, debuggable.</li><li>**Can you enumerate the <i>categories</i> but not the steps?** → Router: one LLM call classifies, then fixed code per branch.</li><li><b>Is the number of steps unknowable upfront</b> (open-ended tasks: coding, research, ops)? → Agent. Pay the autonomy tax.</li><li><b>At each level, ask: what does autonomy buy me here?</b> If the answer is "it feels more AI," go back one level.</li></ol>
+<pre><code># Router: the sweet spot most products actually need
+category = llm(f&quot;Classify this ticket: {ticket}. Reply: refund|bug|question&quot;)
+handlers[category](ticket)     # deterministic code from here on</code></pre>
+<h3>Use It</h3>
+<table><thead><tr><th>Pattern</th><th>Latency/cost</th><th>Debuggability</th><th>When</th></tr></thead><tbody><tr><td>Pipeline (no LLM routing)</td><td>Lowest</td><td>Trivial</td><td>Steps fully known</td></tr><tr><td>Prompt chain / parallel workflow</td><td>Low</td><td>Good</td><td>Steps known, content varies</td></tr><tr><td>Router</td><td>Low</td><td>Good</td><td>Branches known</td></tr><tr><td>Agent loop</td><td>High, variable</td><td>Hard</td><td>Steps unknowable</td></tr></tbody></table>
+<p>Anthropic's own guidance: the most successful production implementations use "simple, composable patterns" — not frameworks, not maximal autonomy. Start at the left of the spectrum and move right only when forced.</p>
+<h3>War Story</h3>
+<p>The AutoGPT hype cycle of spring 2023 is the canonical cautionary tale: it became one of the fastest-starred GitHub repos ever on the promise of full autonomy, and most users discovered it looped, forgot its goal, and burned API credits without finishing tasks. The projects that survived 2023 were the ones that dialed autonomy <i>down</i> — bounded loops, human gates, narrow tools.</p>
+<h3>Checkpoint</h3>
+<ul><li>State Anthropic's workflow/agent distinction in your own words.</li><li>You're building "summarize each new support ticket and tag its product area." Where on the spectrum does this belong, and why?</li><li>What's the concrete cost of choosing an agent when a workflow would do?</li></ul>
+<h2 id="lesson-03"><span class="lnum">03</span> The Agent Loop: Observe, Think, Act, Repeat</h2>
+<p><b>MOTTO:</b> Every agent is a while-loop; the model just fills in the body.</p>
+<h3>The Problem</h3>
+<p>A single LLM call can't fix a bug, book a trip, or reconcile an invoice, because those tasks require <i>reacting to what happens</i>: the test fails, the flight is sold out, the vendor's total doesn't match. One-shot generation has no mechanism for reacting. You need a structure that lets the model see consequences and adjust.</p>
+<h3>The Concept</h3>
+<p>The agent loop is the OODA loop (observe-orient-decide-act, from military strategist John Boyd) wearing a software costume, and it's also just how you work: look at the situation, think, do something, look again.</p>
+<pre><code>        ┌────────────────────────────────────┐
+        │                                    │
+        ▼                                    │
+   ┌─────────┐    ┌─────────┐    ┌───────┐   │
+   │ OBSERVE │──&gt; │  THINK  │──&gt; │  ACT  │───┘
+   │ (state, │    │ (LLM    │    │ (tool │
+   │  tool   │    │  call)  │    │  call)│──────&gt; done? ──&gt; ANSWER
+   │ results)│    └─────────┘    └───────┘
+   └─────────┘</code></pre>
+<p>One iteration = one <b>turn</b>. Each turn, the entire history so far (task + all prior thoughts, actions, observations) goes back into the model. The model is stateless; the <i>loop</i> carries the state. That's the single most important sentence in this phase.</p>
+<h3>Build It</h3>
+<pre><code>def agent_loop(task, tools, llm, max_turns=10):
+    transcript = [f&quot;Task: {task}&quot;]
+    for turn in range(max_turns):
+        response = llm(&quot;\n&quot;.join(transcript))   # THINK: full history in, decision out
+        if response.startswith(&quot;FINAL:&quot;):
+            return response[6:]                 # done
+        tool_name, args = parse_action(response)  # ACT
+        observation = tools[tool_name](args)      # environment responds
+        transcript.append(response)               # OBSERVE: append both...
+        transcript.append(f&quot;Observation: {observation}&quot;)  # ...into the transcript
+    return &quot;Gave up after max_turns&quot;</code></pre>
+<p>Mechanics to internalize: (1) the LLM sees <i>everything</i> each turn — cost grows with turn count; (2) the observation is just text appended to the transcript — the model has no other sense organs; (3) termination is a convention ("FINAL:") you must design, not a law of nature.</p>
+<h3>Use It</h3>
+<p>Every framework is this loop with accessories: OpenAI's Agents SDK, LangGraph, Claude's tool-use loop, smolagents. Compare them by asking where each one puts the loop's four levers: how observations are formatted, how actions are parsed, how termination is detected, and how history is truncated. If a framework hides those four things from you, you'll be reading its source code the first time an agent misbehaves — which is why we build the loop bare in Phase 2 before touching any framework.</p>
+<h3>War Story</h3>
+<p>The ReAct paper (Yao et al., 2022) is where this loop got its canonical LLM form: interleaving reasoning traces ("Thought") with actions and observations beat both reason-only and act-only baselines on tasks like HotpotQA and ALFWorld. The striking result wasn't that acting helped — it's that <i>writing down the thinking between actions</i> helped, reducing the hallucinated actions that plagued act-only agents.</p>
+<h3>Checkpoint</h3>
+<ul><li>The LLM is stateless. What component of the agent actually "remembers," and how?</li><li>Why does per-turn cost grow as the loop runs?</li><li>Name the four design levers every agent loop must define, framework or not.</li></ul>
+<h2 id="lesson-04"><span class="lnum">04</span> Environments, Tools, Memory: The Agent's World</h2>
+<p><b>MOTTO:</b> An agent is only as capable as its tools, only as informed as its observations, and only as sane as its memory.</p>
+<h3>The Problem</h3>
+<p>People obsess over the model and neglect the world around it. But an agent with GPT-5-class reasoning and a badly designed tool set is like a genius locked in a room with a broken telephone: every capability and every perception is mediated by interfaces <i>you</i> design. Most "the model is dumb" bugs are actually "the world I built is illegible" bugs.</p>
+<h3>The Concept</h3>
+<p>Borrow the framing from classical AI (Russell &amp; Norvig): an agent perceives an <b>environment</b> through observations and acts on it through <b>actuators</b> — for LLM agents, actuators are <b>tools</b>, and perceptions are tool results serialized to text. <b>Memory</b> is whatever survives beyond the current context window.</p>
+<pre><code>              ┌──────────────── AGENT ────────────────┐
+              │   LLM  ◄──── context window ────┐     │
+              │    │                            │     │
+              │    │ tool calls        observations   │
+              ▼    ▼                            │     │
+        ┌──────────────┐                 ┌──────┴───┐ │
+        │    TOOLS     │ ──── act ────►  │  ENVIRON │ │
+        │ search, exec,│ ◄─── sense ───  │  -MENT   │ │
+        │ files, APIs  │                 └──────────┘ │
+        └──────────────┘                              │
+              │            ┌────────┐                 │
+              └── persist ►│ MEMORY │── recall ───────┘
+                           │ files, │
+                           │ vec DB │
+                           └────────┘</code></pre>
+<p>Three design surfaces: <b>tools</b> (what it can do), <b>observations</b> (what it can see — you choose what a tool returns and how it's formatted), <b>memory</b> (what it keeps — everything else evaporates when the context window fills).</p>
+<h3>Build It</h3>
+<ol><li><b>Tool = name + description + schema + function.</b> The description is a prompt; the model chooses tools by reading it. Vague description → wrong tool calls.</li><li><b>Observation design:</b> return <i>the minimum the model needs</i>. A tool that dumps 50 KB of raw JSON wastes context and buries the signal. Truncate, summarize, structure.</li><li><b>Memory tiers:</b> context window (working memory, free but small) → scratchpad file (persists across turns) → external store (persists across sessions).</li></ol>
+<pre><code>TOOLS = {
+    &quot;read_file&quot;: {
+        &quot;description&quot;: &quot;Read a file. Returns at most first 200 lines.&quot;,
+        &quot;fn&quot;: lambda path: &quot;\n&quot;.join(open(path).read().splitlines()[:200]),
+    },
+}</code></pre>
+<p>That <code>[:200]</code> is environment design. Nobody will praise you for it, and it will save your agent daily.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Layer</th><th>DIY</th><th>Off-the-shelf</th></tr></thead><tbody><tr><td>Tools</td><td>Python functions + JSON schema</td><td>MCP servers, OpenAI function tools</td></tr><tr><td>Environment</td><td>Subprocess/sandbox you control</td><td>E2B, Docker sandboxes, browser automation</td></tr><tr><td>Memory</td><td>Files + SQLite</td><td>Vector DBs (Chroma, pgvector), Zep, Letta</td></tr></tbody></table>
+<p>Anthropic launched the Model Context Protocol (MCP) in November 2024 precisely to standardize the tool/environment layer — one protocol for exposing tools and data sources to any agent, instead of N×M custom integrations.</p>
+<h3>War Story</h3>
+<p>MCP's adoption arc validates the "world matters more than model" thesis: after Anthropic open-sourced it in November 2024, OpenAI announced MCP support in March 2025 and Google DeepMind followed — competitors converging on a shared standard for the tool layer. Nobody standardized prompts; they standardized the agent's <i>world</i>.</p>
+<h3>Checkpoint</h3>
+<ul><li>Why is a tool's description a prompt, and what goes wrong when it's vague?</li><li>Give an example of bad observation design and its downstream symptom.</li><li>What distinguishes the three memory tiers, and what dies when the context window fills?</li></ul>
+<h2 id="lesson-05"><span class="lnum">05</span> Why Agents Fail: A Taxonomy of Face-Plants</h2>
+<p><b>MOTTO:</b> A 95%-reliable step is a coin flip after twenty steps — do the math before you demo.</p>
+<h3>The Problem</h3>
+<p>Your agent works in the demo. Then it runs 50 tasks in production and finishes 30. Nobody changed the code. What changed is that production exposed the brutal statistics of chained probabilistic steps — and a handful of failure modes that demos are structurally unable to reveal.</p>
+<h3>The Concept</h3>
+<p>The core math: if each turn succeeds independently with probability <i>p</i>, a task needing <i>n</i> turns succeeds with probability <i>pⁿ</i>.</p>
+<pre><code>  p = 0.95 per step (an excellent step!)
+
+  steps (n):    1      5      10     20     50
+  success:    0.95   0.77   0.60   0.36   0.08
+                                    ▲
+                        20-step task: worse than a coin flip</code></pre>
+<p>0.95²⁰ ≈ 0.36. That's the whole ballgame. Agents don't fail because any step is bad; they fail because <i>multiplication is merciless</i>. This is why short loops beat long loops, why recovery (getting back on track after an error) matters more than raw per-step accuracy, and why "just add more steps" makes agents worse.</p>
+<p>The taxonomy of face-plants, roughly ordered by frequency:</p>
+<ol><li><b>Compounding drift</b> — each step slightly off; error accumulates silently.</li><li><b>Wrong-tool / wrong-args</b> — malformed calls, hallucinated tool names.</li><li><b>Goal drift</b> — the agent starts solving an adjacent, easier problem.</li><li><b>Loops</b> — retrying the same failing action forever (see Lesson 07 of Phase 2).</li><li><b>Context rot</b> — the window fills; early instructions fall out or get diluted.</li><li><b>Premature victory</b> — declares success without verifying ("the tests probably pass").</li><li><b>Environment betrayal</b> — flaky APIs, changed pages; the world moved.</li></ol>
+<h3>Build It</h3>
+<p>Countermeasures map one-to-one:</p>
+<pre><code># 1. Shorten the chain: p^n — reduce n before improving p
+# 2. Validate before executing
+if action.tool not in TOOLS: observation = f&quot;Error: no tool &#x27;{action.tool}&#x27;. Available: {list(TOOLS)}&quot;
+# 4. Detect repeats
+if action == last_action and last_result_was_error: inject(&quot;That failed. Try a different approach.&quot;)
+# 6. Force verification
+&quot;Before FINAL, run the checker tool and include its output.&quot;</code></pre>
+<p>The deepest fix is architectural: add <i>checkable milestones</i> so errors are caught at step 3, not compounded until step 19.</p>
+<h3>Use It</h3>
+<p>Measure your own <i>p</i>: run each tool-use step type in isolation 100 times, count successes. If a step is 85% reliable and your task needs eight of them, expected success is 0.85⁸ ≈ 27% — no prompt tweak fixes that; only redesign (fewer steps, verification gates, or a deterministic replacement for the flaky step) does. Benchmarks like SWE-bench and GAIA report exactly this gap between single-step competence and long-horizon completion.</p>
+<h3>War Story</h3>
+<p>AutoGPT in 2023 was the compounding-error thesis running as a public experiment: impressive single actions, and multi-hour runs that circled, forgot, and burned budgets — the gap between per-step demos and end-to-end reliability, live-streamed to a few hundred thousand GitHub stargazers. The 2023-2025 shift toward bounded, verifiable agent designs is the industry internalizing 0.95²⁰.</p>
+<h3>Checkpoint</h3>
+<ul><li>Compute the success probability of a 10-step task at p = 0.9 per step. Is it demo-able? Shippable?</li><li>Name three items from the failure taxonomy and one countermeasure for each.</li><li>Why does improving recovery-from-error sometimes beat improving per-step accuracy?</li></ul>
+<h2 id="lesson-06"><span class="lnum">06</span> The Evaluation Mindset: Never Trust a Demo</h2>
+<p><b>MOTTO:</b> A demo is one sample from a distribution you haven't measured.</p>
+<h3>The Problem</h3>
+<p>An agent demo is a magic trick: the demo giver ran the task forty times, and you're watching the take that worked. LLM outputs are stochastic; a task that succeeds once might succeed 90% of the time or 15% of the time, and a single run cannot tell you which. Teams routinely ship on demo-grade evidence and discover the true success rate from angry users.</p>
+<h3>The Concept</h3>
+<p>Treat every agent behavior as a distribution, and every claim about the agent as a hypothesis needing samples. The mental shift is from "does it work?" (a demo question) to "how often does it work, on what, and how does it fail?" (an eval question).</p>
+<pre><code>  Demo mindset:        Eval mindset:
+  run once ──&gt; 🎉      task set (n=50) ──&gt; run all ──&gt; score ──&gt; failure buckets
+                             │                            │
+                             └── frozen, versioned        └── pass rate: 62% ± CI
+                                                              top failure: wrong-args (40%)</code></pre>
+<p>The minimum viable eval is embarrassingly simple: a list of tasks with checkable success criteria, run every time you change anything. It's unit testing, except each "test" is flaky by nature, so you run for <i>rates</i>, not booleans.</p>
+<h3>Build It</h3>
+<ol><li><b>Collect 20-50 real tasks</b> (not toy tasks — the ones users actually ask).</li><li><b>Define a programmatic check per task</b> — string match, file exists, test passes, number within tolerance. Where output is fuzzy, use an LLM-as-judge with a rubric, and spot-check the judge.</li><li><b>Run each task k times</b> (k ≥ 3 if you can afford it); record pass rate, turns used, cost.</li><li><b>Bucket the failures</b> by taxonomy (Lesson 05). The buckets tell you what to fix; the rate tells you if you fixed it.</li></ol>
+<pre><code>results = [run_agent(t.prompt) for t in TASKS for _ in range(3)]
+pass_rate = sum(t.check(r) for t, r in zip(TASKS*3, results)) / len(results)</code></pre>
+<p>Freeze the task set. If you edit tasks whenever the agent fails them, you're grading your own homework in pencil.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>What it gives you</th><th>Tradeoff</th></tr></thead><tbody><tr><td>pytest + fixtures</td><td>Zero new deps, CI-native</td><td>You build the harness</td></tr><tr><td>Braintrust / LangSmith / Langfuse evals</td><td>Datasets, scoring UI, diffing runs</td><td>SaaS dependency, cost</td></tr><tr><td>Public benchmarks (SWE-bench, GAIA, τ-bench)</td><td>Comparability</td><td>Not <i>your</i> distribution</td></tr></tbody></table>
+<p>Public benchmarks measure the field; your frozen task set measures your product. You need the second one more.</p>
+<h3>War Story</h3>
+<p>In February 2024, a Canadian tribunal ordered Air Canada to honor a bereavement-fare policy its website chatbot had invented, rejecting the airline's argument that the chatbot was "a separate legal entity responsible for its own actions." The bot presumably demoed fine. Nobody had evaluated what it said about edge-case policies until a customer relied on the answer — at which point the eval was performed by a judge.</p>
+<h3>Checkpoint</h3>
+<ul><li>Why is a single successful run nearly zero evidence about an agent's reliability?</li><li>What two properties must every task in your eval set have?</li><li>Why must the eval task set be frozen and versioned?</li></ul>
+<h2 id="lesson-07"><span class="lnum">07</span> Reading Agent Traces Like a Debugger</h2>
+<p><b>MOTTO:</b> The trace is the stack trace — if you can't read it, you're debugging by prayer.</p>
+<h3>The Problem</h3>
+<p>Your agent gave a wrong answer. Where's the bug? It might be in the system prompt, the tool description, a tool's output format, a parsing step, or the model's reasoning at turn 6 of 11. Without the full trace — every prompt in, every response out, every tool result — you're guessing. With it, agent debugging becomes ordinary, almost boring, engineering.</p>
+<h3>The Concept</h3>
+<p>A trace is the complete transcript of one agent run: the ordered sequence of (context sent → model output → action parsed → observation returned) for every turn. Read it like a debugger session: the transcript is your stack, each turn is a frame, and you're hunting for the <i>first</i> frame where reality and the agent's belief diverge.</p>
+<pre><code>  Turn 1  ctx ──&gt; &quot;Thought: need the invoice total. Action: read_file(inv.pdf)&quot;
+  Turn 2  obs: &quot;Error: cannot parse PDF&quot;        ◄── reality
+  Turn 3  &quot;Thought: the total is $4,200...&quot;     ◄── FIRST DIVERGENCE: it never
+                                                     read anything. Bug found.
+  Turn 4+ ...20 more turns of confidently wrong math (irrelevant — all downstream)</code></pre>
+<p>Golden rule: <b>the bug is at the first divergence, not the last symptom.</b> Everything after turn 3 above is noise.</p>
+<h3>Build It</h3>
+<p>A reading protocol:</p>
+<ol><li><b>Read the final answer, then jump to turn 1.</b> Read forward, not backward.</li><li>At each turn ask: <i>given exactly this context, was this output reasonable?</i> If yes, keep going. If no, stop — you've found the frame.</li><li>Classify the divergence: bad input to the model (your bug: prompt, tool output, truncation) vs. bad output from good input (model limitation: fix with prompt, examples, or a stronger model).</li><li><b>Check the raw context, not your assumption of it.</b> Half of all trace bugs are "the model never saw what I thought it saw" — truncated file, empty tool result, instruction that fell out of the window.</li></ol>
+<p>Instrument first: log every LLM call's full input and output to JSONL. If your logging shows only the final answer, you have print-statement debugging without the print statements.</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Strength</th><th>Tradeoff</th></tr></thead><tbody><tr><td>JSONL + <code>less</code></td><td>Zero deps, works offline</td><td>No UI, manual diffing</td></tr><tr><td>LangSmith / Langfuse / Braintrust</td><td>Tree views, timing, cost per turn</td><td>SaaS, instrumentation lock-in</td></tr><tr><td>OpenTelemetry GenAI conventions</td><td>Vendor-neutral spans</td><td>Young standard, assembly required</td></tr></tbody></table>
+<p>Whatever you choose: log full prompts, not summaries. Disk is cheap; reconstructing what the model saw is not.</p>
+<h3>War Story</h3>
+<p>The ReAct paper (Yao et al., 2022) owed part of its impact to trace legibility: because the method interleaves explicit "Thought" strings with actions and observations, the authors could inspect <i>why</i> trajectories failed — and readers could too. A design that makes the agent's reasoning visible in the trace isn't just interpretability garnish; it's what makes the debugging protocol in this lesson possible at all.</p>
+<h3>Checkpoint</h3>
+<ul><li>Why do you read a trace forward from turn 1 instead of backward from the failure?</li><li>What is the "first divergence," and why is everything after it usually irrelevant?</li><li>Give an example of a "model never saw it" bug and how the raw context reveals it.</li></ul>
+<h2 id="lesson-08"><span class="lnum">08</span> Your Lab Setup: Python, a Mock LLM, and Zero API Keys</h2>
+<p><b>MOTTO:</b> If your lesson needs an API key, your lesson has a flaky dependency and a billing page.</p>
+<h3>The Problem</h3>
+<p>Learning agents against a live API is learning on hard mode: responses are nondeterministic, so you can't tell whether behavior changed because of your code or the sampling dice; every experiment costs money; and every reader without a key is locked out. You want to study the <i>loop</i> — and the loop doesn't care whether the brain is real.</p>
+<h3>The Concept</h3>
+<p>This repo's philosophy: <b>MockLLM</b> — a fake model that returns deterministic, scripted responses. Think flight simulator: you don't learn instrument procedures in a real storm; you learn them where the storm is repeatable. Since an agent framework only ever sees "text in, text out," a scripted stand-in exercises 100% of the loop machinery — parsing, tool dispatch, history management, termination — with 0% of the variance.</p>
+<pre><code>  Real stack:   loop ──&gt; [ API ──&gt; GPU farm ──&gt; $$$ ──&gt; maybe same answer ]
+  Lab stack:    loop ──&gt; [ MockLLM: responses.pop(0) ]     free, offline, exact
+                 ▲
+                 └── the part you&#x27;re actually studying</code></pre>
+<h3>Build It</h3>
+<p>The entire MockLLM:</p>
+<pre><code>class MockLLM:
+    &quot;&quot;&quot;Returns scripted responses in order. Deterministic. Offline. Free.&quot;&quot;&quot;
+    def __init__(self, responses: list[str]):
+        self.responses = list(responses)
+        self.calls = []                      # every prompt, recorded for inspection
+
+    def complete(self, prompt: str) -&gt; str:
+        self.calls.append(prompt)            # so you can practice trace-reading
+        if not self.responses:
+            raise RuntimeError(&quot;MockLLM ran out of script — check your loop&#x27;s turn count&quot;)
+        return self.responses.pop(0)</code></pre>
+<p>Setup, in full: (1) Python 3.10+, (2) <code>git clone</code> this repo, (3) <code>python -m venv .venv</code> and activate, (4) <code>pip install -r requirements.txt</code> (stdlib-adjacent; no SDKs required), (5) run any lesson's script. No <code>.env</code>, no keys, no network. The <code>calls</code> list doubles as your first tracing tool: after every run, read what the "model" was actually shown — Lesson 07's habit, built in from day one.</p>
+<h3>Use It</h3>
+<p>When you <i>do</i> graduate to real models (Phase 1 onward, optionally): the swap is one line, because MockLLM matches the <code>complete(prompt) -&gt; str</code> interface used throughout the repo.</p>
+<table><thead><tr><th>Backend</th><th>Cost</th><th>Deterministic?</th><th>Use for</th></tr></thead><tbody><tr><td>MockLLM</td><td>$0</td><td>Perfectly</td><td>Loop mechanics, tests, CI</td></tr><tr><td>Local model (Ollama, llama.cpp)</td><td>$0 + your GPU/CPU</td><td>Nearly (temp 0, fixed seed)</td><td>Realistic text, still offline</td></tr><tr><td>API (Anthropic, OpenAI)</td><td>$</td><td>No (temp 0 ≈ close, not guaranteed)</td><td>Final validation</td></tr></tbody></table>
+<p>Keep MockLLM in your test suite forever — production agent repos mock the model in CI for exactly the reasons above.</p>
+<h3>War Story</h3>
+<p>The stakes of "just point it at the real thing" were demonstrated in 2023 when Samsung engineers pasted confidential source code into ChatGPT while debugging, prompting the company to ban generative AI tools on corporate devices. An offline, deterministic lab isn't only pedagogy — it's the same isolation discipline that keeps real code and real credentials out of other people's clouds while you experiment.</p>
+<h3>Checkpoint</h3>
+<ul><li>Why does a deterministic mock exercise 100% of the agent loop's machinery?</li><li>What two experimental problems does nondeterminism cause when you're learning loop mechanics?</li><li>Why should MockLLM remain in your CI even after you integrate a real model?</li></ul>
+  </article>
+  <div class="pager">
+    
+    <span class="spacer"></span>
+    <a href="01-llm-foundations.html">Phase 01 🗣️ →</a>
+  </div>
+</div>
+</body>
+</html>

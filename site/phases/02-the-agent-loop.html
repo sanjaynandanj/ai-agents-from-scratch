@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Agent Loop — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 02</div>
+  <h1><span class="pnum">02</span> 🔄 The Agent Loop</h1>
+  <div class="tagline">Every agent framework is 100 lines of while-loop wearing a trench coat.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>ReAct: reason, act, observe</a>
+<a href="#lesson-02"><span class="lnum">02</span>The scratchpad: an agent&#x27;s working memory</a>
+<a href="#lesson-03"><span class="lnum">03</span>Stop conditions: knowing when to quit</a>
+<a href="#lesson-04"><span class="lnum">04</span>Error handling inside the loop</a>
+<a href="#lesson-05"><span class="lnum">05</span>Reflection: the agent that critiques itself</a>
+<a href="#lesson-06"><span class="lnum">06</span>Self-consistency: ask three times, take the vote</a>
+<a href="#lesson-07"><span class="lnum">07</span>Turn budgets and runaway loops</a>
+<a href="#lesson-08"><span class="lnum">08</span>Streaming and interruptibility</a>
+<a href="#lesson-09"><span class="lnum">09</span>Human-in-the-loop gates</a>
+<a href="#lesson-10"><span class="lnum">10</span>Build a complete agent loop in 100 lines</a>
+  </div>
+  <article>
+<blockquote>Every agent framework is 100 lines of while-loop wearing a trench coat.</blockquote>
+<p>Phase 0 gave you the mental model; Phase 1 gave you the engine. Now you build the transmission: the loop that turns one-shot LLM calls into an agent. This phase covers the canonical ReAct pattern, then hardens it piece by piece — stop conditions, error handling, reflection, budgets, streaming, human gates — until Lesson 10, where you assemble everything into a complete, runnable, zero-API-key agent. By the end, you'll read any framework's source and recognize old friends.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> ReAct: Reason, Act, Observe</h2>
+<p><b>MOTTO:</b> Make the model narrate its plan before every move — the narration is free error-checking.</p>
+<h3>The Problem</h3>
+<p>Give an LLM tools and let it fire actions directly, and it acts on stale assumptions: calling tools that don't fit, chaining actions that made sense two observations ago. Give it only reasoning and it hallucinates the facts it was supposed to look up. Each mode alone fails in a characteristic way — confident action without grounding, or grounded reasoning without hands.</p>
+<h3>The Concept</h3>
+<p>ReAct (Yao et al., 2022) interleaves the two: every turn, the model emits a <b>Thought</b> (free-text reasoning about the current state), then an <b>Action</b> (a tool call), then receives an <b>Observation</b>. Chain-of-thought (Phase 1, Lesson 06) with its feet on the ground.</p>
+<pre><code>  Thought: I need France&#x27;s population before I can halve it.
+  Action:  lookup[population of France]
+  Observation: 68,000,000 (approx., 2024)
+  Thought: Now divide by 2. The commas will break the calculator; strip them.
+  Action:  calculator[68000000 / 2]
+  Observation: 34000000.0
+  Thought: Done.
+  FINAL:   About 34 million.
+
+  ── the Thought line is where the model course-corrects using
+     the LAST observation before committing to the NEXT action.</code></pre>
+<p>The paper's finding: reasoning-only (CoT) hallucinated facts; acting-only made ungrounded moves; interleaving beat both on HotpotQA and Fever (fact-checking, grounded via a Wikipedia API) and on interactive tasks (ALFWorld, WebShop). The thought isn't decoration — it's the synthesis step between perception and action.</p>
+<h3>Build It</h3>
+<ol><li>Prompt format: teach the exact grammar, ideally with one full few-shot turn (Phase 1, Lesson 05): <code>Thought: ...</code> then <code>Action: tool[input]</code>, and <code>FINAL: ...</code> to finish.</li><li>Parse with a strict regex; anything unparseable becomes an observation saying so (Lesson 04).</li><li>Append the model's full output <i>and</i> the observation to the transcript — the thoughts must persist, they're the agent's running plan.</li><li>Modern variant: with native function calling (Phase 1, Lesson 08), the "Action" is a structured tool call, and the "Thought" is the text (or reasoning block) accompanying it. Same pattern, better parser.</li></ol>
+<h3>Use It</h3>
+<p>ReAct is the default skeleton nearly everywhere: LangChain's original agents were literally named after the paper (<code>zero-shot-react-description</code>), and today's tool-calling loops in the OpenAI Agents SDK, Claude's tool use, and smolagents are ReAct with structured actions. When choosing a framework, ask how it exposes the three beats — if you can't see thoughts and observations in the trace, debugging (Phase 0, Lesson 07) gets strictly harder.</p>
+<h3>War Story</h3>
+<p>ReAct (Yao et al., 2022, published at ICLR 2023) reported that on Fever fact verification, interleaved reasoning-and-acting outperformed both chain-of-thought-only and act-only baselines, with CoT-only prone to fact hallucination it could not check. The pattern was so legible that LangChain — the breakout agent library of 2023 — shipped it as the default agent, which is how a research prompt format became the industry's while-loop.</p>
+<h3>Checkpoint</h3>
+<ul><li>What failure mode does reasoning-only exhibit, and what failure mode does acting-only exhibit?</li><li>Why must Thought lines be kept in the transcript rather than discarded after parsing?</li><li>How does the ReAct pattern map onto native function calling?</li></ul>
+<h2 id="lesson-02"><span class="lnum">02</span> The Scratchpad: An Agent's Working Memory</h2>
+<p><b>MOTTO:</b> The transcript is RAM; the scratchpad is the notebook that survives the pager.</p>
+<h3>The Problem</h3>
+<p>By turn 18, your agent's transcript holds three file dumps, five dead-end explorations, and — somewhere in the middle — the two facts that matter. Context costs are climbing (Phase 1, Lesson 12), attention is diluting (Phase 1, Lesson 01), and when you eventually compact history, you'd better not compact away the answer. The transcript is a <i>log</i>; what the agent needs is <i>notes</i>.</p>
+<h3>The Concept</h3>
+<p>A scratchpad is a distinct, curated store of working state — separate from the raw conversation. The transcript records everything that happened; the scratchpad records what's <i>worth remembering</i>: goals, confirmed facts, decisions, open questions.</p>
+<pre><code>  TRANSCRIPT (append-only log)          SCRATCHPAD (curated state)
+  ├ turn 1: read config… 4KB dump      ┌─────────────────────────────┐
+  ├ turn 2: grep… 2KB, dead end        │ GOAL: fix failing test #12  │
+  ├ turn 3: read test… 3KB             │ FACTS: bug in parse_date(), │
+  ├ …                                  │   introduced in commit a1c  │
+  └ turn 18: …                         │ TRIED: regex fix — broke #7 │
+       │                               │ NEXT: widen format list     │
+       └── compactable, lossy          └── small, dense, durable ────┘</code></pre>
+<p>Two implementations: <b>in-context</b> (a maintained summary block the agent rewrites, always pinned in the prompt) and <b>externalized</b> (a file or store the agent writes/reads via tools — surviving compaction, and even sessions). Writing notes is also thinking: forcing the agent to distill "what do I now know?" is a comprehension checkpoint, not just storage.</p>
+<h3>Build It</h3>
+<ol><li>Give the agent two tools: <code>write_note(text)</code> and <code>read_notes()</code> — or simpler, one <code>notes.md</code> file via generic file tools.</li><li>Instruct it in the system prompt: after any significant observation, record conclusions (not raw output) in notes; consult notes before planning.</li><li>On compaction (Phase 1, Lesson 09), drop raw transcript freely — the scratchpad is what you keep verbatim.</li><li>Structure beats prose: <code>GOAL / FACTS / TRIED / NEXT</code> headings make notes greppable by the agent and by you at trace-reading time.</li><li>Anti-pattern to police: the agent dumping raw tool output into notes. Notes are <i>distilled</i> — enforce a length budget.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Approach</th><th>Survives compaction?</th><th>Survives sessions?</th><th>Cost</th></tr></thead><tbody><tr><td>Thoughts in transcript only</td><td>No</td><td>No</td><td>Free</td></tr><tr><td>Pinned in-context summary block</td><td>Yes (you pin it)</td><td>No</td><td>Tokens every turn</td></tr><tr><td>External file/store via tools</td><td>Yes</td><td>Yes</td><td>Tool-call turns</td></tr></tbody></table>
+<p>Production tools converged here: Claude Code reads <code>CLAUDE.md</code> memory files and writes plan/note files during long tasks, and Anthropic's agent guidance explicitly lists note-taking outside the context window as a core context-management technique. The file system is the most underrated memory architecture in agents.</p>
+<h3>War Story</h3>
+<p>Anthropic's own engineering guidance on context management (2025) describes agentic memory as "taking notes that persist outside the context window" — citing an agent playing Pokémon that maintained tallies and maps across thousands of steps far exceeding any context window. The industry's most advanced answer to long-horizon memory is, sincerely, "the agent keeps a notebook."</p>
+<h3>Checkpoint</h3>
+<ul><li>What's the difference in <i>purpose</i> between the transcript and the scratchpad?</li><li>Why does an external scratchpad make history compaction safe?</li><li>Why is "distill, don't dump" a rule worth enforcing with a length budget?</li></ul>
+<h2 id="lesson-03"><span class="lnum">03</span> Stop Conditions: Knowing When to Quit</h2>
+<p><b>MOTTO:</b> An agent that can't stop isn't autonomous — it's unattended.</p>
+<h3>The Problem</h3>
+<p>Your loop's exit is <code>if "FINAL:" in response</code> — a string the model may never produce. Maybe it keeps "double-checking." Maybe it finished the task and moved on to unrequested improvements. Maybe it's stuck re-verifying forever. Termination is not a behavior models come with; it's a mechanism you design, and a missing one turns every edge case into an infinite loop.</p>
+<h3>The Concept</h3>
+<p>Stop conditions come in three families, and a production loop needs all three:</p>
+<pre><code>  ┌─ 1. SUCCESS ────── the model signals done (FINAL:, a submit() tool,
+  │                    or a text-response-with-no-tool-call turn)
+  ├─ 2. VERIFIED ───── an external check confirms done (tests pass,
+  │                    file exists, validator accepts) — the strong form
+  └─ 3. GUARDRAIL ──── you stop it regardless: max turns, max cost,
+                       wall-clock timeout, repeated-action detector
+
+  precedence: guardrails ALWAYS enforce; verification gates success;
+  model signal alone is the WEAKEST evidence of doneness.</code></pre>
+<p>The deep issue: the model's "I'm done" is a claim, not a fact (premature victory, Phase 0, Lesson 05). Wherever a programmatic check exists, doneness should be <i>verified</i>, not declared — "stop when the tests pass," not "stop when the model says the tests would pass."</p>
+<h3>Build It</h3>
+<ol><li>Make stopping explicit and easy: a dedicated <code>finish(answer)</code> tool (or <code>FINAL:</code> sentinel) beats inferring doneness from prose.</li><li>Gate it: when <code>finish</code> is called, run your checker; on failure, don't stop — return the checker's output as an observation ("2 tests still failing") and continue.</li><li>Layer guardrails outside the model's control: <code>for turn in range(max_turns)</code> (never <code>while True</code>), a cost ceiling (Phase 1, Lesson 12), a duplicate-action detector.</li><li>Distinguish exits in your result object: <code>success_verified</code>, <code>success_claimed</code>, <code>budget_exhausted</code>, <code>stuck</code>. Downstream code and your evals must treat these differently.</li></ol>
+<pre><code>if action.tool == &quot;finish&quot;:
+    ok, report = checker(task)
+    if ok: return Result(&quot;success_verified&quot;, action.args)
+    observation = f&quot;Not done: {report}&quot;     # back into the loop</code></pre>
+<h3>Use It</h3>
+<p>Frameworks encode family 1 and 3 for you: OpenAI's Agents SDK ends a run when the model produces a final text output and enforces <code>max_turns</code>; LangGraph ships a recursion limit (default 25) that raises <code>GraphRecursionError</code>. Family 2 — verification — is domain-specific and almost always yours to write. It's also the highest-leverage line of code in the whole loop.</p>
+<h3>War Story</h3>
+<p>AutoGPT's own 2023 documentation warned that its "continuous mode" was "potentially dangerous" and could "run forever" — an agent shipped with an explicit disclaimer that its stop conditions were the user watching it. Thousands of users ran it anyway and reported agents circling indefinitely on subgoals; "how do I make it stop researching and start doing" became a genre of GitHub issue. Termination is a feature; absence of termination is a warning label.</p>
+<h3>Checkpoint</h3>
+<ul><li>Rank the three stop-condition families by strength of evidence that the task is actually done.</li><li>Why should a <code>finish</code> call be gated by a checker rather than trusted?</li><li>Why is <code>for turn in range(N)</code> non-negotiable even when you also have cost limits?</li></ul>
+<h2 id="lesson-04"><span class="lnum">04</span> Error Handling Inside the Loop</h2>
+<p><b>MOTTO:</b> Inside an agent loop, an exception isn't a crash — it's an observation.</p>
+<h3>The Problem</h3>
+<p>Turn 7: the model calls <code>search</code> with malformed arguments, your tool raises, the exception propagates, and the whole run — six turns of paid, correct progress — dies. Or worse: your code catches the error silently, returns nothing, and the model, seeing no pushback, assumes the action worked. Traditional error handling (crash or swallow) is exactly wrong for agents.</p>
+<h3>The Concept</h3>
+<p>The loop is a conversation with an entity that can <i>read error messages and adapt</i>. So route errors back into the transcript as observations, written for a model audience:</p>
+<pre><code>                     ┌──────────────┐
+   action ──────────►│   dispatch   │── ok ──► Observation: &lt;result&gt;
+                     │  (validate,  │
+                     │   execute,   │── err ─► Observation: Error: unknown tool
+                     │   timeout)   │          &#x27;serch&#x27;. Available: search, read_file.
+                     └──────────────┘          Did you mean &#x27;search&#x27;?
+                                                    │
+        model reads the error, corrects, retries ◄──┘
+
+  Error message quality = recovery probability. &quot;Error 500&quot; teaches nothing;
+  &quot;file not found: ./config.yml — directory contains: config.yaml&quot; teaches everything.</code></pre>
+<p>Distinguish error classes: <b>model errors</b> (bad tool name, bad args, unparseable output) — always recoverable, feed back with guidance; <b>environment errors</b> (timeout, 404, permission denied) — feed back with what's known, maybe retry idempotent calls yourself; <b>infrastructure errors</b> (LLM API down, budget breached) — the loop itself must handle these; the model can't reason its way around a dead API.</p>
+<h3>Build It</h3>
+<ol><li>Wrap every tool call: <code>try/except</code> with a timeout; <i>nothing</i> a tool does should escape the dispatch layer.</li><li>Validate before executing (name in registry, args against schema) — cheaper than executing and failing.</li><li>Write errors as actionable observations: what failed, why, what's available, a suggestion.</li><li>Add a repeat detector: same action + same error twice → inject "This approach has now failed twice. Try a different one." Models anchor on their own transcript; sometimes you must break the anchor.</li><li>Cap error recovery: N consecutive failed turns → exit as <code>stuck</code> with the trace. Infinite resilience is just a slow infinite loop.</li><li>For transient environment errors (rate limits, flaky HTTP), retry with backoff <i>below</i> the model's awareness — don't waste model turns on jitter.</li></ol>
+<h3>Use It</h3>
+<p>Anthropic's "Building Effective Agents" (2024) calls the tool layer an <b>agent-computer interface (ACI)</b> and urges investing in it like a human UI. The SWE-agent paper (Yao et al., 2024) demonstrated it empirically: redesigning the interface — concise feedback, guardrails against repeated mistakes — substantially improved software-fixing success with the <i>same</i> model. Error messages are prompts. Write them like prompts.</p>
+<h3>War Story</h3>
+<p>SWE-agent (Yao et al., 2024) attributed much of its state-of-the-art SWE-bench performance not to a better model but to a better interface: purpose-built file viewers and editors whose feedback (including error feedback) was designed for LLM consumption, versus dropping the model into a raw shell. Same brain, kinder error messages, materially more resolved GitHub issues — the strongest published evidence that this lesson's unglamorous plumbing moves the top-line number.</p>
+<h3>Checkpoint</h3>
+<ul><li>Why is "exception as observation" the right default, and for which error class does it break down?</li><li>What makes an error message high-quality from the model's perspective?</li><li>Why do you need both a repeat detector and a consecutive-failure cap?</li></ul>
+<h2 id="lesson-05"><span class="lnum">05</span> Reflection: The Agent That Critiques Itself</h2>
+<p><b>MOTTO:</b> The cheapest second opinion is the same model reading its own work with fresh instructions.</p>
+<h3>The Problem</h3>
+<p>Your agent submits an answer that fails the checker. The loop just... tries again, with the failure in the transcript but no analysis of it — so it often repeats a near-identical attempt. The information needed to do better is present; the <i>processing</i> of that information into a lesson is missing.</p>
+<h3>The Concept</h3>
+<p>Reflection adds an explicit self-critique step: after a failed (or completed) attempt, the model is prompted to analyze what went wrong and produce guidance for the next attempt. Reflexion (Shinn et al., 2023) formalized this: the agent attempts a task, receives feedback (test results, environment signals), generates a <i>verbal</i> reflection — "I assumed the list was sorted; it isn't; next time check first" — stores it in an episodic memory buffer, and retries with reflections in context. Verbal reinforcement learning: the lesson is a paragraph, not a gradient.</p>
+<pre><code>   attempt ──► evaluate ──► fail ──► REFLECT ──► memory ──► attempt #2
+      ▲                              (why did it              │
+      │                               fail? what to           │
+      └────────── reflections in context ◄────────────────────┘
+                  change?)
+
+   distinct from retry: retry = same context, new dice.
+   reflexion = context now contains a diagnosis.</code></pre>
+<p>Two flavors: <b>episodic</b> (between full attempts, à la Reflexion) and <b>inline</b> (mid-loop critique of a draft before submitting — generator/critic in one loop). Both hinge on the same asymmetry: models are better at <i>judging</i> a concrete artifact than at generating perfectly on the first pass.</p>
+<h3>Build It</h3>
+<ol><li>After a failed attempt, issue a dedicated reflection call — separate prompt, critic persona: "Here is the attempt and the failure evidence. Diagnose the root cause in ≤3 sentences and state one concrete change."</li><li>Ground it in evidence: reflection over a <i>test failure</i> is diagnosis; reflection with no external signal is often confabulation. Prefer reflecting on checker output, not vibes.</li><li>Store reflections in a running list; prepend on retry; cap attempts (2-3 — returns fall off fast).</li><li>Inline variant: before <code>finish</code>, one critique pass against an explicit rubric ("check: edge cases, off-by-one, spec compliance"), then revise once.</li><li>Caveat honestly: self-critique without new information can degenerate into the model agreeing with itself. External feedback is the active ingredient; reflection is the metabolizer.</li></ol>
+<h3>Use It</h3>
+<table><thead><tr><th>Pattern</th><th>Signal source</th><th>Cost</th><th>When</th></tr></thead><tbody><tr><td>Plain retry</td><td>None</td><td>1x per attempt</td><td>Transient/randomness failures</td></tr><tr><td>Reflexion-style</td><td>Tests/env feedback</td><td>+1 reflection call per attempt</td><td>Checkable tasks (code, math)</td></tr><tr><td>Inline critic pass</td><td>Rubric</td><td>+1 call before finish</td><td>Quality-sensitive output</td></tr><tr><td>Separate critic model</td><td>Second model</td><td>2 models</td><td>Adversarial review, evals</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>Reflexion (Shinn et al., 2023) reported 91% pass@1 on the HumanEval coding benchmark with GPT-4 — surpassing the previously reported GPT-4 baseline of 67% — with no weight updates, purely by letting the agent read its own test failures, write itself a memo, and try again. Few published results make the case this cleanly that the loop's <i>structure</i>, not the model, was the binding constraint.</p>
+<h3>Checkpoint</h3>
+<ul><li>What distinguishes Reflexion-style retry from naive retry, mechanically?</li><li>Why does reflection work best when anchored to external feedback like test output?</li><li>Why cap reflection-retry cycles at 2-3 attempts?</li></ul>
+<h2 id="lesson-06"><span class="lnum">06</span> Self-Consistency: Ask Three Times, Take the Vote</h2>
+<p><b>MOTTO:</b> One sample is an anecdote; five samples and a vote is a measurement.</p>
+<h3>The Problem</h3>
+<p>On genuinely hard reasoning steps, your model is right 70% of the time — and you're sampling it once, at some temperature, and shipping whatever comes out. A 30% error rate on a load-bearing step, injected into a compounding loop (Phase 0, Lesson 05), is a slow-motion disaster you're choosing per-call cheapness over.</p>
+<h3>The Concept</h3>
+<p>Self-consistency (Wang et al., 2022): sample the same prompt multiple times at nonzero temperature, extract each sample's final answer, and take the majority vote. The intuition — correct reasoning paths are many and convergent (different routes, same destination); errors are diverse and scattered. Sampling diversity turns that asymmetry into signal.</p>
+<pre><code>  prompt ──┬── sample 1 (T=0.7) ──► reasoning A ──► &quot;34,000,000&quot; ─┐
+           ├── sample 2 (T=0.7) ──► reasoning B ──► &quot;34,000,000&quot; ─┼─► vote:
+           ├── sample 3 (T=0.7) ──► reasoning C ──► &quot;3,400,000&quot;  ─┤   34,000,000
+           ├── sample 4 (T=0.7) ──► reasoning D ──► &quot;34,000,000&quot; ─┤   (4/5) ✓
+           └── sample 5 (T=0.7) ──► reasoning E ──► &quot;34,000,000&quot; ─┘
+                                        errors scatter; truth clusters.
+  BONUS: the vote margin (4/5 vs 3/5) is a free confidence signal.</code></pre>
+<p>Requirements: temperature &gt; 0 (identical greedy samples can't vote — Phase 1, Lesson 02), and an extractable, <i>comparable</i> final answer (a number, a choice, a normalized string). For free-form prose there's no clean vote; use a judge/critic instead (Lesson 05).</p>
+<h3>Build It</h3>
+<ol><li>Isolate the load-bearing decision (the plan choice, the numeric answer, the classification) — don't self-consistency the whole trajectory.</li><li>Sample k=3-10 at T≈0.7, in parallel (latency ≈ one call; cost = k calls).</li><li>Extract answers via your delimiter (Phase 1, Lesson 06: <code>ANSWER:</code> exists for this), normalize, <code>Counter(...).most_common(1)</code>.</li><li>Use the margin: unanimous → proceed; split vote → escalate (more samples, stronger model, or a human gate — Lesson 09).</li><li>Budget honestly: k=5 is 5x that step's cost. Reserve it for steps whose failure is expensive; this is precision spending, not a default.</li></ol>
+<pre><code>answers = parallel(lambda: extract(llm(prompt, temperature=0.7)), k=5)
+winner, count = Counter(answers).most_common(1)[0]
+confidence = count / len(answers)</code></pre>
+<h3>Use It</h3>
+<p>The idea generalizes across the modern stack: best-of-n with a verifier or reward model picking the winner, and consult-multiple-models patterns all trade parallel samples for reliability. Within agents, the highest-leverage placements are plan selection at the start of a run and final-answer checks on quantitative tasks — the steps where one wrong draw poisons everything downstream.</p>
+<h3>War Story</h3>
+<p>Wang et al. (2022) reported that self-consistency boosted chain-of-thought accuracy on GSM8K math by +17.9 percentage points, with large gains on other reasoning benchmarks — no new model, no new training, just "sample several and vote." It remains one of the best accuracy-per-engineering-hour trades in the literature: about five lines of orchestration code.</p>
+<h3>Checkpoint</h3>
+<ul><li>Why does self-consistency require temperature &gt; 0?</li><li>Why does majority voting work — what asymmetry between correct and incorrect paths does it exploit?</li><li>Where in an agent loop is the k-times cost of self-consistency most justified?</li></ul>
+<h2 id="lesson-07"><span class="lnum">07</span> Turn Budgets and Runaway Loops</h2>
+<p><b>MOTTO:</b> Automation without a kill switch isn't a system — it's a stampede.</p>
+<h3>The Problem</h3>
+<p>The agent hits a state its prompt never anticipated: a tool that always errors, a task that's subtly impossible, a transcript that anchors it into repeating itself. Without hard limits, it will burn turns — and money — indefinitely, because an LLM under anchoring pressure is perfectly happy to try the same thing an eleventh time. Stop conditions (Lesson 03) defined the families; this lesson engineers the guardrail family properly, because it's the one that runs when everything else has already failed.</p>
+<h3>The Concept</h3>
+<p>Layered limits, each catching what the previous misses:</p>
+<pre><code>  per-turn:    tool timeout, max output tokens        (catches: one hung call)
+  per-run:     max turns, max cost, wall clock        (catches: runaway loop)
+  cross-run:   daily spend cap, concurrency cap       (catches: runaway RETRIES —
+                                                       the outer system relaunching
+                                                       a failing agent forever)
+  ┌────────────────────────────────────────────────┐
+  │ the failure that hurts is never the loop alone │
+  │ — it&#x27;s the loop × the scheduler that respawns  │
+  │ it × the night nobody was watching.            │
+  └────────────────────────────────────────────────┘</code></pre>
+<p>Runaway detection is subtler than a counter, because loops are often <i>semantic</i>: the agent alternates A→B→A→B, or rephrases the same failing search eight ways. Progress, not motion, is the thing to measure.</p>
+<h3>Build It</h3>
+<ol><li>Turn budget sized empirically: p95 turns of <i>successful</i> runs on your eval set, plus slack. Too tight starves legitimately hard tasks; too loose funds doom loops.</li><li>Cycle detector: hash each (tool, normalized_args); a hash seen ≥3 times, or ≥2 with identical failing observations, triggers intervention.</li><li>Escalating intervention ladder — don't jump straight to kill: (a) inject a nudge observation ("you have repeated this action; change strategy"), (b) force a reflection turn (Lesson 05), (c) terminate as <code>stuck</code> with the trace.</li><li>Warn the model near budget end: "3 turns remain — wrap up with your best current answer." Models finish gracefully when told; guillotined runs return nothing.</li><li>Enforce cost/time in the loop body itself (the <code>Budget</code> class, Phase 1, Lesson 12) — never in a sidecar that observes but can't halt.</li></ol>
+<h3>Use It</h3>
+<p>Every serious harness exposes the per-run layer — <code>max_turns</code> (OpenAI Agents SDK), recursion limits (LangGraph), max iterations (nearly all others). The cross-run layer is almost always missing from frameworks and almost always where real incidents live: it's provider spend alerts, queue-level concurrency caps, and your own retry policy having a ceiling. Configure all three layers; test the guardrails by deliberately giving the agent an impossible task and watching what happens.</p>
+<h3>War Story</h3>
+<p>The canonical runaway-automation parable predates LLMs: on August 1, 2012, Knight Capital deployed trading software with a repurposed feature flag that activated dead code, and the system fired unintended orders for about 45 minutes — losing roughly $440 million and nearly destroying the firm — because no layer existed that could recognize "this is wrong" and halt. Agent loops inherit the same physics: the cost of a runaway is set not by the bug but by how long nothing stops it.</p>
+<h3>Checkpoint</h3>
+<ul><li>What failure class does each of the three limit layers catch that the others miss?</li><li>Why is a semantic cycle detector needed in addition to a turn counter?</li><li>Why warn the model before the turn budget expires instead of just terminating?</li></ul>
+<h2 id="lesson-08"><span class="lnum">08</span> Streaming and Interruptibility</h2>
+<p><b>MOTTO:</b> Users forgive slowness they can watch; they don't forgive a spinner hiding a mistake in progress.</p>
+<h3>The Problem</h3>
+<p>Your agent takes 60 seconds across six turns. Rendered as one silent spinner, that's an eternity — users assume it hung, refresh, and now two agents are mutating the same data. Worse: at turn 2 the user can already <i>see</i> the agent misread the task, and there's no way to stop it before it acts five more times on the wrong premise.</p>
+<h3>The Concept</h3>
+<p>Two distinct capabilities, often conflated:</p>
+<pre><code>  STREAMING (visibility)                 INTERRUPTIBILITY (control)
+  tokens/events emitted as produced      run can be stopped/redirected mid-flight
+  ──────────────────────────────         ──────────────────────────────
+  UI: &quot;Thought: checking the            UI: [ ■ stop ]  &quot;wait — use the
+       invoice table…&quot;                        staging DB, not prod&quot;
+  cuts PERCEIVED latency                 cuts WASTED WORK and BLAST RADIUS
+  (TTFT ~1s vs total 60s)
+        └────────────── streaming is what MAKES timely interruption
+                        possible: you can&#x27;t stop what you can&#x27;t see ─┘</code></pre>
+<p>For agents, stream <i>semantic events</i>, not just tokens: turn started, thought text, tool called with args, observation received, final answer streaming. And interruption has a hard rule inherited from systems programming: <b>interrupt at action boundaries.</b> Killing a run mid-tool-execution can leave the environment half-mutated; the safe points are before dispatch and after observation.</p>
+<h3>Build It</h3>
+<ol><li>Restructure the loop as a generator: <code>yield Event("thought", ...)</code>, <code>yield Event("tool_call", ...)</code>, <code>yield Event("observation", ...)</code> — the UI consumes events; the loop doesn't know about UIs.</li><li>Check a cancellation flag at every action boundary: before dispatching a tool and before starting the next turn.</li><li>On cancel: finish or roll back the in-flight tool if possible, persist the transcript + scratchpad, exit as <code>interrupted</code> — resumable, not vaporized.</li><li>Support <i>redirect</i>, not just stop: user input mid-run is appended as a new user message; the next turn's context includes it. (This is how "actually, use staging" steers a live run.)</li><li>Transport: provider APIs stream via server-sent events (SSE); pass through with your semantic events layered on top.</li></ol>
+<h3>Use It</h3>
+<p>Streaming has been table stakes since ChatGPT's launch UX (November 2022): token-by-token rendering plus a stop-generation button. Agent frameworks now expose event streams (Agents SDK streaming events, LangGraph's <code>stream</code> modes yielding node-level updates). The frontier of this lesson is voice: OpenAI's Realtime API (October 2024) had to handle <i>barge-in</i> — the user talking over the model — making interruption a first-class protocol event, with the model's unspoken audio truncated from history. Interruptibility, it turns out, is an API design problem all the way down.</p>
+<h3>War Story</h3>
+<p>OpenAI's Realtime API (announced at DevDay, October 2024) shipped interruption handling as a core primitive for speech-to-speech apps — because in voice, users <i>naturally</i> interrupt, and a model that talks over them is unusable regardless of intelligence. When a modality forces the issue, the answer is instructive: interruption support was built into the protocol itself, not bolted onto the UI. Text agents deserve the same architecture.</p>
+<h3>Checkpoint</h3>
+<ul><li>Distinguish what streaming buys you from what interruptibility buys you.</li><li>Why must interruption happen at action boundaries rather than at arbitrary moments?</li><li>What should be persisted on interruption, and why does that make <code>interrupted</code> different from <code>failed</code>?</li></ul>
+<h2 id="lesson-09"><span class="lnum">09</span> Human-in-the-Loop Gates</h2>
+<p><b>MOTTO:</b> Autonomy is earned per action, not granted per agent.</p>
+<h3>The Problem</h3>
+<p>Your agent is 95% reliable. Its actions include "read a file" and "email 4,000 customers." Treating those uniformly means either paralyzing the agent with confirmations for trivial reads, or discovering the 5% failure rate via an apology campaign. The unit of trust is wrong: it's not the agent that deserves autonomy or not — it's each <i>action</i>.</p>
+<h3>The Concept</h3>
+<p>Classify every tool by reversibility and blast radius; gate accordingly:</p>
+<pre><code>                low blast radius        high blast radius
+  reversible    ✓ auto-approve          ⚠ auto + audit log
+                (read file, search)     (bulk edit w/ undo)
+  irreversible  ⚠ confirm or sandbox    ⛔ HARD GATE: human
+                (send one email,        approves the CONCRETE
+                 small payment)         action + args
+                                        (deploy, delete, mass send)
+
+  gate = loop PAUSES: (proposed action, args, context) → human
+         → approve | edit args | reject-with-reason → loop resumes
+  A rejection is an observation too: &quot;Rejected: wrong recipient list.&quot;</code></pre>
+<p>Design constraint that decides whether this works in practice: <b>approval fatigue</b>. A gate that fires 50 times a run trains the human to click yes — at which point you have ceremony, not safety. Gates must be rare, high-signal, and rich in context (what, why, what happens if approved).</p>
+<h3>Build It</h3>
+<ol><li>Tag tools at registration: <code>risk="auto" | "confirm" | "hard_gate"</code> — policy lives in the tool registry, not scattered through prompts.</li><li>Implement the pause: the loop yields an <code>approval_request</code> event (Lesson 08's event stream) and blocks — or, for async workflows, checkpoints state and resumes on decision, hours later if need be.</li><li>Feed decisions back as observations — especially rejections with reasons; "Rejected: that's the prod database" is steering data (and scratchpad material).</li><li>Batch approvals where natural: "here are the 3 emails I propose to send" beats three interruptions.</li><li>Log every approval with the exact args approved. When something goes wrong anyway, "human approved <i>this specific action</i>" versus "agent acted alone" is the whole incident review — and increasingly, the whole legal question.</li><li>Escalation hooks: low vote-confidence (Lesson 06), repeated failures (Lesson 07), and budget-end (Lesson 07) are all natural triggers to <i>promote</i> an action to a gate dynamically.</li></ol>
+<h3>Use It</h3>
+<p>Framework support is real but thin: LangGraph has first-class <code>interrupt</code>/checkpoint primitives for human approval; the OpenAI Agents SDK and Claude-based harnesses support tool-approval callbacks; Claude Code prompts before running commands it classifies as consequential. The classification of <i>your</i> tools' blast radius, though, is judgment no framework ships. Do the 2×2 for every tool you register.</p>
+<h3>War Story</h3>
+<p>In July 2025, an AI coding agent on Replit deleted a production database during a "code freeze" for SaaStr founder Jason Lemkin's project — an incident Replit's CEO publicly called "unacceptable," followed by announced safeguards including better separation of development and production environments. The action was irreversible, high-blast-radius, and ungated. The 2×2 in this lesson is cheap; the incident review isn't.</p>
+<h3>Checkpoint</h3>
+<ul><li>What two properties of an action determine its gate level, and why per-action rather than per-agent?</li><li>Why is approval fatigue a <i>safety</i> problem and not just a UX problem?</li><li>How should a human rejection flow back into the loop, and what makes a rejection valuable?</li></ul>
+<h2 id="lesson-10"><span class="lnum">10</span> Build a Complete Agent Loop in 100 Lines</h2>
+<p><b>MOTTO:</b> If you can't build it in 100 lines, you don't get to import it in one.</p>
+<h3>The Problem</h3>
+<p>You've now met every organ: ReAct format, transcript-as-memory, stop conditions, error-as-observation, budgets. Separately, each is a paragraph. The proof of understanding is assembly: one file, no framework, no API key, that runs an agent end to end — and that you can read a trace from, break on purpose, and fix.</p>
+<h3>The Concept</h3>
+<p>The full anatomy, and where each prior lesson lives in it:</p>
+<pre><code>  ┌── agent.py ─────────────────────────────────────────────┐
+  │  MockLLM        (Phase 0 L08: deterministic brain)      │
+  │  tools          (Phase 0 L04: calculator, lookup)       │
+  │  parse()        (L01 ReAct grammar; P1 L07 rigor)       │
+  │  run_agent()    (P0 L03 loop · L03 stops · L04 errors   │
+  │                  · L07 turn budget · trace printing)    │
+  └─────────────────────────────────────────────────────────┘</code></pre>
+<h3>Build It</h3>
+<p>Save as <code>agent.py</code>, run <code>python agent.py</code>. No keys, no network, fully deterministic.</p>
+<pre><code>&quot;&quot;&quot;A complete agent loop in ~100 lines. Zero API keys. Run: python agent.py&quot;&quot;&quot;
+import re
+
+# ---------- The &quot;brain&quot;: a mock LLM with scripted responses (Phase 0, L08) ----------
+class MockLLM:
+    def __init__(self, responses):
+        self.responses = list(responses)
+        self.calls = []                       # full prompts, for trace-reading practice
+
+    def complete(self, prompt: str) -&gt; str:
+        self.calls.append(prompt)
+        if not self.responses:
+            raise RuntimeError(&quot;MockLLM ran out of script — is your loop over-turning?&quot;)
+        return self.responses.pop(0)
+
+# ---------- Tools (Phase 0, L04): name -&gt; function, str in, str out ----------
+def calculator(expression: str) -&gt; str:
+    if not set(expression) &lt;= set(&quot;0123456789+-*/(). &quot;):
+        return f&quot;Error: calculator only accepts digits and + - * / ( ). Got: {expression!r}&quot;
+    try:
+        return str(eval(expression, {&quot;__builtins__&quot;: {}}, {}))    # sandboxed eval
+    except Exception as e:
+        return f&quot;Error: {e}&quot;
+
+FACTS = {
+    &quot;population of france&quot;: &quot;68,000,000 (approx., 2024)&quot;,
+    &quot;capital of france&quot;: &quot;Paris&quot;,
+}
+def lookup(query: str) -&gt; str:
+    return FACTS.get(query.strip().lower(), f&quot;Error: no entry for {query!r}. Try a simpler query.&quot;)
+
+TOOLS = {&quot;calculator&quot;: calculator, &quot;lookup&quot;: lookup}
+
+# ---------- Parsing the ReAct grammar (L01): Action: tool[input] | FINAL: answer ----------
+ACTION_RE = re.compile(r&quot;Action:\s*(\w+)\[(.*)\]&quot;, re.DOTALL)
+
+def parse(response: str):
+    if &quot;FINAL:&quot; in response:
+        return &quot;final&quot;, response.split(&quot;FINAL:&quot;, 1)[1].strip()
+    m = ACTION_RE.search(response)
+    if m:
+        return &quot;action&quot;, (m.group(1), m.group(2).strip())
+    return &quot;invalid&quot;, None
+
+# ---------- The loop (Phase 0 L03; stops L03; errors L04; budget L07) ----------
+def run_agent(task: str, llm: MockLLM, max_turns: int = 6) -&gt; str:
+    transcript = [f&quot;Task: {task}&quot;]
+    for turn in range(1, max_turns + 1):                 # guardrail: never while True
+        response = llm.complete(&quot;\n&quot;.join(transcript))   # THINK: full history in
+        transcript.append(response)
+        print(f&quot;--- turn {turn} ---\n{response}&quot;)
+
+        kind, payload = parse(response)
+        if kind == &quot;final&quot;:                              # model claims done
+            print(f&quot;=== FINAL after {turn} turn(s) ===&quot;)
+            return payload
+
+        if kind == &quot;action&quot;:                             # ACT
+            tool_name, arg = payload
+            if tool_name in TOOLS:
+                try:
+                    observation = TOOLS[tool_name](arg)  # errors stay inside dispatch
+                except Exception as e:
+                    observation = f&quot;Error: {tool_name} crashed: {e}&quot;
+            else:                                        # model error -&gt; teachable obs
+                observation = (f&quot;Error: unknown tool {tool_name!r}. &quot;
+                               f&quot;Available: {&#x27;, &#x27;.join(TOOLS)}.&quot;)
+        else:                                            # unparseable -&gt; teachable obs
+            observation = (&quot;Error: could not parse. Reply with &quot;
+                           &quot;&#x27;Action: tool[input]&#x27; or &#x27;FINAL: answer&#x27;.&quot;)
+
+        transcript.append(f&quot;Observation: {observation}&quot;) # OBSERVE
+        print(f&quot;Observation: {observation}&quot;)
+    return &quot;Stopped: turn budget exhausted (best-effort trace above).&quot;
+
+# ---------- The script: what our deterministic &quot;model&quot; says, turn by turn ----------
+SCRIPT = [
+    &quot;Thought: I need France&#x27;s population before I can halve it.\n&quot;
+    &quot;Action: lookup[population of France]&quot;,
+
+    &quot;Thought: Got 68,000,000 — but commas would break the calculator, so I&#x27;ll strip them.\n&quot;
+    &quot;Action: calculator[68000000 / 2]&quot;,
+
+    &quot;Thought: 34000000.0 — that&#x27;s the answer.\n&quot;
+    &quot;FINAL: Half of France&#x27;s population is about 34,000,000 people.&quot;,
+]
+
+if __name__ == &quot;__main__&quot;:
+    llm = MockLLM(SCRIPT)
+    answer = run_agent(&quot;What is half the population of France?&quot;, llm)
+    print(f&quot;\nAnswer: {answer}&quot;)
+    print(f&quot;LLM was called {len(llm.calls)} time(s); &quot;
+          f&quot;final prompt was {len(llm.calls[-1])} chars (watch this grow — Phase 1, L12).&quot;)</code></pre>
+<p>Exercises, in ascending order of insight: (1) misspell <code>lookup</code> as <code>lookupp</code> in the script and watch the error-observation path run — then add a fourth scripted response that recovers; (2) delete the <code>FINAL</code> response and watch the turn budget catch it; (3) print <code>llm.calls[-1]</code> and read the exact context the "model" saw — that's Phase 0 L07 made tangible; (4) replace <code>MockLLM</code> with a real client behind the same <code>complete()</code> interface and change nothing else.</p>
+<h3>Use It</h3>
+<p>Now open a framework and find these same ~100 lines: smolagents' agent step loop, the Agents SDK's runner, LangGraph's compiled graph loop. Everything they add — retries, streaming events, checkpointing, tool schemas — you now have a slot for in your mental model. That's the point of the trench-coat joke: the coat is real and sometimes worth wearing, but you should always know what's under it.</p>
+<h3>War Story</h3>
+<p>BabyAGI (Yohei Nakajima, spring 2023) went viral as a task-driven autonomous agent implemented in roughly a hundred lines of Python — tiny enough that thousands of people read the entire source in one sitting, which was precisely why it spread: everyone could see the whole trick. Hugging Face's smolagents (December 2024) made minimalism the brand promise itself — an agent library advertising its core logic in about a thousand lines. The loop is small. It was always small.</p>
+<h3>Checkpoint</h3>
+<ul><li>Map each of Lessons 01, 03, 04, and 07 to the specific line(s) of <code>agent.py</code> that implement them.</li><li>Why does the script's second response mention stripping commas, and what loop property does that demonstrate?</li><li>What is the <i>only</i> change required to swap MockLLM for a real model, and why was the code designed that way?</li></ul>
+  </article>
+  <div class="pager">
+    <a href="01-llm-foundations.html">← 🗣️ Phase 01</a>
+    <span class="spacer"></span>
+    <a href="03-tools-and-function-calling.html">Phase 03 🔧 →</a>
+  </div>
+</div>
+</body>
+</html>

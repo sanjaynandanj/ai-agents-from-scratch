@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protocols: MCP & Friends — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 08</div>
+  <h1><span class="pnum">08</span> 🌐 Protocols: MCP &amp; Friends</h1>
+  <div class="tagline">Tools were bespoke. Then MCP made them USB.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Why protocols: the N×M integration problem</a>
+<a href="#lesson-02"><span class="lnum">02</span>MCP architecture: hosts, clients, servers</a>
+<a href="#lesson-03"><span class="lnum">03</span>MCP tools, resources, and prompts</a>
+<a href="#lesson-04"><span class="lnum">04</span>Building an MCP server</a>
+<a href="#lesson-05"><span class="lnum">05</span>MCP transports: stdio, HTTP, SSE</a>
+<a href="#lesson-06"><span class="lnum">06</span>MCP security: the confused deputy and beyond</a>
+<a href="#lesson-07"><span class="lnum">07</span>A2A: agent-to-agent communication</a>
+<a href="#lesson-08"><span class="lnum">08</span>Function-calling dialects: OpenAI vs Anthropic vs Gemini</a>
+<a href="#lesson-09"><span class="lnum">09</span>OpenAPI as a tool source</a>
+<a href="#lesson-10"><span class="lnum">10</span>Computer use: screenshots and clicks as a protocol</a>
+<a href="#lesson-11"><span class="lnum">11</span>Skills and slash commands: packaged capabilities</a>
+<a href="#lesson-12"><span class="lnum">12</span>Build an MCP server from scratch</a>
+  </div>
+  <article>
+<blockquote>Tools were bespoke. Then MCP made them USB.</blockquote>
+<p>Every agent needs tools; every tool used to need custom glue for every agent. This phase is about the protocols that ended the glue era: MCP for tools and context, A2A for agent-to-agent talk, OpenAPI as a tool source, and computer use as the protocol of last resort. You'll finish by writing an MCP server from scratch — raw JSON-RPC over stdio, no SDK — so the "magic" is permanently demystified.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> Why Protocols: The N×M Integration Problem</h2>
+<p><b>MOTTO:</b> N agents × M tools = N×M adapters. Protocols make it N+M.</p>
+<h3>The Problem</h3>
+<p>You wrote a GitHub tool for your OpenAI agent. Now you want it in your Claude agent — rewrite. Now Cursor — rewrite. Every agent framework speaks its own tool dialect, so every integration is bespoke, and the ecosystem drowns in duplicated adapters.</p>
+<h3>The Concept</h3>
+<p>The classic interoperability fix: a standard interface in the middle.</p>
+<pre><code>Without protocol:            With protocol:
+ A1──T1  A1──T2  A1──T3       A1──┐         ┌──T1
+ A2──T1  A2──T2  A2──T3       A2──┼──[MCP]──┼──T2
+ A3──T1  A3──T2  A3──T3       A3──┘         └──T3
+ 9 adapters                   6 adapters (N+M)</code></pre>
+<p>USB did this for peripherals, LSP did it for editor-language integrations, HTTP did it for everything. A protocol succeeds when both sides win: tool authors write once and reach every client; agent authors integrate once and reach every tool.</p>
+<h3>Build It</h3>
+<p>Nothing to code yet — build the judgment. Checklist for evaluating any agent protocol: What's standardized (transport? schema? discovery? auth?)? Who bears the migration cost? Is there a spec or just a vendor's SDK? Who else has adopted it?</p>
+<h3>Use It</h3>
+<table><thead><tr><th>Protocol</th><th>Solves N×M for</th></tr></thead><tbody><tr><td>MCP</td><td>Agents ↔ tools/context</td></tr><tr><td>A2A</td><td>Agents ↔ agents</td></tr><tr><td>OpenAPI</td><td>Clients ↔ HTTP APIs (pre-dates agents, still central)</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>OpenAI's ChatGPT plugins (March 2023) were the first big swing at this problem — OpenAPI manifests as a universal tool layer. They were sunset in April 2024 in favor of GPTs' Actions. Seven months later Anthropic open-sourced MCP (November 2024), and within months it did what plugins didn't: cross-vendor adoption. The difference wasn't the idea; it was being an open protocol rather than one vendor's product feature.</p>
+<h3>Checkpoint</h3>
+<ol><li>Show the adapter arithmetic for 5 agents and 20 tools, with and without a protocol.</li><li>Why did LSP succeed at a structurally identical problem?</li><li>What made MCP's fate differ from ChatGPT plugins'?</li></ol>
+<h2 id="lesson-02"><span class="lnum">02</span> MCP Architecture: Hosts, Clients, Servers</h2>
+<p><b>MOTTO:</b> Three roles, one wire format, zero bespoke glue.</p>
+<h3>The Problem</h3>
+<p>"Connect my agent to my tools" hides real questions: who spawns what, who holds credentials, who approves a dangerous call, what happens when there are five tool sources at once? A protocol needs named roles with defined responsibilities.</p>
+<h3>The Concept</h3>
+<p>MCP defines three:</p>
+<ul><li><b>Host</b>: the LLM application (Claude Desktop, an IDE, your agent). Owns the model, the user, and the security decisions.</li><li><b>Client</b>: a connector object <i>inside</i> the host — one client per server connection, maintaining a stateful 1:1 session.</li><li><b>Server</b>: a program exposing capabilities (tools, resources, prompts) — often small, single-purpose.</li></ul>
+<pre><code>┌────────────── HOST (e.g., Claude Desktop) ──────────────┐
+│   LLM ⟷ [client A] ⟷ [client B] ⟷ [client C]            │
+└─────────────│────────────│────────────│─────────────────┘
+              ▼            ▼            ▼
+        [server:git]  [server:db]  [server:slack]</code></pre>
+<p>Sessions start with a handshake: <code>initialize</code> exchanges protocol versions and <i>capability flags</i>, so both sides know what the other supports. The wire format throughout is JSON-RPC 2.0 — the same choice LSP made.</p>
+<h3>Build It</h3>
+<ul><li>Config-level first: register a server in a host's config (command + args for stdio, or a URL) and watch its tools appear.</li><li>Note who holds secrets: the <i>server</i> holds its API tokens; the host never sees them. That boundary is a feature.</li></ul>
+<h3>Use It</h3>
+<p>Hosts today: Claude Desktop and Claude Code, Cursor, Windsurf, VS Code (GitHub Copilot), ChatGPT, and the OpenAI Agents SDK — all speak the same servers.</p>
+<h3>War Story</h3>
+<p>Anthropic released MCP on November 25, 2024. In March 2025 Sam Altman announced OpenAI would adopt it across its products, and in April 2025 Demis Hassabis said Google DeepMind would too — direct competitors adopting a rival's protocol within five months. That's the strongest possible signal a standard has escaped its creator.</p>
+<h3>Checkpoint</h3>
+<ol><li>Distinguish host, client, and server — and why client is a separate concept from host.</li><li>What does the <code>initialize</code> handshake negotiate?</li><li>Why is "the server holds its own credentials" a security feature?</li></ol>
+<h2 id="lesson-03"><span class="lnum">03</span> MCP Tools, Resources, and Prompts</h2>
+<p><b>MOTTO:</b> Verbs, nouns, and scripts — know which one you're shipping.</p>
+<h3>The Problem</h3>
+<p>"Expose my stuff to the model" flattens three different things: actions the model can take, data the app can supply, and workflows the user can invoke. Mash them into one mechanism and you get tool lists cluttered with things that were never actions.</p>
+<h3>The Concept</h3>
+<p>MCP's three primitives, distinguished by <i>who controls them</i>:</p>
+<table><thead><tr><th>Primitive</th><th>Nature</th><th>Controlled by</th><th>Example</th></tr></thead><tbody><tr><td>Tool</td><td>Verb — do something</td><td>Model decides to call</td><td><code>create_issue(title)</code></td></tr><tr><td>Resource</td><td>Noun — readable data</td><td>Application attaches</td><td><code>file:///repo/README.md</code></td></tr><tr><td>Prompt</td><td>Script — a workflow</td><td>User invokes</td><td><code>/summarize-thread</code></td></tr></tbody></table>
+<p>A tool is a function with a JSON Schema. A resource is content addressed by URI. A prompt is a parameterized template surfaced in the host's UI (slash-command style). Servers can also <i>ask the host</i> for things: sampling (request an LLM completion) and elicitation (request user input) — capabilities flowing in reverse.</p>
+<h3>Build It</h3>
+<p>Sorting exercise for a database MCP server: <code>run_query</code> → tool. Table schemas → resources (<code>db://schema/users</code>). "Explain this week's slow queries" → prompt. If you'd shipped all three as tools, the model would "decide" to read schemas at random and users could never invoke the workflow directly.</p>
+<h3>Use It</h3>
+<p>Anthropic's launch-day reference servers showed the split: Filesystem and Postgres servers lean on resources + tools; GitHub and Slack servers are tool-heavy; prompt-centric servers power slash commands in hosts like Claude Code.</p>
+<h3>War Story</h3>
+<p>MCP launched in November 2024 with a suite of open-source reference servers — including Filesystem, GitHub, Git, Postgres, Slack, and Puppeteer — precisely so the three-primitive model had running examples on day one. Early adopters named at launch included Block and Apollo, with Zed, Replit, Codeium, and Sourcegraph working on integrations. Reference implementations, not spec prose, taught the ecosystem the tool/resource/prompt split.</p>
+<h3>Checkpoint</h3>
+<ol><li>Assign controller (model/app/user) to each of the three primitives.</li><li>Why shouldn't readable data be exposed as a tool?</li><li>What are sampling and elicitation, and which direction do they flow?</li></ol>
+<h2 id="lesson-04"><span class="lnum">04</span> Building an MCP Server</h2>
+<p><b>MOTTO:</b> One decorator per capability. The SDK does the wire; you do the value.</p>
+<h3>The Problem</h3>
+<p>You have an internal API, a database, a pile of scripts. Every agent in the company wants access. Time to write the adapter <i>once</i> — as an MCP server — instead of once per agent framework.</p>
+<h3>The Concept</h3>
+<p>With the official Python SDK (<code>FastMCP</code>), a server is decorated functions. Type hints become the JSON Schema; docstrings become the descriptions the model reads:</p>
+<pre><code>from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP(&quot;ticket-server&quot;)
+
+@mcp.tool()
+def search_tickets(query: str, limit: int = 10) -&gt; str:
+    &quot;&quot;&quot;Search support tickets by keyword. Returns matching summaries.&quot;&quot;&quot;
+    return do_search(query, limit)          # your existing code
+
+@mcp.resource(&quot;tickets://open&quot;)
+def open_tickets() -&gt; str:
+    &quot;&quot;&quot;All currently open tickets as JSON.&quot;&quot;&quot;
+    return json.dumps(load_open())
+
+if __name__ == &quot;__main__&quot;:
+    mcp.run()                                # stdio by default</code></pre>
+<p>Descriptions are prompt engineering: the model chooses tools by reading them. "Search support tickets by keyword" beats "search function" — vague descriptions are the #1 cause of wrong-tool-chosen bugs.</p>
+<h3>Build It</h3>
+<ul><li>Wrap 2–3 real functions; run with <code>mcp dev server.py</code> (MCP Inspector) to poke tools interactively before any LLM is involved.</li><li>Register in Claude Code (<code>claude mcp add</code>) or Claude Desktop config; watch the model discover and call your tools.</li><li>Return errors as <i>useful text</i> — the model reads them and adapts; a bare stack trace wastes the turn.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>SDK</th><th>Language</th></tr></thead><tbody><tr><td><code>mcp</code> (FastMCP)</td><td>Python — official</td></tr><tr><td><code>@modelcontextprotocol/sdk</code></td><td>TypeScript — official</td></tr><tr><td>Community SDKs</td><td>Go, Rust, Java, C#, Kotlin</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>Within months of the November 2024 launch, community MCP servers numbered in the thousands, with registries like mcp.so and Smithery springing up to index them, and companies from Cloudflare to Stripe shipping official servers. The bar to entry — a decorated function — is exactly why the catalog exploded.</p>
+<h3>Checkpoint</h3>
+<ol><li>What do your type hints and docstring become on the wire?</li><li>Why test with MCP Inspector before connecting an LLM?</li><li>Why should tool errors be descriptive text rather than raw exceptions?</li></ol>
+<h2 id="lesson-05"><span class="lnum">05</span> MCP Transports: stdio, HTTP, SSE</h2>
+<p><b>MOTTO:</b> Same messages, different pipes. Choose the pipe for the deployment.</p>
+<h3>The Problem</h3>
+<p>A local file server and a SaaS-hosted CRM server can't ship messages the same way: one is a subprocess on your laptop, the other is a URL serving thousands of users. The protocol messages are identical — the transport must differ.</p>
+<h3>The Concept</h3>
+<pre><code>stdio:              host spawns server as subprocess
+   host ──stdin──▶ server           one user, local, trivial auth
+   host ◀─stdout── server           (inherits your OS permissions)
+
+Streamable HTTP:    server is a web service
+   client ──POST /mcp──▶ server     remote, multi-user, OAuth
+   client ◀── JSON or SSE stream ── (response can stream via SSE)</code></pre>
+<ul><li><b>stdio</b>: newline-delimited JSON-RPC over the subprocess's stdin/stdout. Rule one: never <code>print()</code> to stdout in a stdio server — you'll corrupt the protocol stream. Log to stderr.</li><li><b>Streamable HTTP</b>: POST each message; the server replies with plain JSON or upgrades to an SSE stream for progressive/server-initiated messages.</li><li><b>HTTP+SSE</b> (the original remote transport, separate <code>/sse</code> + <code>/messages</code> endpoints): deprecated, still seen in the wild.</li></ul>
+<h3>Build It</h3>
+<ul><li>Ship local/personal tools as stdio (default in FastMCP).</li><li>Ship shared/hosted tools as Streamable HTTP: <code>mcp.run(transport="streamable-http")</code>, put OAuth in front, treat it like any production web service.</li><li>Debug tip: stdio servers can be tested with a hand-typed JSON-RPC line piped to the process — lesson 12 exploits this.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Deployment</th><th>Transport</th></tr></thead><tbody><tr><td>Laptop dev tools, IDE integrations</td><td>stdio</td></tr><tr><td>Company-hosted tool gateway</td><td>Streamable HTTP + OAuth</td></tr><tr><td>Legacy remote servers</td><td>HTTP+SSE (migrate)</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>The MCP spec's March 2025 revision (2025-03-26) replaced the original HTTP+SSE transport with Streamable HTTP — the two-endpoint SSE design required long-lived connections that fought serverless platforms and load balancers, a lesson learned only after real deployments. Protocols are software: they ship bugs and ship fixes.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does <code>print()</code> break a stdio MCP server, and what's the fix?</li><li>What deployment realities killed the original HTTP+SSE transport?</li><li>Which transport for: a personal note-taking tool vs. a company CRM connector?</li></ol>
+<h2 id="lesson-06"><span class="lnum">06</span> MCP Security: The Confused Deputy and Beyond</h2>
+<p><b>MOTTO:</b> Every tool description is a prompt. Every prompt is an attack surface.</p>
+<h3>The Problem</h3>
+<p>An MCP-enabled agent runs with <i>your</i> permissions — your files, your GitHub, your Slack. The classic confused deputy: a privileged intermediary tricked into using its authority for an attacker. With LLMs the trick doesn't need a buffer overflow; it needs a persuasive sentence.</p>
+<h3>The Concept</h3>
+<p>The lethal trifecta: private data access + exposure to untrusted content + an exfiltration channel. MCP setups routinely have all three. Attack classes:</p>
+<pre><code>Tool poisoning     malicious instructions hidden in a tool&#x27;s
+                   description — the model reads and obeys them
+Rug pull           server is benign at install, swaps tool
+                   definitions after you&#x27;ve approved it
+Cross-server       evil server&#x27;s tool description instructs the
+shadowing          model to misuse a *trusted* server&#x27;s tools
+Data-borne         injection arrives in tool RESULTS (an email
+injection          body, a webpage) and steers later calls</code></pre>
+<h3>Build It</h3>
+<p>Defenses, layered (Phase 7 lesson 06 déjà vu):</p>
+<ul><li>Pin and review: hash/version-pin server tool definitions; alert on changes.</li><li>Least privilege: read-only tokens where possible; separate identities per server.</li><li>Human-in-the-loop for irreversible actions — enforced by the <i>host</i>, not by prompts.</li><li>Treat all tool results as untrusted input; never let "just text" reach another tool call unexamined.</li></ul>
+<h3>Use It</h3>
+<p>Host-level approval prompts (Claude Desktop/Code confirm tool calls), MCP gateways/proxies that scan and pin tool definitions, and OAuth resource-scoping in the 2025 spec revisions are the current defense stack.</p>
+<h3>War Story</h3>
+<p>In April 2025, Invariant Labs published tool-poisoning attacks against real MCP setups — including a demo where a malicious server's tool description induced exfiltration of WhatsApp message history through a legitimate WhatsApp MCP server, invisible in the UI. In May 2025 they showed a GitHub MCP scenario where a poisoned public issue steered an agent into leaking private-repo data into a public PR. Months into the ecosystem, the deputy was already confused.</p>
+<h3>Checkpoint</h3>
+<ol><li>Map the confused deputy onto an MCP agent: who's the deputy, who's the attacker, what's the authority?</li><li>Why does the rug pull defeat one-time install review, and what defends against it?</li><li>Name the lethal trifecta and remove one leg for a concrete deployment.</li></ol>
+<h2 id="lesson-07"><span class="lnum">07</span> A2A: Agent-to-Agent Communication</h2>
+<p><b>MOTTO:</b> MCP gives agents hands. A2A gives them colleagues.</p>
+<h3>The Problem</h3>
+<p>MCP connects an agent to <i>tools</i> — but a tool call is one shot: request, result, done. Delegating to another <i>agent</i> is different: tasks run for minutes or days, need progress updates, clarifying questions, and rich artifacts — and the two agents belong to different companies that won't share internals.</p>
+<h3>The Concept</h3>
+<p>A2A (Agent2Agent), announced by Google in April 2025, standardizes peer delegation:</p>
+<ul><li><b>Agent Card</b>: a JSON discovery document (<code>/.well-known/agent.json</code>) advertising identity, skills, endpoint, auth requirements.</li><li><b>Task</b>: the unit of work, with a lifecycle (<code>submitted → working → input-required → completed/failed</code>) — inherently long-running.</li><li><b>Messages &amp; Artifacts</b>: multi-turn dialogue within a task; typed outputs (text, files, structured data).</li><li>Built on HTTP + JSON-RPC with SSE streaming and push notifications; agents stay <i>opaque</i> — capabilities are advertised, internals are not.</li></ul>
+<pre><code>[client agent] ──discover card──▶ [remote agent]
+       │──── task: &quot;audit these invoices&quot; ───▶│
+       │◀─── status: working (stream) ────────│
+       │◀─── input-required: &quot;which FY?&quot; ─────│
+       │──── &quot;FY2025&quot; ────────────────────────▶│
+       │◀─── artifact: audit_report.json ─────│</code></pre>
+<p>Complement, not competitor: MCP for agent→tool, A2A for agent→agent. Your agent might use both in one workflow.</p>
+<h3>Build It</h3>
+<p>Serve an Agent Card, accept task submissions, emit status events, return artifacts — SDKs exist, but the mental model is "async job API with discovery and streaming."</p>
+<h3>Use It</h3>
+<p>Cross-vendor delegation (your procurement agent hiring a supplier's quoting agent), and intra-enterprise meshes where teams ship agents as opaque services.</p>
+<h3>War Story</h3>
+<p>Google announced A2A in April 2025 with 50+ named partners (Salesforce, SAP, Atlassian, LangChain among them), and in June 2025 donated the protocol to the Linux Foundation — with the announcement stressing MCP-complementarity rather than rivalry. The ecosystem visibly did not want another VHS-vs-Betamax.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is a tool-call abstraction wrong for delegating to another agent?</li><li>What does an Agent Card contain, and how is it discovered?</li><li>Why does agent opacity matter for cross-company delegation?</li></ol>
+<h2 id="lesson-08"><span class="lnum">08</span> Function-Calling Dialects: OpenAI vs Anthropic vs Gemini</h2>
+<p><b>MOTTO:</b> Same idea, three accents. Your abstraction layer is the translator.</p>
+<h3>The Problem</h3>
+<p>Below the protocol layer, each provider's native API speaks its own function-calling dialect. Port an agent across providers and everything breaks at once: where schemas go, how calls come back, how results go in.</p>
+<h3>The Concept</h3>
+<p>The differences that bite:</p>
+<table><thead><tr><th></th><th>OpenAI</th><th>Anthropic</th><th>Gemini</th></tr></thead><tbody><tr><td>Declare</td><td><code>tools: [{type: "function", function: {...}}]</code></td><td><code>tools: [{name, description, input_schema}]</code></td><td><code>tools: [{function_declarations: [...]}]</code></td></tr><tr><td>Call arrives</td><td><code>tool_calls</code> on assistant msg; <b>args = JSON string</b></td><td><code>tool_use</code> content block; <b>input = object</b></td><td><code>functionCall</code> part; <b>args = object</b></td></tr><tr><td>Result returns</td><td><code>role: "tool"</code> message + <code>tool_call_id</code></td><td><code>role: "user"</code> msg with <code>tool_result</code> block</td><td><code>functionResponse</code> part</td></tr><tr><td>Force a tool</td><td><code>tool_choice: "required"</code> / named</td><td><code>tool_choice: {type: "tool", name}</code></td><td><code>function_calling_config</code> mode <code>ANY</code></td></tr></tbody></table>
+<p>The classic porting bug: OpenAI's arguments arrive as a <i>string</i> needing <code>json.loads</code>; Anthropic's and Gemini's arrive parsed. Anthropic's "tool result goes in a user message" trips up everyone at least once.</p>
+<h3>Build It</h3>
+<ul><li>Write a translation layer once: internal canonical <code>ToolCall {id, name, args: dict}</code> / <code>ToolResult {id, content}</code>, plus per-provider adapters ~30 lines each.</li><li>Or adopt one: LiteLLM normalizes everything to OpenAI's dialect; Vercel AI SDK and LangChain do their own normalization.</li><li>Test the seams: argument parsing, parallel calls, and forced tool choice differ most.</li></ul>
+<h3>Use It</h3>
+<p>LiteLLM, OpenRouter, and the OpenAI-compatible endpoints most providers now ship exist because of this lesson; MCP sits <i>above</i> all three dialects — the host translates MCP tools into its model's native dialect.</p>
+<h3>War Story</h3>
+<p>OpenAI shipped function calling in June 2023 (gpt-4-0613); Anthropic's tool use went GA in May 2024; Gemini's arrived with its own conventions — three deliberate, incompatible designs for the same concept in under a year. The ecosystem's answer was translation layers: LiteLLM's pitch is literally "call 100+ LLMs in the OpenAI format." Dialects didn't converge; adapters won.</p>
+<h3>Checkpoint</h3>
+<ol><li>Which provider returns tool arguments as an unparsed string, and what bug does that cause?</li><li>How do tool results return to the model in Anthropic's dialect?</li><li>Where does MCP sit relative to these dialects?</li></ol>
+<h2 id="lesson-09"><span class="lnum">09</span> OpenAPI as a Tool Source</h2>
+<p><b>MOTTO:</b> The world's APIs already wrote their own tool definitions. Read them.</p>
+<h3>The Problem</h3>
+<p>Thousands of services already publish machine-readable API descriptions — OpenAPI specs with paths, parameters, schemas, and docs. Hand-writing LLM tool definitions for an API that <i>already describes itself</i> is duplicated effort and instant drift.</p>
+<h3>The Concept</h3>
+<p>Mechanical transformation:</p>
+<pre><code>OpenAPI operation                LLM tool
+  operationId: createInvoice  →  name: &quot;createInvoice&quot;
+  summary + description       →  description (what the model reads)
+  parameters + requestBody    →  input JSON Schema
+  the actual endpoint         →  executor: build &amp; send HTTP request</code></pre>
+<p>One generic executor handles every generated tool: fill path params, set query/body, attach auth, call, return the response body as the tool result.</p>
+<p>The catch: specs are written for developers, not models. A 300-operation spec flattened to 300 tools drowns the model — real pipelines <i>curate</i> (expose 10 relevant operations), <i>rewrite</i> descriptions that say useless things like "the id parameter is the id," and <i>summarize</i> elephantine response schemas.</p>
+<h3>Build It</h3>
+<ul><li>Parse a small spec (petstore is tradition), generate tool defs, wire the generic HTTP executor, let the model book a pet.</li><li>Add an allowlist of operationIds — curation as config.</li><li>Handle auth outside the model: the executor injects keys; the model never sees them.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>OpenAPI → agent</th></tr></thead><tbody><tr><td>LangChain OpenAPI toolkit</td><td>Spec → toolkit</td></tr><tr><td>Custom GPTs "Actions"</td><td>Spec pasted into config</td></tr><tr><td>Speakeasy / Stainless-style gens</td><td>Spec → typed SDK → tools</td></tr><tr><td>MCP wrappers</td><td>Spec → generated MCP server</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>ChatGPT plugins (March 2023) bet everything on this: a plugin <i>was</i> an OpenAPI spec plus a manifest, model-facing descriptions and all. The plugins program was sunset in April 2024, but the mechanism survived intact inside GPTs' Actions — and the same year, the Gorilla paper (Patil et al., 2023) showed LLMs could be trained specifically to emit correct API calls from large API collections. The spec-as-tool-source idea outlived its first vehicle.</p>
+<h3>Checkpoint</h3>
+<ol><li>Which OpenAPI fields map to a tool's name, description, and schema?</li><li>Why does exposing all 300 operations of a spec hurt more than help?</li><li>Why must auth live in the executor rather than the tool schema?</li></ol>
+<h2 id="lesson-10"><span class="lnum">10</span> Computer Use: Screenshots and Clicks as a Protocol</h2>
+<p><b>MOTTO:</b> When there's no API, the screen is the API.</p>
+<h3>The Problem</h3>
+<p>Legacy desktop apps, internal web tools, third-party sites with no public API — a huge share of real work lives behind interfaces built for eyeballs and mice. No MCP server, no OpenAPI spec, no function calls. Yet the work must flow.</p>
+<h3>The Concept</h3>
+<p>Computer use turns the GUI itself into a tool interface — the universal fallback protocol:</p>
+<pre><code>loop:
+  screenshot ──▶ model looks, reasons
+  model emits ──▶ {action: &quot;left_click&quot;, coordinate: [512, 384]}
+                  {action: &quot;type&quot;, text: &quot;Q3 report&quot;}
+                  {action: &quot;key&quot;, text: &quot;Return&quot;}
+  execute in sandbox ──▶ new screenshot ──▶ repeat</code></pre>
+<p>The action vocabulary is tiny (screenshot, click, type, key, scroll); the intelligence is all in visual grounding — mapping "the Submit button" to pixel coordinates. It's slow (a screenshot round-trip per action), brittle (UIs change), and expensive (images are tokens) — which is why it's the <i>last resort</i> protocol, not the first.</p>
+<h3>Build It</h3>
+<ul><li>Always sandbox: a VM or container the agent can't escape — it's clicking with your authority (lesson 06's deputy, now armed with a mouse).</li><li>Cap actions per task; screenshot-diff to detect "nothing happened" loops.</li><li>Prefer hybrid: API/MCP for everything that has one, computer use only for the gap.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>System</th><th>Notes</th></tr></thead><tbody><tr><td>Anthropic computer use (Oct 2024)</td><td>API tool: screenshot/click/type loop</td></tr><tr><td>OpenAI Operator → agent mode (Jan 2025)</td><td>Hosted browser agent (CUA model)</td></tr><tr><td>Browser-use, Playwright-MCP</td><td>Browser control, DOM or vision based</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>Anthropic shipped computer use in public beta in October 2024 — Claude 3.5 Sonnet scored 14.9% on the OSWorld benchmark (screenshot-only), roughly double the next best system's result but far below the ~72% human baseline, and Anthropic said so in the announcement. OpenAI's Operator followed in January 2025. Everyone shipped it humble; the gap to human is the roadmap.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is computer use the fallback protocol rather than the default?</li><li>What sandboxing and budget controls are non-negotiable, and why?</li><li>What is visual grounding, and why is it the hard part?</li></ol>
+<h2 id="lesson-11"><span class="lnum">11</span> Skills and Slash Commands: Packaged Capabilities</h2>
+<p><b>MOTTO:</b> Don't paste the runbook into every chat. Ship it as a file.</p>
+<h3>The Problem</h3>
+<p>Your team's deploy procedure, your PDF-report style, your code-review checklist — this knowledge gets re-pasted into prompts daily, drifting with every copy. Tools (MCP) package <i>actions</i>; nothing so far packages <i>procedures and expertise</i>.</p>
+<h3>The Concept</h3>
+<p>A <b>skill</b> is a folder of instructions the agent loads on demand:</p>
+<pre><code>pdf-reports/
+├── SKILL.md        # name + description (always in context)
+│                   # + full instructions (loaded when triggered)
+├── template.html   # supporting files, read as needed
+└── make_pdf.py     # scripts the agent can run</code></pre>
+<p>The key design is <i>progressive disclosure</i>: only each skill's name and one-line description sit in context permanently; the body loads when relevant. Fifty skills cost dozens of tokens until one fires. <b>Slash commands</b> are the manual-trigger cousin: user types <code>/deploy</code>, a stored prompt template expands — user-controlled, like MCP prompts, versus model-triggered skills.</p>
+<p>Placement in the capability stack: MCP = <i>what the agent can touch</i>; skills = <i>what the agent knows how to do</i>; slash commands = <i>what the user can invoke by name</i>.</p>
+<h3>Build It</h3>
+<ul><li>Write a SKILL.md for a real procedure: crisp trigger description up top ("Use when the user asks for a release"), then steps, edge cases, and a checklist.</li><li>Add a script for the deterministic parts — instructions for judgment, code for mechanics (Phase 7 lesson 09, again).</li><li>Version it in git; skills are prompts that finally get code review.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Mechanism</th><th>Trigger</th></tr></thead><tbody><tr><td>Claude Agent Skills (SKILL.md)</td><td>Model-invoked by description match</td></tr><tr><td>Claude Code slash commands</td><td>User-typed <code>/name</code></td></tr><tr><td>MCP prompts</td><td>User-invoked via host UI</td></tr><tr><td>Custom GPTs / Gems</td><td>Packaged persona + instructions</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>Anthropic launched Agent Skills in October 2025 — folders of markdown, scripts, and resources with progressive disclosure as the headline design, and its own anthropic/skills repo of examples. Claude Code's slash commands had already proven the pattern: capabilities as reviewable files in your repo beat capabilities as tribal prompt lore.</p>
+<h3>Checkpoint</h3>
+<ol><li>How does progressive disclosure keep 50 installed skills affordable?</li><li>Skills vs MCP tools: which packages knowledge, which packages access?</li><li>Why does "skills in git" improve on "prompts in a wiki"?</li></ol>
+<h2 id="lesson-12"><span class="lnum">12</span> Build an MCP Server From Scratch</h2>
+<p><b>MOTTO:</b> No SDK. Just you, stdin, and the JSON-RPC spec.</p>
+<h3>The Problem</h3>
+<p>FastMCP's decorators are lovely and opaque. To <i>trust</i> the protocol — and debug it when a host misbehaves — you should speak it raw once: initialize handshake, <code>tools/list</code>, <code>tools/call</code>, over stdio, by hand.</p>
+<h3>The Concept</h3>
+<p>An MCP server is a loop: read a JSON-RPC line from stdin, dispatch on <code>method</code>, write a JSON-RPC line to stdout. That's the whole trick.</p>
+<h3>Build It</h3>
+<pre><code>#!/usr/bin/env python3
+&quot;&quot;&quot;Minimal MCP server: JSON-RPC 2.0 over stdio. No SDK.&quot;&quot;&quot;
+import json, sys
+
+TOOLS = [{
+    &quot;name&quot;: &quot;add&quot;,
+    &quot;description&quot;: &quot;Add two numbers and return the sum.&quot;,
+    &quot;inputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {&quot;a&quot;: {&quot;type&quot;: &quot;number&quot;}, &quot;b&quot;: {&quot;type&quot;: &quot;number&quot;}},
+        &quot;required&quot;: [&quot;a&quot;, &quot;b&quot;],
+    },
+}]
+
+def handle(req):
+    method, params = req.get(&quot;method&quot;), req.get(&quot;params&quot;, {})
+    if method == &quot;initialize&quot;:
+        return {&quot;protocolVersion&quot;: &quot;2025-03-26&quot;,
+                &quot;capabilities&quot;: {&quot;tools&quot;: {}},
+                &quot;serverInfo&quot;: {&quot;name&quot;: &quot;scratch-server&quot;, &quot;version&quot;: &quot;0.1.0&quot;}}
+    if method == &quot;tools/list&quot;:
+        return {&quot;tools&quot;: TOOLS}
+    if method == &quot;tools/call&quot;:
+        if params.get(&quot;name&quot;) == &quot;add&quot;:
+            args = params.get(&quot;arguments&quot;, {})
+            total = args[&quot;a&quot;] + args[&quot;b&quot;]
+            return {&quot;content&quot;: [{&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: str(total)}]}
+        raise ValueError(f&quot;unknown tool: {params.get(&#x27;name&#x27;)}&quot;)
+    raise ValueError(f&quot;unknown method: {method}&quot;)
+
+def main():
+    for line in sys.stdin:                      # newline-delimited JSON-RPC
+        if not line.strip():
+            continue
+        req = json.loads(line)
+        if &quot;id&quot; not in req:                     # notification (e.g. initialized)
+            continue                            # no response allowed
+        try:
+            resp = {&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: req[&quot;id&quot;], &quot;result&quot;: handle(req)}
+        except Exception as e:
+            resp = {&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: req[&quot;id&quot;],
+                    &quot;error&quot;: {&quot;code&quot;: -32603, &quot;message&quot;: str(e)}}
+        sys.stdout.write(json.dumps(resp) + &quot;\n&quot;)
+        sys.stdout.flush()                      # unbuffered, or the host hangs
+        print(f&quot;handled {req[&#x27;method&#x27;]}&quot;, file=sys.stderr)   # logs → stderr!
+
+if __name__ == &quot;__main__&quot;:
+    main()</code></pre>
+<p>Test it with no host at all:</p>
+<pre><code>printf &#x27;%s\n&#x27; \
+ &#x27;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;initialize&quot;,&quot;params&quot;:{}}&#x27; \
+ &#x27;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:2,&quot;method&quot;:&quot;tools/list&quot;}&#x27; \
+ &#x27;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:3,&quot;method&quot;:&quot;tools/call&quot;,&quot;params&quot;:{&quot;name&quot;:&quot;add&quot;,&quot;arguments&quot;:{&quot;a&quot;:2,&quot;b&quot;:40}}}&#x27; \
+ | python server.py</code></pre>
+<p>Then register it in a real host (<code>claude mcp add scratch -- python server.py</code>) and watch an actual model call your forty lines. Exercises: (a) add a second tool with a <code>required</code> field, send a bad call, return a proper error; (b) break it on purpose — <code>print()</code> to stdout mid-loop — and observe the host-side failure; (c) forget <code>flush()</code> and watch it hang.</p>
+<h3>Use It</h3>
+<p>Everything FastMCP generates is this file with more armor. When a server "doesn't show up" in a host, you can now bisect: handshake? capability flags? notification mishandled? stdout polluted? You've touched every failure point.</p>
+<h3>War Story</h3>
+<p>MCP's choice of JSON-RPC 2.0 over stdio wasn't novel — it's the exact architecture of the Language Server Protocol, which Microsoft released in 2016 and which killed the N×M problem for editors and languages. Anthropic has been explicit about the LSP inspiration. You just rebuilt the pattern that standardized two ecosystems a decade apart.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why must a server never respond to a request without an <code>id</code>?</li><li>Walk the full message sequence from host launch to a tool result.</li><li>What are the three ways this server can silently break a host, and the fix for each?</li></ol>
+  </article>
+  <div class="pager">
+    <a href="07-structured-control.html">← 🧩 Phase 07</a>
+    <span class="spacer"></span>
+    <a href="09-frameworks.html">Phase 09 🤖 →</a>
+  </div>
+</div>
+</body>
+</html>

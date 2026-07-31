@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Studies — Design Real Agents — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 18</div>
+  <h1><span class="pnum">18</span> 🏗️ Case Studies — Design Real Agents</h1>
+  <div class="tagline">Whiteboard the agents people actually pay for.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>Design a coding agent (Claude Code-lite)</a>
+<a href="#lesson-02"><span class="lnum">02</span>Design a deep-research agent</a>
+<a href="#lesson-03"><span class="lnum">03</span>Design a customer-support agent</a>
+<a href="#lesson-04"><span class="lnum">04</span>Design a data-analyst agent</a>
+<a href="#lesson-05"><span class="lnum">05</span>Design a browser QA agent</a>
+<a href="#lesson-06"><span class="lnum">06</span>Design a personal assistant with memory</a>
+<a href="#lesson-07"><span class="lnum">07</span>Design an email triage agent</a>
+<a href="#lesson-08"><span class="lnum">08</span>Design a document-processing pipeline agent</a>
+<a href="#lesson-09"><span class="lnum">09</span>Design a sales/CRM agent</a>
+<a href="#lesson-10"><span class="lnum">10</span>Design a multi-agent content studio</a>
+  </div>
+  <article>
+<blockquote>Whiteboard the agents people actually pay for.</blockquote>
+<p>You've built every component; now you'll design whole systems the way a staff engineer does in an interview or an architecture review: requirements first, napkin math second, boxes and arrows third, hard parts fourth, tradeoffs on the record. Each case study is a design you could defend to a hiring panel or a paying customer. Prices below are stated assumptions (typical mid-2025 list prices) — the <i>method</i> is the lesson; re-run the math with today's numbers.</p>
+<hr>
+<h2 id="lesson-01"><span class="lnum">01</span> Design a Coding Agent (Claude Code-Lite)</h2>
+<p><b>MOTTO:</b> The terminal is the best agent harness ever shipped.</p>
+<h3>Requirements</h3>
+<ul><li><b>Functional:</b> given a repo and a task ("fix this bug", "add this feature"), read code, edit files, run commands/tests, iterate until tests pass; produce a diff the human reviews.</li><li><b>Functional:</b> works on repos far larger than the context window; supports interactive steering mid-run.</li><li><b>Non-functional:</b> never executes destructive commands without approval; every file touch auditable; a typical small task completes in &lt;10 min and &lt;$2; degrades gracefully when stuck (asks, doesn't thrash).</li></ul>
+<h3>Napkin Math</h3>
+<p>Assume $3/M input, $15/M output (Sonnet-class), and prompt caching at ~10% of input price for cached tokens.</p>
+<ul><li>A mid-size task ≈ 40 model calls; average context ≈ 8k tokens/call (system + tools + compacted history + file excerpts); output ≈ 500 tokens/call.</li><li>Input: 40 × 8k = 320k tokens → naive 320,000 × $3/1M = <b>$0.96</b>. Output: 40 × 500 = 20k → 20,000 × $15/1M = <b>$0.30</b>. Naive total ≈ <b>$1.26/task</b>.</li><li>With caching (assume 75% of input tokens are cache reads): 240k × $0.30/1M = $0.072; 80k × $3/1M = $0.24 → input ≈ $0.31; <b>total ≈ $0.61/task</b>. Caching roughly halves cost — it's not optional.</li><li>Latency: 40 calls × ~3s + tool time ≈ 3–6 min. Fine for the async-with-streaming UX; hopeless as a blocking request.</li></ul>
+<h3>Architecture</h3>
+<pre><code> user ⇄ CLI (stream + approvals)
+          │
+   ┌──────▼───────┐   tools: read_file, grep, glob,
+   │  agent loop  │──▶ edit(old→new), bash(sandboxed),
+   │ (big model)  │    run_tests, git_diff
+   └──────┬───────┘
+          │ context mgr: compaction + file-excerpt window
+   [permission gate]──▶ effectful ops need approval
+          │
+   [trace log + cost meter]</code></pre>
+<p>One strong model in a plain tool loop — no planner/executor split; the model plans in-line. Tools are deliberately primitive (read, search, edit, run): capability lives in the model, reliability lives in the tools. Context manager keeps history under budget by compacting old turns and evicting stale file contents. Permission gate classifies commands (read-only auto-approved; writes/network/deletes prompt the human). Memory: a per-repo notes file the agent maintains (build commands, conventions) — cheap, transparent, effective.</p>
+<h3>Deep Dives</h3>
+<ul><li><b>Repo &gt;&gt; context.</b> Never load the repo; give the agent <i>navigation</i> tools (grep/glob/outline) and trust it to pull only what it needs. Add a repo map (file tree + symbols, ~2k tokens) to orient it. Failure mode to test: the agent edits a function without reading its callers.</li><li><b>Edit reliability.</b> Whole-file rewrites truncate; line numbers drift. Use search/replace edits (exact old text → new text) with "old text must match exactly and uniquely" validation; on mismatch, return a precise error so the model re-reads and retries. This single design choice moves edit success from ~80% to near-100%.</li><li><b>The stuck detector.</b> Track (test failures, edit targets) across iterations; if the same test fails 3× with similar edits, stop and ask the human with a summary of attempts. Thrashing is the #1 cost leak.</li></ul>
+<h3>Tradeoffs</h3>
+<table><thead><tr><th>Decision</th><th>Chose</th><th>Alternative</th><th>Why</th></tr></thead><tbody><tr><td>Control flow</td><td>Single loop</td><td>Planner + sub-agents</td><td>Coding is interleaved discovery; plans go stale in minutes</td></tr><tr><td>Edit format</td><td>Search/replace</td><td>Full-file rewrite / unified diff</td><td>Highest apply success, cheapest tokens</td></tr><tr><td>Safety</td><td>Command allowlist + approval</td><td>Full VM isolation only</td><td>UX: devs won't tolerate approving <code>ls</code>; combine both</td></tr><tr><td>Model</td><td>One big model</td><td>Cheap model for reads</td><td>Simplicity first; route later when traces justify it</td></tr></tbody></table>
+<h3>Checkpoint</h3>
+<ol><li>How would you add a "plan mode" where the agent proposes before touching files — and when is it worth the extra tokens?</li><li>Your agent's SWE-bench-style pass rate is 55%. What instrumentation finds the biggest failure class?</li><li>A customer wants this on a 2M-line monorepo. What breaks first and what do you change?</li></ol>
+<hr>
+<h2 id="lesson-02"><span class="lnum">02</span> Design a Deep-Research Agent</h2>
+<p><b>MOTTO:</b> Breadth is cheap. Verified synthesis is the product.</p>
+<h3>Requirements</h3>
+<ul><li><b>Functional:</b> given an open question, plan sub-questions, search/browse dozens of sources, and produce a structured report with inline citations that actually support their claims.</li><li><b>Functional:</b> progress visible during the run; user can scope (depth, source types, recency).</li><li><b>Non-functional:</b> 5–20 min acceptable (async job, 16-07); target &lt;$1/report at scale; zero fabricated citations tolerated; paywalled/blocked sources handled gracefully.</li></ul>
+<h3>Napkin Math</h3>
+<p>Assume lead agent on a big model ($3/M in, $15/M out); subagents on a cheap model ($0.15/M in, $0.60/M out).</p>
+<ul><li>Run shape: 1 lead + 3 parallel subagents; ~20 total searches; fetched pages are fat (3–10k tokens each).</li><li>Subagents: ~500k input → 500,000 × $0.15/1M = <b>$0.075</b>; ~30k output → 30,000 × $0.60/1M = <b>$0.018</b>.</li><li>Lead (plan + synthesis over subagent summaries): ~100k input → $0.30; ~10k output → $0.15.</li><li><b>Total ≈ $0.54/report.</b> All-big-model variant: 600k in ($1.80) + 40k out ($0.60) = <b>$2.40</b> — the two-tier design is a 4.4× saving. Latency: dominated by fetch + read; parallel subagents cut wall-clock ~3× vs. serial.</li></ul>
+<h3>Architecture</h3>
+<pre><code> user ─▶ [scoping turn] ─▶ research plan (visible, editable)
+              │
+        ┌─────▼─────┐ spawn
+        │ lead agent│──────▶ subagent A ─ search/fetch/read ─▶ findings + citations
+        │ (big)     │──────▶ subagent B      (cheap model)
+        └─────┬─────┘──────▶ subagent C
+              │ gather findings (compressed, source-linked)
+        [synthesis pass] ─▶ [citation verifier] ─▶ report.md</code></pre>
+<p>Orchestrator-workers (Anthropic's Research feature uses this shape): the lead decomposes the question, spawns subagents with <i>explicit, non-overlapping briefs</i>, then synthesizes. Subagents return compressed findings — claims each tied to a source URL + supporting quote — never raw pages, or the lead drowns. A final verifier pass checks each citation: fetch the source, confirm the quote exists and supports the claim; unverifiable claims get flagged or cut.</p>
+<h3>Deep Dives</h3>
+<ul><li><b>Decomposition quality.</b> Vague briefs make subagents duplicate work or leave gaps. The lead must emit briefs with: objective, suggested query types, output schema, and "do NOT cover" exclusions. Eval this separately — bad decomposition caps the whole system.</li><li><b>Citation integrity.</b> Models paraphrase drift into fabrication. Force subagents to record (url, exact quote) pairs at read time — not at write time from memory — and make the verifier mechanical: string/fuzzy match the quote against fetched source text. This converts "trust the model" into "check the receipt."</li><li><b>Stopping criteria.</b> Research can expand forever. Give the lead a search budget (e.g., 25 fetches) and a marginal-value rule: after each gather, ask "what material question remains?"; if none or budget hit, synthesize. Log budget-vs-quality to tune.</li></ul>
+<h3>Tradeoffs</h3>
+<table><thead><tr><th>Decision</th><th>Chose</th><th>Alternative</th><th>Why</th></tr></thead><tbody><tr><td>Topology</td><td>Lead + parallel subagents</td><td>Single agent, serial</td><td>3× wall-clock win; isolation of context per thread</td></tr><tr><td>Subagent model</td><td>Cheap</td><td>Same big model</td><td>Reading/extracting is easy; 4× cost saving</td></tr><tr><td>Citations</td><td>Quote-at-read + verifier</td><td>Trust generation</td><td>Fabricated citations are product-fatal</td></tr><tr><td>Delivery</td><td>Async job + progress</td><td>Blocking chat</td><td>10-min holds are hostile (16-07)</td></tr></tbody></table>
+<h3>Checkpoint</h3>
+<ol><li>How do you evaluate report <i>quality</i> at scale when there's no single right answer? (Hint: rubric + LLM judge + spot audits.)</li><li>Two subagents return contradictory claims from different sources. What should the synthesis pass do?</li><li>Where does this design fail on questions requiring non-public data, and what tool addition fixes it?</li></ol>
+<hr>
+<h2 id="lesson-03"><span class="lnum">03</span> Design a Customer-Support Agent</h2>
+<p><b>MOTTO:</b> Deflect the easy 60%. Escalate the rest like a professional.</p>
+<h3>Requirements</h3>
+<ul><li><b>Functional:</b> answer product questions from a knowledge base; perform account actions (order status, address change, refunds under policy) via tools; escalate to humans with full context.</li><li><b>Non-functional:</b> first token &lt;2s; grounded answers only (no invented policy — see Air Canada, 16-12); refunds capped and policy-gated; multilingual; full audit trail per conversation; measurable deflection rate.</li></ul>
+<h3>Napkin Math</h3>
+<p>Assume a cheap model at $0.15/M input, $0.60/M output.</p>
+<ul><li>Conversation ≈ 6 turns; ~3k input tokens/turn (system + policy snippets + retrieved KB + history) → 18k input → 18,000 × $0.15/1M = <b>$0.0027</b>. Output 6 × 250 = 1.5k → <b>$0.0009</b>. <b>≈ $0.004/conversation</b> — call it half a cent with retrieval overhead.</li><li>Business math: 10,000 tickets/mo, 60% deflected = 6,000 tickets. At a $5/ticket blended human cost, that's <b>$30,000/mo saved</b> against ~<b>$36/mo</b> of model spend (10,000 × $0.0036). The model cost is a rounding error; the project cost is KB quality, tool integration, and evals.</li><li>Latency: retrieval ~200ms + first token ~500ms → streams comfortably under the 2s bar.</li></ul>
+<h3>Architecture</h3>
+<pre><code> user ⇄ chat UI
+        │
+  [intent + language classifier] (tiny model)
+        │
+  ┌─────▼──────┐  tools: kb_search, get_order,
+  │ support     │─▶ update_address, issue_refund(≤cap),
+  │ agent (cheap)│  create_ticket, escalate(summary)
+  └─────┬──────┘
+        │ grounding rule: cite KB or escalate
+  [policy gate: refunds &gt; $X → human approve]
+        │
+  [trace + CSAT capture] ─▶ eval flywheel (16-11)</code></pre>
+<p>Cheap model + RAG over a curated KB. The system prompt's core rule: <i>answer only from retrieved content; if retrieval is empty or ambiguous, say so and escalate</i> — hallucinated policy is the catastrophic failure. Effectful tools are narrow and parameter-validated server-side (refund amount checked against order value and policy <i>in code</i>, not in prompt). Escalation is a first-class tool that packages: user goal, what was tried, relevant KB, and a draft reply — making the human 3× faster, which is half the ROI.</p>
+<h3>Deep Dives</h3>
+<ul><li><b>Grounding enforcement.</b> Prompt rules aren't enough. Add a post-generation check: does the draft answer's key claim appear in retrieved chunks (NLI or LLM-judge)? On fail, regenerate constrained or escalate. Track "grounded rate" as a top-line metric.</li><li><b>The refund path.</b> Layered defense: (1) tool schema caps amount; (2) server re-validates against order + policy; (3) amounts over threshold require human click; (4) idempotency key per refund (16-04); (5) daily refund budget alarm (16-02). The agent <i>proposes</i>; the system <i>disposes</i>.</li><li><b>Deflection honesty.</b> "Deflected" must mean <i>resolved</i>, not <i>user gave up</i>. Define it as: conversation ended, no reopen in 72h, no human touch, CSAT ≥ neutral. Gaming this metric is how support-bot projects die politically.</li></ul>
+<h3>Tradeoffs</h3>
+<table><thead><tr><th>Decision</th><th>Chose</th><th>Alternative</th><th>Why</th></tr></thead><tbody><tr><td>Model</td><td>Cheap + RAG</td><td>Big model</td><td>Latency + cost; task is grounding, not genius</td></tr><tr><td>Refunds</td><td>Agent proposes, code enforces</td><td>Agent decides</td><td>Blast-radius control; auditability</td></tr><tr><td>Escalation</td><td>Rich handoff package</td><td>Transfer with transcript</td><td>Human speed is half the ROI</td></tr><tr><td>KB</td><td>Curated, versioned</td><td>Crawl everything</td><td>Garbage retrieval = confident garbage answers</td></tr></tbody></table>
+<h3>Checkpoint</h3>
+<ol><li>Design the eval suite: what 5 metrics, measured how, gate a prompt change here?</li><li>A user says "your site says refunds within 90 days" and it doesn't. Walk the agent's ideal behavior.</li><li>How do you roll this out without betting the brand — what's the graduated exposure plan?</li></ol>
+<hr>
+<h2 id="lesson-04"><span class="lnum">04</span> Design a Data-Analyst Agent</h2>
+<p><b>MOTTO:</b> The hard part isn't writing SQL. It's knowing which SQL is wrong.</p>
+<h3>Requirements</h3>
+<ul><li><b>Functional:</b> natural-language questions over a warehouse (Snowflake/BigQuery/Postgres); generates SQL, executes read-only, iterates on errors, returns tables/charts with a plain-English summary and the SQL shown.</li><li><b>Non-functional:</b> read-only enforced at the database role level; per-query cost/row limits; answers reproducible (SQL is the artifact); handles schema drift; p50 answer &lt;30s.</li></ul>
+<h3>Napkin Math</h3>
+<p>Assume $3/M input, $15/M output.</p>
+<ul><li>A question ≈ 10 model calls (clarify → draft SQL → fix errors ×2–3 → interpret results ×2) with ~6k input tokens/call (schema slice + exemplars + history) → 60k input → <b>$0.18</b>. Output 10 × 400 = 4k → <b>$0.06</b>. <b>≈ $0.24/question.</b></li><li>An analyst asking 20 questions/day costs <b>$4.80/day</b> ≈ $105/mo — versus hours of their time. Warehouse compute often exceeds LLM cost: one careless full-table scan on a big warehouse can cost more than a month of tokens, so query guards are cost controls too.</li><li>Schema context is the token hog: a 400-table warehouse's full DDL ≈ 200k tokens. Retrieval over schema (below) keeps it to ~4k.</li></ul>
+<h3>Architecture</h3>
+<pre><code> user ─▶ [clarifier: ambiguous? ask once]
+            │
+      ┌─────▼──────┐  schema RAG: tables/columns/joins
+      │ analyst    │◀─ + semantic layer (metric definitions)
+      │ agent      │  tools: run_sql(read-only, LIMIT+timeout),
+      └─────┬──────┘         sample_table, chart(spec)
+            │ error? → self-repair loop (max 3)
+      [result critic: sanity checks]
+            │
+      answer = summary + table/chart + the SQL</code></pre>
+<p>The two context pillars: <b>schema retrieval</b> (embed table/column descriptions; retrieve the relevant slice per question) and a <b>semantic layer</b> — curated definitions of business metrics ("active user = …", "revenue = … excluding refunds") — because the model can't guess your company's definition of churn, and wrong-metric answers look exactly like right ones. Execution sandbox: a read-only DB role, statement timeout, auto-appended LIMIT, and a dry-run cost estimate on big warehouses. The critic pass checks results for smell: empty result, suspicious 0s/NULLs, count(*) mismatch with expectations — triggering a re-examination before the user sees it.</p>
+<h3>Deep Dives</h3>
+<ul><li><b>Silent wrongness.</b> SQL that runs but answers a different question is the core risk. Mitigations: show the SQL and the interpreted question ("I computed X as…"), run assertion queries (row counts vs. a known total), and keep a golden set of (question, verified SQL, answer) pairs as your regression gate (16-06).</li><li><b>Ambiguity discipline.</b> "How are sales doing?" has no SQL. The clarifier asks <i>one</i> consolidated question (time range? region? metric?) — repeated clarifying rounds kill the UX; guessing kills trust. Default-with-disclosure for minor gaps ("assumed calendar-month; say otherwise").</li><li><b>Schema drift.</b> Nightly job re-indexes the schema RAG and diffs: renamed/dropped columns invalidate cached exemplars and flag affected golden-set queries. Otherwise accuracy decays invisibly as the warehouse evolves.</li></ul>
+<h3>Tradeoffs</h3>
+<table><thead><tr><th>Decision</th><th>Chose</th><th>Alternative</th><th>Why</th></tr></thead><tbody><tr><td>Grounding</td><td>Schema RAG + semantic layer</td><td>Full DDL in prompt</td><td>50× token saving; and definitions beat guessing</td></tr><tr><td>Safety</td><td>Read-only role + limits</td><td>Prompt "don't write"</td><td>DB-level enforcement is not optional</td></tr><tr><td>Wrongness</td><td>Critic + golden set + shown SQL</td><td>Trust the model</td><td>Silent wrong answers destroy the product</td></tr><tr><td>Charting</td><td>Declarative spec (Vega-lite)</td><td>Agent-written plot code</td><td>Sandboxing simplicity, consistent output</td></tr></tbody></table>
+<h3>Checkpoint</h3>
+<ol><li>Why is a semantic layer more valuable than a bigger model here?</li><li>Design the "result smells wrong" critic: what five checks catch the most silent errors?</li><li>A PM asks for write access — "let the agent fix the data." Argue the design response.</li></ol>
+<hr>
+<h2 id="lesson-05"><span class="lnum">05</span> Design a Browser QA Agent</h2>
+<p><b>MOTTO:</b> Cheaper than a QA team, tireless as a robot, blind as one too.</p>
+<h3>Requirements</h3>
+<ul><li><b>Functional:</b> execute test cases written in plain English ("sign up, add item to cart, check out with test card, verify confirmation email") against a staging web app; report pass/fail with screenshots and a step log; flag visual regressions.</li><li><b>Non-functional:</b> a 30-step test in &lt;5 min; deterministic-enough for CI (flake rate &lt;5%); runs against staging with test accounts only; nightly full-suite budget known and capped.</li></ul>
+<h3>Napkin Math</h3>
+<p>Assume $3/M input, $15/M output; a screenshot ≈ 1.2k tokens.</p>
+<ul><li>A test ≈ 30 steps; per step: ~4k text (instructions + accessibility-tree slice + history) + 1.2k screenshot ≈ 5.2k input → 30 × 5.2k = 156k → 156,000 × $3/1M = <b>$0.47</b>. Output 30 × 300 = 9k → <b>$0.14</b>. <b>≈ $0.60/test.</b></li><li>Suite of 200 tests: <b>$120/run</b>; nightly for a month ≈ <b>$3,600/mo</b>. That's real money — hence the hybrid below: cached selectors handle repeat runs, dropping steady-state cost ~10× (model only invoked when cached selectors break, ~10–20% of runs).</li><li>Latency: 30 steps × (2s model + 1–3s page) ≈ 2–2.5 min/test; 200 tests at 20 parallel browsers ≈ 25 min/suite.</li></ul>
+<h3>Architecture</h3>
+<pre><code> test spec (English) ─▶ ┌────────────┐   browser tools: goto, click(el),
+                        │  QA agent   │─▶ type, select, wait_for, screenshot,
+                        │             │   read_axtree, check(assertion)
+                        └─────┬──────┘        │
+        [selector cache: step→locator]   [Playwright, headless pool]
+                        │
+        pass/fail + screenshots + step trace ─▶ CI report / visual diff</code></pre>
+<p>Perception: prefer the <b>accessibility tree</b> (cheap, semantic, stable) over screenshots; screenshot only when the ax-tree is ambiguous (canvas apps, visual assertions). Action: the agent picks elements by role/name ("button 'Checkout'"), which Playwright resolves — more robust than pixel coordinates. The <b>selector cache</b> is the economic core: first run, the agent explores and records the resolved locator per step; later runs replay locators directly (no model), invoking the agent only on failure ("self-healing tests"). Assertions are explicit <code>check()</code> tool calls, so pass/fail is programmatic, never vibes.</p>
+<h3>Deep Dives</h3>
+<ul><li><b>Flake vs. bug.</b> Web apps are nondeterministically slow. Discipline: every action auto-waits for element stability; on failure, retry the <i>step</i> once with fresh observation; only then fail the test — and classify (element missing = likely bug; timeout = likely flake) so CI can quarantine flakes instead of crying wolf.</li><li><b>Self-healing without self-deception.</b> When a cached locator breaks and the agent finds the button moved, that's healing; when it "finds" a different button that kinda matches, that's a masked regression. Rule: healed steps are marked, diffed (old vs. new locator + screenshots), and require human ack in the report. Healing is a PR, not a silent commit.</li><li><b>Visual regression.</b> Pixel-diff is noisy (fonts, anti-aliasing). Use layout-aware diffing on key screens plus an LLM-judge pass ("do these differ in a way a user would notice?") only on candidates the cheap diff flags — keeps vision-token spend on the interesting 2%.</li></ul>
+<h3>Tradeoffs</h3>
+<table><thead><tr><th>Decision</th><th>Chose</th><th>Alternative</th><th>Why</th></tr></thead><tbody><tr><td>Perception</td><td>Ax-tree first, pixels second</td><td>Screenshots every step</td><td>4× cheaper, more stable targeting</td></tr><tr><td>Repeat runs</td><td>Selector cache + heal</td><td>Full agent every run</td><td>10× cost cut; determinism for CI</td></tr><tr><td>Assertions</td><td>Explicit check() tool</td><td>Judge the final screenshot</td><td>Programmatic truth; debuggable failures</td></tr><tr><td>Scope</td><td>Staging + test data</td><td>Production canary</td><td>Effectful flows (checkout!) need a sandbox</td></tr></tbody></table>
+<h3>Checkpoint</h3>
+<ol><li>Why does the selector cache change both the economics <i>and</i> the reliability story?</li><li>A test fails only in CI, never locally. Walk your debugging path using the step trace.</li><li>How would you extend this to exploratory testing ("find bugs I didn't write tests for") — and how do you budget it?</li></ol>
+<hr>
+<h2 id="lesson-06"><span class="lnum">06</span> Design a Personal Assistant with Memory</h2>
+<p><b>MOTTO:</b> Useful on day 1. Irreplaceable by day 90 — that's the memory talking.</p>
+<h3>Requirements</h3>
+<ul><li><b>Functional:</b> conversational assistant across sessions and devices; remembers preferences, people, projects, and commitments; proactive recall ("you said to remind you when…"); user can view, edit, and delete everything it knows.</li><li><b>Non-functional:</b> first token &lt;1.5s; memory writes never block replies; strict per-user isolation (16-10); privacy: memory is user-visible and erasable by design; runs sustainably under a ~$20/mo subscription.</li></ul>
+<h3>Napkin Math</h3>
+<p>Assume $3/M input, $15/M output.</p>
+<ul><li>Active user ≈ 20 interactions/day; ~4k input tokens each (system + memory brief + retrieved memories + recent turns) → 80k/day → <b>$0.24</b>. Output 20 × 300 = 6k → <b>$0.09</b>. <b>≈ $0.33/day → ~$9.90/mo</b> per active user.</li><li>Against a $20/mo price: ~50% gross margin before infra — workable but tight; the levers are caching the static prefix (system + memory brief ≈ 2k of the 4k → caching cuts input cost roughly by a third) and routing chit-chat to a cheap model.</li><li>Nightly consolidation (17-04): ~50k tokens/user on a cheap model ($0.15/M) ≈ <b>$0.0075/night</b> — effectively free, and it <i>reduces</i> daytime tokens by shrinking retrieved context.</li></ul>
+<h3>Architecture</h3>
+<pre><code> user ⇄ assistant (fast model, streaming)
+           │                       │async
+    [memory retrieval]      [memory writer]
+           │                       │
+   ┌───────▼───────────────────────▼──────┐
+   │ memory store (per-user, encrypted)   │
+   │  • profile (structured facts/prefs)  │
+   │  • episodic (dated event summaries)  │
+   │  • commitments (structured, queryable)│
+   └───────────────▲──────────────────────┘
+        nightly consolidator (17-04): dedupe,
+        resolve contradictions, refresh brief</code></pre>
+<p>Three memory types with different mechanics. <b>Profile</b>: small structured store (name, preferences, relationships) injected wholesale as a ~1k-token brief every turn. <b>Episodic</b>: summarized past sessions, embedding-retrieved on demand. <b>Commitments</b>: structured rows (what, when, trigger) checked by a scheduler — reminders must fire from <i>code</i>, because retrieval-based "remembering to remind" is a coin flip. Writes happen post-response, async: an extractor scans the turn for memorable facts and proposes writes; consolidation cleans up nightly. Every fact carries provenance (which conversation, when) — powering both the user-facing "why do you think that?" and safe deletion.</p>
+<h3>Deep Dives</h3>
+<ul><li><b>What to remember.</b> Extract too eagerly and the store fills with trivia that poisons retrieval; too lazily and the product forgets the thing that mattered. Use an importance-scored extractor (à la Generative Agents) with category allowlists (preferences, people, projects, commitments — not opinions about third parties, not sensitive categories unless explicitly asked to remember), and let contradiction resolution favor recency.</li><li><b>Forgetting as a feature.</b> GDPR-style deletion must actually work: provenance links mean deleting a conversation cascades to facts derived solely from it; the memory UI shows facts with sources and one-tap delete. Design this first — retrofitting deletion onto an entangled memory graph is misery.</li><li><b>Proactivity without creepiness.</b> Proactive recall ("didn't you meet Sam today?") is the wow moment and the ick moment. Gate proactive messages on: explicit commitments, high-confidence relevance, and rate limits (≤N/day). Log user reactions as feedback (16-11) to tune the threshold.</li></ul>
+<h3>Tradeoffs</h3>
+<table><thead><tr><th>Decision</th><th>Chose</th><th>Alternative</th><th>Why</th></tr></thead><tbody><tr><td>Memory arch</td><td>3 typed stores</td><td>One vector store for all</td><td>Reminders need code triggers; profiles need full injection</td></tr><tr><td>Writes</td><td>Async post-response</td><td>Inline during reply</td><td>Latency; a slow write shouldn't slow speech</td></tr><tr><td>Consolidation</td><td>Nightly batch (17-04)</td><td>On every write</td><td>Cost + global view of contradictions</td></tr><tr><td>Transparency</td><td>Full memory UI + provenance</td><td>Opaque memory</td><td>Trust is the product; also, regulators</td></tr></tbody></table>
+<h3>Checkpoint</h3>
+<ol><li>Why must reminders be scheduler-driven rather than retrieval-driven? What's the failure math?</li><li>A user asks "what do you know about me and why?" Trace how the design answers it.</li><li>Where does per-user memory create the worst privacy blast radius, and which two mitigations matter most?</li></ol>
+<hr>
+<h2 id="lesson-07"><span class="lnum">07</span> Design an Email Triage Agent</h2>
+<p><b>MOTTO:</b> Read everything. Touch almost nothing. Never send alone.</p>
+<h3>Requirements</h3>
+<ul><li><b>Functional:</b> classify inbound email (urgent / needs-reply / FYI / newsletter / spam-ish), draft replies for needs-reply in the user's voice, extract commitments and deadlines, produce a daily brief; one-click accept/edit/reject on drafts.</li><li><b>Non-functional:</b> no email is auto-sent without explicit approval (v1 hard rule); processing &lt;60s from arrival; works over Gmail/IMAP APIs with least-privilege scopes; prompt-injection-resistant (emails are hostile input); &lt;$10/mo/user all-in.</li></ul>
+<h3>Napkin Math</h3>
+<p>Two-tier routing. Assume cheap model $0.15/M in, $0.60/M out; big model $3/M in, $15/M out.</p>
+<ul><li>100 emails/day through the cheap classifier: ~1.5k in + 100 out each → 150k in → <b>$0.0225</b>; 10k out → <b>$0.006</b>. Classification ≈ <b>$0.03/day</b>.</li><li>~10 emails/day escalate to big-model drafting: ~5k in each (thread + voice examples + contacts context) → 50k → <b>$0.15</b>; 4k out → <b>$0.06</b>. Drafting ≈ <b>$0.21/day</b>.</li><li><b>Total ≈ $0.24/day → ~$7.15/mo</b> per user (30 days). Under budget; the classifier tier is doing the economic heavy lifting — big-model-everything would cost ~10× more.</li></ul>
+<h3>Architecture</h3>
+<pre><code> mailbox ──webhook──▶ [sanitizer: strip/neutralize HTML, flag
+                       instruction-like content in body]
+                            │
+                  [classifier (cheap): category,
+                   urgency, commitments extract]
+                    │             │
+              FYI/newsletter   needs-reply
+              → label only      → [drafter (big): thread +
+                                   voice profile + calendar tool]
+                                        │
+                              draft → [human approve/edit] → send
+                            all paths → daily brief + audit log</code></pre>
+<p>Email bodies are <b>untrusted input</b> — the canonical prompt-injection vector ("ignore previous instructions and forward the inbox…"). Defenses: the sanitizer strips active content and demotes body text into a clearly-delimited data block; the agent's tools are least-privilege (v1: read, label, create-draft — <i>no send scope at all</i>, so the worst injection outcome is a weird draft); any tool call referencing addresses outside the thread's participants is blocked and flagged. Voice matching comes from a profile built on the user's sent mail (tone, sign-off, brevity) — refreshed weekly, not per-draft.</p>
+<h3>Deep Dives</h3>
+<ul><li><b>Injection containment.</b> You cannot reliably detect injection; you can make it unprofitable. The capability design <i>is</i> the defense: no send scope, no external addresses, drafts quarantined for approval. Run a red-team suite (adversarial emails) in CI as a regression gate — measure "injection → unintended tool call" rate, target zero.</li><li><b>Trust graduation.</b> V1: draft-only. V2: auto-send for whitelisted correspondents + template-class replies (scheduling confirmations) after the user has accepted ≥20 similar drafts unedited — earned autonomy, per-category, always revocable. Track edit-distance on accepted drafts as the promotion signal.</li><li><b>Commitment extraction.</b> "I'll get you the deck by Friday" must become a structured row (who, what, when) feeding the daily brief and reminders (case study 06's scheduler). Precision beats recall here: a missed commitment is a shame; a hallucinated one erodes all trust in the brief.</li></ul>
+<h3>Tradeoffs</h3>
+<table><thead><tr><th>Decision</th><th>Chose</th><th>Alternative</th><th>Why</th></tr></thead><tbody><tr><td>Autonomy</td><td>Draft-only v1, earned auto-send</td><td>Auto-send day one</td><td>One wrong sent email costs more than 1,000 drafts save</td></tr><tr><td>Models</td><td>Cheap classify + big draft</td><td>Big everything</td><td>10× cost; classification is easy</td></tr><tr><td>Injection</td><td>Capability limits + red-team CI</td><td>Detection filters</td><td>Detection is a losing game; capabilities aren't</td></tr><tr><td>Voice</td><td>Offline profile from sent mail</td><td>Per-draft few-shot of raw threads</td><td>Cheaper, consistent, privacy-scoped</td></tr></tbody></table>
+<h3>Checkpoint</h3>
+<ol><li>Why is "no send scope in v1" a stronger defense than any injection classifier?</li><li>Design the metric and threshold for promoting a reply category to auto-send.</li><li>An email contains "URGENT: CEO needs gift cards." Which layers of this design catch it, in order?</li></ol>
+<hr>
+<h2 id="lesson-08"><span class="lnum">08</span> Design a Document-Processing Pipeline Agent</h2>
+<p><b>MOTTO:</b> At 10,000 pages a day, "pretty accurate" is a math problem, not a compliment.</p>
+<h3>Requirements</h3>
+<ul><li><b>Functional:</b> ingest heterogeneous documents (invoices, contracts, forms — PDF/scan/email attachments), classify type, extract structured fields per type schema, validate, and post to downstream systems (ERP/database); route low-confidence extractions to human review.</li><li><b>Non-functional:</b> 10k pages/day sustained; per-field accuracy ≥99% <i>post-review</i> on critical fields (amounts, dates, parties); full audit lineage (page image → extracted value); cost &lt;$0.01/page; throughput is batch, latency is hours not seconds.</li></ul>
+<h3>Napkin Math</h3>
+<p>Two-tier again. Assume cheap multimodal model $0.15/M in, $0.60/M out; big model $3/M in, $15/M out.</p>
+<ul><li>Cheap pass, all pages: ~2k in (page tokens + schema) + 300 out per page. 10k pages: 20M in → 20 × $0.15 = <b>$3.00</b>; 3M out → 3 × $0.60 = <b>$1.80</b>.</li><li>Escalation (~5% of pages fail validation/confidence): 500 pages × (3k in, 500 out) on the big model → 1.5M in = <b>$4.50</b>; 250k out = <b>$3.75</b>.</li><li><b>Total ≈ $13.05/day for 10k pages ≈ $0.0013/page</b> — 7× under the $0.01 budget, leaving headroom for retries and vision-heavy scans. Human review at 2% of pages (200/day, ~1 min each) ≈ 3.3 review-hours/day — the real operating cost; every point of validation-pass-rate improvement is worth more than any model discount.</li></ul>
+<h3>Architecture</h3>
+<pre><code> intake (email/SFTP/API) ─▶ [normalize: split, deskew, OCR-if-scan]
+        │
+ [classifier: doc type + routing]   (cheap)
+        │
+ [extractor: type schema → JSON]    (cheap; structured output mode)
+        │
+ [validators: deterministic rules]  sums add up? dates parse? vendor
+        │ pass       │ fail/low-conf  in master list? totals = Σ lines?
+     [post to ERP]  [escalate: big model re-extract]
+        │                 │ still failing
+ [audit store: page image ⇄ field ⇄ value ⇄ confidence]
+                          ▼
+                 [human review queue] ─corrections─▶ eval set + few-shots</code></pre>
+<p>This is a <i>pipeline with agentic stages</i>, not a free-roaming agent — determinism where possible, models only where needed. Extraction uses schema-constrained structured output (JSON mode against a per-type schema) so downstream code never parses prose. Validators are boring code and do the heavy lifting: arithmetic checks (line items sum to total), format checks, referential checks (PO number exists). Confidence routing: model logprob/self-reported confidence + validator results decide pass / re-extract / human. Corrections from review flow back as regression evals and few-shot exemplars (16-11) — the pipeline literally learns from its reviewers.</p>
+<h3>Deep Dives</h3>
+<ul><li><b>The accuracy budget.</b> 99% per-field on 20 fields/doc ≈ 0.99²⁰ ≈ 82% of documents fully correct — so <i>document-level</i> automation rates disappoint unless you reason per-field. Route per-field, not per-doc: post the 19 confident fields, review the 1 shaky one. This doubles effective automation at the same model quality.</li><li><b>Weird documents.</b> The tail is brutal: handwritten notes, 200-page contracts, rotated scans, mixed-language invoices. Detect out-of-distribution inputs early (page count, OCR confidence, classifier entropy) and route them straight to humans — a wrong-but-confident extraction of a weird doc is far worse than a fast escalation.</li><li><b>Idempotent posting.</b> Docs arrive twice (email re-sends, retry storms). Content-hash dedupe at intake + idempotency keys on ERP posting (16-04), or you'll pay one invoice twice and the CFO will learn your name.</li></ul>
+<h3>Tradeoffs</h3>
+<table><thead><tr><th>Decision</th><th>Chose</th><th>Alternative</th><th>Why</th></tr></thead><tbody><tr><td>Shape</td><td>Pipeline w/ model stages</td><td>End-to-end agent per doc</td><td>Determinism, throughput, auditability</td></tr><tr><td>Extraction</td><td>Schema-constrained JSON</td><td>Freeform + parse</td><td>Parsing prose at 10k/day is self-harm</td></tr><tr><td>Routing</td><td>Per-field confidence</td><td>Per-document</td><td>~2× automation at same accuracy</td></tr><tr><td>Learning</td><td>Review corrections → evals</td><td>Static prompts</td><td>The tail is where accuracy lives</td></tr></tbody></table>
+<h3>Checkpoint</h3>
+<ol><li>Redo the accuracy-budget math for 40 fields at 99.5%: what document-level rate, and what does that imply for routing?</li><li>Where exactly does a vision model beat OCR+text, and how would you prove it's worth the token cost?</li><li>The ERP was down for 6 hours. What properties of the pipeline make this a non-event?</li></ol>
+<hr>
+<h2 id="lesson-09"><span class="lnum">09</span> Design a Sales/CRM Agent</h2>
+<p><b>MOTTO:</b> Automate the research and the drudgery. Never automate the relationship.</p>
+<h3>Requirements</h3>
+<ul><li><b>Functional:</b> research inbound leads (company, role, news, tech stack) into a brief; score against the ICP; draft personalized outreach; keep CRM hygiene (log calls from transcripts, update fields, flag stale deals); prep meeting briefs from CRM + email + calendar.</li><li><b>Non-functional:</b> all outbound is human-approved (draft-first, like case 07); CRM writes are attributed to the agent and reversible; complies with email regulations (unsubscribe, sending limits); lead research &lt;5 min from form-fill to brief-in-CRM.</li></ul>
+<h3>Napkin Math</h3>
+<p>Assume $3/M input, $15/M output for research + drafting quality.</p>
+<ul><li>Per lead: research agent does ~8 searches/fetches, ~30k input tokens total → 30,000 × $3/1M = <b>$0.09</b>; ~2k output (brief + score + draft) → <b>$0.03</b>. <b>≈ $0.12/lead.</b></li><li>50 leads/day → <b>$6/day</b>, ≈ <b>$132/mo</b> (22 workdays). Compare: an SDR spending 10 min/lead on manual research spends 50 × 10 = 500 min ≈ <b>8.3 hours/day</b> — the agent gives that time back for actual conversations.</li><li>CRM hygiene (call-transcript summarization, ~20 calls/day × 8k tokens in, 500 out on a cheap model at $0.15/$0.60): 160k in ($0.024) + 10k out ($0.006) ≈ <b>$0.03/day</b> — negligible.</li></ul>
+<h3>Architecture</h3>
+<pre><code> lead form / list ─▶ [research agent] ─ tools: web_search, fetch,
+        │                │              enrichment APIs, news
+        │           [ICP scorer: rubric → score + reasons]
+        │                │
+        ▼                ▼
+   ┌────────────── CRM (source of truth) ──────────────┐
+   │  brief attached • score field • activity log      │
+   └───▲───────────────▲───────────────────▲───────────┘
+       │               │                   │
+ [outreach drafter] [hygiene agent:     [meeting-prep agent:
+  → human approves   transcripts→notes,  CRM+email+calendar
+  → sequenced send]  stale-deal flags]   → pre-call brief]</code></pre>
+<p>Four narrow agents around the CRM as the spine — not one grand "AI SDR." The research agent is a scoped version of case study 02 (fixed brief schema, budgeted at 8 fetches). The ICP scorer is rubric-driven with <i>reasons logged</i> — an unexplained score is a score reps will ignore. Drafting uses the brief + the rep's voice profile + past won-deal messaging; every draft lands in the rep's queue, and the send path enforces sequence rules, unsubscribe handling, and per-domain rate limits in code. The hygiene agent is the sleeper hit: reps hate data entry, and clean CRM data compounds into better briefs, scores, and forecasts.</p>
+<h3>Deep Dives</h3>
+<ul><li><b>Personalization vs. cringe.</b> LLM outreach fails by being generically "personalized" ("I saw your company does software!"). Constrain drafts to <i>evidence-linked</i> personalization: every personalized claim in the draft must cite a line in the research brief, enforced like case 02's citation verifier. No evidence, no claim — shorter honest emails outperform confabulated warmth.</li><li><b>Score trust.</b> Reps ignore black-box scores. Ship score + top-3 reasons + counter-signal ("strong fit except: 40-person company, ICP floor is 100"). Back-test the rubric quarterly against closed-won/lost — the scorer needs a regression gate like any prompt (16-06).</li><li><b>Compliance as code.</b> CAN-SPAM/CASL/GDPR aren't prompt guidelines: unsubscribe suppression lists, sending-domain warm-up limits, and regional consent rules live in the send service, hard-blocking whatever any agent drafts.</li></ul>
+<h3>Tradeoffs</h3>
+<table><thead><tr><th>Decision</th><th>Chose</th><th>Alternative</th><th>Why</th></tr></thead><tbody><tr><td>Shape</td><td>4 narrow agents around CRM</td><td>One autonomous "AI SDR"</td><td>Blast radius, debuggability, rep trust</td></tr><tr><td>Outreach</td><td>Draft-first, human sends</td><td>Auto-send sequences</td><td>Brand + deliverability risk exceeds savings</td></tr><tr><td>Scoring</td><td>Rubric + reasons + backtests</td><td>Learned opaque score</td><td>Adoption depends on explainability</td></tr><tr><td>Research</td><td>Budgeted (8 fetches)</td><td>Unbounded deep-research</td><td>$0.12/lead is the business case</td></tr></tbody></table>
+<h3>Checkpoint</h3>
+<ol><li>Why does the citation-verifier pattern from deep research reappear in outreach drafting?</li><li>Design the backtest for the ICP scorer: data, metric, and what triggers a rubric change.</li><li>Marketing wants the agent to auto-send at 10× volume. Walk the argument, including deliverability math.</li></ol>
+<hr>
+<h2 id="lesson-10"><span class="lnum">10</span> Design a Multi-Agent Content Studio</h2>
+<p><b>MOTTO:</b> A newsroom in a box — but somebody still has to be the editor-in-chief.</p>
+<h3>Requirements</h3>
+<ul><li><b>Functional:</b> turn a content brief ("comparison post: X vs Y for audience Z, 1,500 words, our style") into a published-ready draft: research with sources, outline, draft, style-edit, fact-check, SEO pass, plus images briefs; support revision rounds against human feedback.</li><li><b>Non-functional:</b> brief → reviewable draft in &lt;30 min; every factual claim traceable to a source; consistent brand voice across all output; cost &lt;$1/article; humans hold publish authority — the pipeline produces <i>candidates</i>.</li></ul>
+<h3>Napkin Math</h3>
+<p>Assume $3/M input, $15/M output.</p>
+<ul><li>Pipeline: researcher (case-02-lite, 40k in / 3k out) → outliner (5k/1k) → drafter (8k in incl. outline+research / 3k out) → style editor (5k/2k) → fact-checker (re-reads draft vs sources: 8k/1k) → SEO pass (4k/1k). Totals ≈ 70k in, 11k out — round to 60–70k in, ~12k out with revision overhead.</li><li>Cost: 60,000 × $3/1M = <b>$0.18</b> input + 12,000 × $15/1M = <b>$0.18</b> output → <b>≈ $0.36/article</b> (at 70k in: $0.21 + $0.18 = $0.39 — either way, well under $1).</li><li>100 articles/mo ≈ <b>$36–39</b> of tokens. The dominant real cost is the human editor's 20 min/article review: 100 × 20 min ≈ 33 hours/mo. Every improvement that cuts review time (better fact-check flags, tracked changes) is worth ~50× any token optimization.</li></ul>
+<h3>Architecture</h3>
+<pre><code> brief ─▶ [producer/orchestrator: owns state, budget, sequencing]
+             │
+   ┌─────────┼─────────────────────────────────┐
+   ▼         ▼            ▼          ▼         ▼
+[researcher][outliner]→[drafter]→[style edit][fact-check]
+ (sources)   (approved   (writes   (voice      (claims vs
+    │         by human    from      guide as    sources; flags,
+    │         optionally) research   rubric)    not edits)
+    └───source pack──────────┘          │         │
+                              [SEO pass][revision loop ≤2]
+                                        │
+                          artifact bundle ─▶ human editor ─▶ publish</code></pre>
+<p>A <b>pipeline of specialists with an orchestrator</b>, not a free-form agent swarm: content production is genuinely sequential (research before outline before draft), so the coordination is a state machine, with the orchestrator enforcing budgets, passing <i>artifacts</i> (source pack, outline, draft with tracked changes) rather than chat history between stages. Voice consistency comes from a maintained style guide + exemplar snippets injected into drafter and editor — the editor scores against the rubric and rewrites violations. The fact-checker is adversarial by design: a separate context that re-derives each claim from the source pack (quote-matching, case-02 style) and <i>flags</i> — it never silently edits, because a checker that rewrites is just a second drafter.</p>
+<h3>Deep Dives</h3>
+<ul><li><b>Error cascade.</b> A thin research pack poisons every downstream stage — by the draft, the model confabulates to fill gaps. Put a quality gate after research (coverage rubric: ≥N independent sources per major claim area; else loop research) — gating early is 10× cheaper than catching at fact-check.</li><li><b>Voice at scale.</b> Style drifts across articles and model versions. Maintain the voice as a <i>versioned artifact</i> (rules + 5 exemplar passages + anti-examples), regression-test it (16-06) with an LLM-judge scoring sample outputs against the rubric, and re-tune when the brand team updates it.</li><li><b>Revision routing.</b> Human feedback ("make section 2 punchier, and the pricing claim looks wrong") must route to the right stage — style note to the editor, factual challenge to researcher+fact-checker — not trigger a full re-run. The orchestrator parses feedback into stage-addressed tickets; naive full-pipeline re-runs triple cost and shuffle text the editor already approved.</li></ul>
+<h3>Tradeoffs</h3>
+<table><thead><tr><th>Decision</th><th>Chose</th><th>Alternative</th><th>Why</th></tr></thead><tbody><tr><td>Coordination</td><td>Orchestrated pipeline</td><td>Open agent swarm / debate</td><td>Sequential domain; determinism, cost control</td></tr><tr><td>Handoffs</td><td>Typed artifacts</td><td>Shared chat transcript</td><td>Context stays clean; stages testable in isolation</td></tr><tr><td>Fact-check</td><td>Flags for humans</td><td>Auto-correct</td><td>Checker-rewrites hide errors; humans hold truth</td></tr><tr><td>Human role</td><td>Editor-in-chief gate</td><td>Full autopublish</td><td>Brand risk; also review feedback powers the flywheel</td></tr></tbody></table>
+<h3>Checkpoint</h3>
+<ol><li>Why do typed artifacts beat a shared transcript for inter-agent handoff — name three concrete failure modes avoided.</li><li>Where would you add a second model <i>vendor</i> in this pipeline for quality, and how would you evaluate whether it helps?</li><li>The business wants video scripts and social posts from the same briefs. What generalizes, what doesn't, and what's the incremental cost per format?</li></ol>
+  </article>
+  <div class="pager">
+    <a href="17-advanced-topics.html">← 🧪 Phase 17</a>
+    <span class="spacer"></span>
+    <a href="19-capstones.html">Phase 19 🏆 →</a>
+  </div>
+</div>
+</body>
+</html>

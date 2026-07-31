@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Structured Outputs & Control — AI Agents From Scratch</title>
+<style>
+  :root {
+    --bg: #0d0b14; --bg-alt: #14111f; --card: #191526; --border: #2b243b;
+    --text: #d8dee9; --muted: #9089a6; --accent: #c792ea; --accent2: #82aaff;
+    --warn: #ffc777;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.8rem 2rem; background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.85rem;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); margin-right: auto; white-space: nowrap; }
+  nav .logo span { color: var(--text); }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .crumb { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin-bottom: 0.4rem; }
+  h1 .pnum { color: var(--accent); font-family: var(--mono); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 2.5rem; }
+  .toc .toc-title { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .toc a { display: block; padding: 0.15rem 0; font-size: 0.92rem; }
+  .toc a .lnum { font-family: var(--mono); color: var(--muted); margin-right: 0.5rem; font-size: 0.8rem; }
+  article h2 { font-size: 1.5rem; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); scroll-margin-top: 70px; }
+  article h2 .lnum { font-family: var(--mono); color: var(--accent); font-size: 1.1rem; }
+  article h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; color: var(--warn); font-family: var(--mono); }
+  article p { margin: 0.8rem 0; }
+  article blockquote { border-left: 3px solid var(--accent); padding: 0.4rem 1rem; margin: 1rem 0; color: var(--muted); background: var(--bg-alt); border-radius: 0 8px 8px 0; }
+  article ul, article ol { margin: 0.8rem 0 0.8rem 1.5rem; }
+  article li { margin: 0.3rem 0; }
+  article code { font-family: var(--mono); font-size: 0.85em; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--warn); }
+  article pre { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1rem 0; }
+  article pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.82rem; line-height: 1.5; }
+  article table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  article th, article td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  article th { background: var(--card); font-family: var(--mono); font-size: 0.8rem; }
+  article tr:nth-child(even) td { background: var(--bg-alt); }
+  article hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.88rem; }
+  .pager a { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1.2rem; }
+  .pager a:hover { border-color: var(--accent); text-decoration: none; }
+  .pager .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">aafs<span>://</span>ai-agents-from-scratch</a>
+  <a href="../index.html#curriculum">Curriculum</a>
+  <a href="../index.html#glossary">Glossary</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html#curriculum">curriculum</a> / phase 07</div>
+  <h1><span class="pnum">07</span> 🧩 Structured Outputs &amp; Control</h1>
+  <div class="tagline">Free text is for poems. Systems need schemas.</div>
+  <div class="toc">
+    <div class="toc-title">Lessons in this phase</div>
+    <a href="#lesson-01"><span class="lnum">01</span>JSON Schema enforcement and constrained decoding</a>
+<a href="#lesson-02"><span class="lnum">02</span>Validation and repair loops</a>
+<a href="#lesson-03"><span class="lnum">03</span>State machines for agent control flow</a>
+<a href="#lesson-04"><span class="lnum">04</span>Grammars and regex-constrained generation</a>
+<a href="#lesson-05"><span class="lnum">05</span>LLM-as-judge: grading with models</a>
+<a href="#lesson-06"><span class="lnum">06</span>Guardrail layers: pre, mid, and post</a>
+<a href="#lesson-07"><span class="lnum">07</span>Routing: classify then dispatch</a>
+<a href="#lesson-08"><span class="lnum">08</span>Confidence and abstention: teaching &#x27;I don&#x27;t know&#x27;</a>
+<a href="#lesson-09"><span class="lnum">09</span>Deterministic scaffolds around stochastic cores</a>
+<a href="#lesson-10"><span class="lnum">10</span>Build a structured-output engine from scratch</a>
+  </div>
+  <article>
+<blockquote>Free text is for poems. Systems need schemas.</blockquote>
+<p>An agent's output isn't read by a human — it's parsed by code, routed by dispatchers, and written to databases. One stray "Sure! Here's your JSON:" and the pipeline dies at 3 a.m. This phase covers making stochastic text generators behave like reliable software components: schemas, grammars, validators, judges, guardrails, routers, and the deterministic scaffolding that holds it all together.</p>
+<h2 id="lesson-01"><span class="lnum">01</span> JSON Schema Enforcement and Constrained Decoding</h2>
+<p><b>MOTTO:</b> Don't ask for JSON. Make anything else impossible.</p>
+<h3>The Problem</h3>
+<p>"Respond in JSON" is a request, and models decline requests: markdown fences, trailing commas, apologetic preambles, invented fields. If downstream code does <code>json.loads()</code> on model output, prompt-level politeness is a production incident on a timer.</p>
+<h3>The Concept</h3>
+<p>Two enforcement levels:</p>
+<ol><li><b>API-level structured outputs</b>: you pass a JSON Schema; the provider guarantees conformant output.</li><li><b>Constrained decoding</b> (how it works under the hood): at every generation step, mask the logits of any token that would violate the schema's grammar. The model literally cannot emit an invalid character.</li></ol>
+<pre><code>next-token logits: { &quot;a&quot;: 2.1, &quot;{&quot;: 1.8, &quot;Sure&quot;: 3.0, ... }
+schema says next char must be &#x27;{&#x27;
+masked logits:     { &quot;{&quot;: 1.8 }   ← everything else → -inf</code></pre>
+<p>It's a bowling lane with the bumpers up: the ball can wobble, but it cannot leave the lane.</p>
+<h3>Build It</h3>
+<ul><li>Define the schema from your code's types (Pydantic model → <code>model_json_schema()</code>), never by hand-writing JSON Schema twice.</li><li>Pass it via the provider's structured-output/tool-schema parameter.</li><li>Keep schemas tight: <code>required</code> everything, <code>additionalProperties: false</code>, enums over free strings.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Mechanism</th></tr></thead><tbody><tr><td>OpenAI Structured Outputs</td><td><code>response_format</code> with strict JSON Schema</td></tr><tr><td>Anthropic tool use</td><td>Tool <code>input_schema</code> constrains arguments</td></tr><tr><td>Outlines / XGrammar / llama.cpp</td><td>Local logit masking for open models</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>OpenAI shipped JSON mode at DevDay in November 2023 (valid JSON, but any shape), then Structured Outputs in August 2024, reporting 100% schema adherence on their evals versus under 40% for prompting alone on gpt-4-0613. The gap between "please" and "must" was measured, and it was enormous.</p>
+<h3>Checkpoint</h3>
+<ol><li>What's the difference between JSON mode and structured outputs?</li><li>How does logit masking guarantee validity without retraining the model?</li><li>Why does <code>additionalProperties: false</code> matter for downstream code?</li></ol>
+<h2 id="lesson-02"><span class="lnum">02</span> Validation and Repair Loops</h2>
+<p><b>MOTTO:</b> Trust, but <code>try/except</code>.</p>
+<h3>The Problem</h3>
+<p>Constrained decoding guarantees <i>syntax</i>, not <i>sense</i>: a schema-valid response can still contain a date of "yesterday-ish", a negative quantity, or an email without an @. And not every model or provider supports constrained decoding at all. You need a net under the net.</p>
+<h3>The Concept</h3>
+<p>Validate → if invalid, repair → revalidate, with a bounded loop:</p>
+<pre><code>LLM output ─▶ parse ─▶ schema check ─▶ semantic check ─▶ ✅ accept
+                │            │               │
+                └────────────┴───────────────┘
+                             ▼
+             repair prompt: original + output + EXACT errors
+                             ▼
+                   retry (max K, then fail loudly)</code></pre>
+<p>The repair prompt is surgical: "Your output failed validation: <code>quantity: -3 is not &gt;= 0</code>. Return corrected JSON only." Specific errors fix in one round; "that was wrong, try again" loops forever.</p>
+<h3>Build It</h3>
+<ul><li>Layer checks: <code>json.loads</code> → Pydantic schema → custom validators (business rules).</li><li>On failure, send back the exact validator messages, not a paraphrase.</li><li>Cap at 2–3 retries; after that, raise. A silent infinite repair loop is worse than a crash.</li></ul>
+<h3>Use It</h3>
+<p>The Instructor library (built on Pydantic) made this pattern famous — define a model, get automatic validation-and-retry against any LLM. LangChain's <code>OutputFixingParser</code> and Guardrails AI do the same dance.</p>
+<h3>War Story</h3>
+<p>This pattern is why function calling exists at all: before OpenAI shipped it in June 2023, developers were regex-scraping JSON out of chatty completions and building homegrown repair loops — a cottage industry of <code>extract_json_from_markdown()</code> utilities that the ecosystem is still deleting. The repair loop remains the portable fallback when strict decoding isn't available.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why can schema-valid output still be wrong, with two examples?</li><li>What makes a repair prompt effective versus useless?</li><li>Why must the repair loop be bounded?</li></ol>
+<h2 id="lesson-03"><span class="lnum">03</span> State Machines for Agent Control Flow</h2>
+<p><b>MOTTO:</b> The LLM proposes. The state machine disposes.</p>
+<h3>The Problem</h3>
+<p>"While loop + LLM decides everything" agents wander: they skip approval steps, call tools out of order, and re-enter states they should have left. Some transitions — <i>refund requires approval first</i> — must be guaranteed, and a prompt cannot guarantee anything.</p>
+<h3>The Concept</h3>
+<p>Model the agent as a finite state machine. States define what the LLM may do <i>right now</i>; edges define legal transitions; your code — not the model — enforces both.</p>
+<pre><code> ┌─────────┐  intent   ┌──────────┐  needs_ok  ┌──────────┐
+ │ TRIAGE  │──────────▶│ RESOLVE  │───────────▶│ APPROVAL │
+ └─────────┘           └────┬─────┘            └────┬─────┘
+      │ chitchat            │ solved                │ approved
+      ▼                     ▼                       ▼
+ ┌─────────┐           ┌──────────┐            ┌──────────┐
+ │  REPLY  │           │  CLOSE   │◀───────────│ EXECUTE  │
+ └─────────┘           └──────────┘            └──────────┘</code></pre>
+<p>The LLM picks <i>among allowed edges</i> (a constrained choice — lesson 01!); it never invents an edge.</p>
+<h3>Build It</h3>
+<ul><li>Represent as a dict: <code>{state: {trigger: next_state}}</code>.</li><li>Per state, restrict the toolset and the output schema to that state's legal actions.</li><li>Illegal transition attempted? Log it, stay put, re-prompt with allowed options.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>State model</th></tr></thead><tbody><tr><td>LangGraph</td><td>Explicit graph: nodes, edges, conditional routing</td></tr><tr><td>AWS Step Functions</td><td>State machine orchestrating LLM steps</td></tr><tr><td>Hand-rolled</td><td>A dict and a while loop — often all you need</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>LangChain launched LangGraph in January 2024 precisely because its original free-form agent executors were too hard to control in production — the pitch was explicit graphs, cycles, and persistence instead of an opaque loop. The market voted for state machines by migrating.</p>
+<h3>Checkpoint</h3>
+<ol><li>What does the state machine guarantee that a system prompt cannot?</li><li>How do states interact with per-state tool restriction?</li><li>When is a full graph framework overkill versus a dict of transitions?</li></ol>
+<h2 id="lesson-04"><span class="lnum">04</span> Grammars and Regex-Constrained Generation</h2>
+<p><b>MOTTO:</b> JSON is one grammar. Your DSL deserves the same rigor.</p>
+<h3>The Problem</h3>
+<p>Not everything is JSON. You need the model to emit valid SQL, a semver string, a chess move, a YAML config, or your product's mini-DSL. Schema enforcement doesn't cover arbitrary syntax — but the logit-masking trick generalizes.</p>
+<h3>The Concept</h3>
+<p>Any formal language with a machine-checkable definition can constrain decoding:</p>
+<ul><li><b>Regex</b>: the generated string must match, char by char — perfect for IDs, dates, phone formats.</li><li><b>Context-free grammars</b> (EBNF/GBNF): full recursive syntax — expressions, nested structures, programming languages.</li></ul>
+<pre><code>grammar:  answer ::= &quot;yes&quot; | &quot;no&quot; | &quot;unsure&quot;
+model wants: &quot;Well, probably...&quot;  → masked
+model emits: &quot;unsure&quot;             → only legal continuation</code></pre>
+<p>Same bumpers as lesson 01, arbitrary lane shape. The constraint engine compiles your grammar into an automaton and walks it in lockstep with generation.</p>
+<h3>Build It</h3>
+<ul><li>With Outlines: <code>outlines.generate.regex(model, r"\d{4}-\d{2}-\d{2}")</code> — done.</li><li>With llama.cpp: write a GBNF grammar file, pass <code>--grammar-file</code>.</li><li>Design tip: constrain <i>structure</i>, not <i>content</i> — a grammar forcing <code>SELECT ... FROM allowed_table</code> beats one allowing arbitrary SQL.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Grammar support</th></tr></thead><tbody><tr><td>llama.cpp</td><td>GBNF grammars</td></tr><tr><td>Outlines (.txt/dottxt)</td><td>Regex, JSON Schema, CFG</td></tr><tr><td>Guidance / SGLang / XGrammar</td><td>Templates and compiled grammars</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>Willard &amp; Louf's 2023 paper "Efficient Guided Generation for Large Language Models" (the Outlines paper) reframed constrained decoding as walking a finite-state machine, making regex-constrained generation effectively free per token. llama.cpp had already made GBNF grammars a beloved feature for local models the same year — hobbyists had guaranteed-valid output before most API users did.</p>
+<h3>Checkpoint</h3>
+<ol><li>When do you need a CFG instead of a regex?</li><li>Why is constraining structure-not-content the right security posture for SQL generation?</li><li>What performance concern did FSM-based guided generation solve?</li></ol>
+<h2 id="lesson-05"><span class="lnum">05</span> LLM-as-Judge: Grading With Models</h2>
+<p><b>MOTTO:</b> Verification is easier than generation. Exploit the asymmetry.</p>
+<h3>The Problem</h3>
+<p>Schemas can't grade quality. "Is this summary faithful? Is this reply on-brand? Did the agent actually answer?" have no regex. Human review doesn't scale to 10,000 outputs a day — but judging is genuinely easier than generating, and models can do it.</p>
+<h3>The Concept</h3>
+<p>A second LLM call, engineered as an instrument:</p>
+<ul><li><b>Rubric-based</b>: score named criteria (faithfulness, completeness) with definitions per level.</li><li><b>Pairwise</b>: "which of A/B is better?" — easier and more reliable than absolute scores.</li><li><b>Reference-based</b>: compare output against a gold answer.</li></ul>
+<p>Known biases to engineer around: position bias (favors first answer — so swap order and average), verbosity bias (favors longer), self-preference (favors its own family's style).</p>
+<h3>Build It</h3>
+<ul><li>Judge prompt = rubric + few graded examples + forced structured verdict: <code>{"score": 1-5, "reasoning": "..."}</code> (lesson 01 again).</li><li>Fresh context — the judge never sees the generator's conversation.</li><li>Calibrate: hand-label 50 outputs, measure judge-human agreement <i>before</i> trusting it in a gate.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Use case</th><th>Pattern</th></tr></thead><tbody><tr><td>Offline evals</td><td>Judge scores a test set per release</td></tr><tr><td>Online gate</td><td>Judge checks response before sending (adds latency)</td></tr><tr><td>Training signal</td><td>Judge verdicts as reward / filter for fine-tuning data</td></tr></tbody></table>
+<p>Tooling: OpenAI Evals, LangSmith, Ragas, promptfoo — all ship judge templates.</p>
+<h3>War Story</h3>
+<p>The MT-Bench / Chatbot Arena paper (Zheng et al., 2023) measured GPT-4-as-judge agreeing with human preferences over 80% of the time — comparable to human-human agreement — while also documenting position and verbosity bias in the same study. The instrument works, and its error bars were published on day one.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is pairwise comparison more reliable than absolute scoring?</li><li>Name two judge biases and the mitigation for each.</li><li>What must you do before using a judge as a deployment gate?</li></ol>
+<h2 id="lesson-06"><span class="lnum">06</span> Guardrail Layers: Pre, Mid, and Post</h2>
+<p><b>MOTTO:</b> Defense in depth — because any single layer has a bad day.</p>
+<h3>The Problem</h3>
+<p>Agents face hostile input (prompt injection), risky middles (dangerous tool calls), and embarrassing output (leaked PII, invented policies, off-topic rants). No single check catches all three, and the model itself is the least reliable enforcer of its own limits.</p>
+<h3>The Concept</h3>
+<p>Three checkpoints around the stochastic core:</p>
+<pre><code> user input ─▶ [PRE]  injection scan, topic filter, PII strip
+                 │
+                 ▼
+              [MID]   tool-call allowlists, arg validation,
+                 │    spend caps, human approval for irreversible ops
+                 ▼
+ response  ◀─ [POST]  PII/output filter, claim check vs policy docs,
+                      tone/format lint</code></pre>
+<p>Pre-guards are cheap rules and classifiers; mid-guards are <i>code</i> (the only layer the model can't talk its way past); post-guards catch what generation invented.</p>
+<h3>Build It</h3>
+<ul><li>Pre: regex + small-model classifier for injection/topic; strip or refuse.</li><li>Mid: validate every tool call against an allowlist and arg schema <i>outside</i> the LLM; require human sign-off for the irreversible list.</li><li>Post: PII scanner, and a judge (lesson 05) checking claims against your actual policy corpus.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>Tool</th><th>Layer focus</th></tr></thead><tbody><tr><td>NVIDIA NeMo Guardrails</td><td>Programmable rails, all three layers</td></tr><tr><td>Guardrails AI</td><td>Validator library, mostly post</td></tr><tr><td>Llama Guard / provider moderation APIs</td><td>Input/output classification</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>In February 2024, a Canadian tribunal ordered Air Canada to honor a bereavement-fare policy its website chatbot had invented — rejecting the airline's argument that the chatbot was "a separate legal entity responsible for its own actions." A post-guard checking claims against real policy documents is cheaper than the ruling, and much cheaper than the headlines.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why is the mid layer the only one the model can't talk its way past?</li><li>Which layer would have saved Air Canada, and what would it check against?</li><li>Why do guardrails belong outside the LLM rather than in the system prompt?</li></ol>
+<h2 id="lesson-07"><span class="lnum">07</span> Routing: Classify Then Dispatch</h2>
+<p><b>MOTTO:</b> Not every question deserves your most expensive model.</p>
+<h3>The Problem</h3>
+<p>One mega-prompt handling refunds, tech support, sales, and chitchat does all of them mediocrely — and burns frontier-model tokens on "what are your hours?". Meanwhile specialized handlers exist but nothing steers traffic to them.</p>
+<h3>The Concept</h3>
+<p>A cheap classifier in front, specialists behind:</p>
+<pre><code>                    ┌▶ billing_agent    (tools: stripe, crm)
+ input ─▶ [ROUTER] ─┼▶ support_agent    (tools: docs, tickets)
+  cheap, fast       ├▶ smalltalk        (tiny model, no tools)
+  structured out    └▶ human_handoff    (low confidence / high stakes)</code></pre>
+<p>The router's output is a <i>constrained enum</i> (lesson 01): <code>{"route": "billing", "confidence": 0.87}</code>. Route on intent, on difficulty (cheap model first, escalate on failure), or on risk (anything irreversible → human lane).</p>
+<h3>Build It</h3>
+<ul><li>Router = small fast model + enum-constrained schema + few-shot examples per route.</li><li>Always include a fallback route; a router without "unsure" is a misrouting machine.</li><li>Log every routing decision — the misroutes become your next few-shot examples.</li></ul>
+<h3>Use It</h3>
+<table><thead><tr><th>System</th><th>Routing flavor</th></tr></thead><tbody><tr><td>LangGraph conditional edges</td><td>Route nodes on state</td></tr><tr><td>OpenRouter / LiteLLM</td><td>Cross-model routing and fallback</td></tr><tr><td>Claude Code</td><td>Model choice per task; subagent dispatch</td></tr></tbody></table>
+<h3>War Story</h3>
+<p>OpenAI's GPT-5 launch in August 2025 put a real-time router in front of ChatGPT, automatically deciding between fast and reasoning variants per query. On launch day the router misbehaved — Sam Altman publicly acknowledged the autoswitcher broke, making the model "seem way dumber" — and user backlash forced OpenAI to restore manual model selection. Routing is powerful, and it is absolutely part of your product surface.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why should the router's output be enum-constrained?</li><li>What are three different keys you can route on besides intent?</li><li>What did the GPT-5 launch teach about silent routing?</li></ol>
+<h2 id="lesson-08"><span class="lnum">08</span> Confidence and Abstention: Teaching "I Don't Know"</h2>
+<p><b>MOTTO:</b> A wrong answer costs 10×. "I don't know" costs an apology.</p>
+<h3>The Problem</h3>
+<p>LLMs are trained to always answer, and they answer wrong with the same fluent confidence as right. In an agent pipeline, unearned confidence compounds: a hallucinated field flows into a database, a guessed route triggers a real tool call.</p>
+<h3>The Concept</h3>
+<p>Give every output an escape hatch and a confidence signal:</p>
+<ul><li><b>Schema-level abstention</b>: make <code>"unknown"</code> a first-class enum value, so refusing is <i>structurally as easy</i> as answering.</li><li><b>Confidence elicitation</b>: self-reported scores (crude, overconfident), sampling agreement (ask 5× at temperature — do answers agree?), or token logprobs where available.</li><li><b>Calibration</b>: does stated 80% mean right 80% of the time? Measure on labeled data; expect overconfidence; remap.</li></ul>
+<pre><code>confidence ≥ τ_high  ─▶ act autonomously
+τ_low ≤ c &lt; τ_high   ─▶ act + flag for review
+confidence &lt; τ_low   ─▶ abstain / escalate to human</code></pre>
+<h3>Build It</h3>
+<ul><li>Add <code>"answer": string | null</code> + <code>"confidence": number</code> + <code>"basis": string</code> to output schemas.</li><li>Prompt the asymmetry explicitly: "If the evidence is insufficient, return null. A null is correct; a guess is a failure."</li><li>Tune thresholds τ from measured calibration, not vibes.</li></ul>
+<h3>Use It</h3>
+<p>Sampling-agreement confidence gates production extraction pipelines (disagreement → human queue); abstention rates are a first-class metric on benchmarks like SimpleQA, which scores correct, incorrect, and <i>not attempted</i> separately.</p>
+<h3>War Story</h3>
+<p>OpenAI's September 2025 paper "Why Language Models Hallucinate" argued the field did this to itself: benchmarks that grade binary right/wrong reward guessing over abstaining, so models learn to bluff like students on a multiple-choice exam with no negative marking. The fix they proposed is exactly this lesson — score "I don't know" better than a confident miss.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does making "unknown" a schema enum increase abstention quality?</li><li>Compare self-reported confidence with sampling agreement — tradeoffs?</li><li>What does it mean for a confidence signal to be calibrated?</li></ol>
+<h2 id="lesson-09"><span class="lnum">09</span> Deterministic Scaffolds Around Stochastic Cores</h2>
+<p><b>MOTTO:</b> Put the dice in a cup. The cup doesn't roll.</p>
+<h3>The Problem</h3>
+<p>Teams sprinkle LLM calls through their codebase and then wonder why nothing is testable, debuggable, or predictable. The failure isn't the model being stochastic — it's letting stochasticity leak into control flow, error handling, and state.</p>
+<h3>The Concept</h3>
+<p>Architectural rule: <b>deterministic code decides; the LLM fills in blanks.</b> Loops, retries, transitions, budgets, and side effects live in ordinary code you can unit-test. The LLM sits inside narrow, schema-bounded sockets.</p>
+<pre><code>┌────────────────── deterministic scaffold ──────────────────┐
+│ state machine · retry caps · validators · budget · logging │
+│                                                            │
+│      ┌─────────┐        ┌─────────┐        ┌─────────┐     │
+│      │ LLM 🎲  │        │ LLM 🎲  │        │ LLM 🎲  │     │
+│      │ socket  │        │ socket  │        │ socket  │     │
+│      └─────────┘        └─────────┘        └─────────┘     │
+│  every socket: typed input → schema-constrained output     │
+└────────────────────────────────────────────────────────────┘</code></pre>
+<p>This is the unifying theory of Phase 7: schemas (01), repair (02), state machines (03), grammars (04), judges (05), guardrails (06), routers (07), abstention (08) are all scaffold components around dice.</p>
+<h3>Build It</h3>
+<ul><li>Wrap every LLM call in a typed function: <code>def extract_invoice(text: str) -&gt; Invoice:</code> — callers never see prompts or raw strings.</li><li>Test the scaffold with a mock LLM (deterministic, instant, free); test the sockets with recorded fixtures and evals.</li><li>Make every socket swappable: model upgrades become config changes, not rewrites.</li></ul>
+<h3>Use It</h3>
+<p>This is the shape of every serious production agent: Temporal or Step Functions for durable deterministic orchestration with LLM activities inside; LangGraph graphs where nodes are typed functions; plain Python services where the LLM is just another fallible dependency behind an interface.</p>
+<h3>War Story</h3>
+<p>Anthropic's December 2024 engineering post "Building Effective Agents" — written from watching dozens of production teams — landed on the same conclusion: the most successful implementations used "simple, composable patterns" rather than complex frameworks, and recommended adding autonomy only where measurably needed. The boring architecture won the field study.</p>
+<h3>Checkpoint</h3>
+<ol><li>What belongs in the scaffold and what belongs in a socket? Give two examples of each.</li><li>How does the typed-function wrapper enable testing without an API key?</li><li>Why does this architecture make model upgrades low-risk?</li></ol>
+<h2 id="lesson-10"><span class="lnum">10</span> Build a Structured-Output Engine From Scratch</h2>
+<p><b>MOTTO:</b> Instructor is ~this~ many lines of ideas. Build the ideas.</p>
+<h3>The Problem</h3>
+<p>You've used validation-and-repair via libraries. Time to own it: a generic engine that takes any schema, any prompt, any (mock) LLM — and returns validated data or a loud, honest failure.</p>
+<h3>The Concept</h3>
+<p>Lesson 02's loop, generalized: validate against a schema, feed exact errors back, bound the retries. Plus lesson 08's abstention and lesson 09's typed socket, in ~70 lines.</p>
+<h3>Build It</h3>
+<pre><code>import json, re
+
+def validate(data, schema):
+    &quot;&quot;&quot;Tiny validator: types, required, enums. Returns list of errors.&quot;&quot;&quot;
+    errors = []
+    for field, spec in schema[&quot;fields&quot;].items():
+        if field not in data:
+            errors.append(f&quot;missing required field &#x27;{field}&#x27;&quot;); continue
+        val = data[field]
+        if spec[&quot;type&quot;] == &quot;number&quot; and not isinstance(val, (int, float)):
+            errors.append(f&quot;&#x27;{field}&#x27;: expected number, got {type(val).__name__}&quot;)
+        if spec[&quot;type&quot;] == &quot;string&quot; and not isinstance(val, str):
+            errors.append(f&quot;&#x27;{field}&#x27;: expected string, got {type(val).__name__}&quot;)
+        if &quot;enum&quot; in spec and val not in spec[&quot;enum&quot;]:
+            errors.append(f&quot;&#x27;{field}&#x27;: {val!r} not in {spec[&#x27;enum&#x27;]}&quot;)
+        if &quot;min&quot; in spec and isinstance(val, (int, float)) and val &lt; spec[&quot;min&quot;]:
+            errors.append(f&quot;&#x27;{field}&#x27;: {val} below minimum {spec[&#x27;min&#x27;]}&quot;)
+    for field in data:
+        if field not in schema[&quot;fields&quot;]:
+            errors.append(f&quot;unexpected field &#x27;{field}&#x27;&quot;)
+    return errors
+
+def extract_json(text):
+    &quot;&quot;&quot;Models wrap JSON in prose/fences. Dig it out.&quot;&quot;&quot;
+    m = re.search(r&quot;\{.*\}&quot;, text, re.DOTALL)
+    return json.loads(m.group()) if m else None
+
+def structured_call(llm, prompt, schema, max_retries=2):
+    msg = f&quot;{prompt}\nReturn ONLY JSON with fields: {json.dumps(schema[&#x27;fields&#x27;])}&quot;
+    for attempt in range(max_retries + 1):
+        raw = llm(msg)
+        data = extract_json(raw)
+        errors = [&quot;output was not JSON&quot;] if data is None else validate(data, schema)
+        if not errors:
+            return {&quot;ok&quot;: True, &quot;data&quot;: data, &quot;attempts&quot;: attempt + 1}
+        msg = (f&quot;{prompt}\nYour previous output failed validation:\n- &quot;
+               + &quot;\n- &quot;.join(errors) + &quot;\nReturn ONLY corrected JSON.&quot;)
+    return {&quot;ok&quot;: False, &quot;errors&quot;: errors, &quot;attempts&quot;: max_retries + 1}
+
+# Mock LLM: wrong on first call, corrected on repair.
+calls = {&quot;n&quot;: 0}
+def mock_llm(prompt):
+    calls[&quot;n&quot;] += 1
+    if calls[&quot;n&quot;] == 1:
+        return &#x27;Sure! Here you go: {&quot;amount&quot;: &quot;forty&quot;, &quot;status&quot;: &quot;OK&quot;}&#x27;
+    return &#x27;{&quot;amount&quot;: 40, &quot;status&quot;: &quot;approved&quot;}&#x27;
+
+schema = {&quot;fields&quot;: {
+    &quot;amount&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0},
+    &quot;status&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: [&quot;approved&quot;, &quot;rejected&quot;, &quot;unknown&quot;]},
+}}
+print(structured_call(mock_llm, &quot;Extract the payment decision.&quot;, schema))
+# → {&#x27;ok&#x27;: True, &#x27;data&#x27;: {&#x27;amount&#x27;: 40, &#x27;status&#x27;: &#x27;approved&#x27;}, &#x27;attempts&#x27;: 2}</code></pre>
+<p>Exercises: (a) add <code>"unknown"</code>-style abstention and a confidence field; (b) make the mock fail all retries and confirm the loud failure; (c) add nested-object support to <code>validate</code>; (d) swap in a real LLM and measure attempts-per-success across 20 runs.</p>
+<h3>Use It</h3>
+<p>This is the core of Instructor, Guardrails AI, and LangChain's fixing parsers — schema in, validated data or honest failure out. When you adopt those libraries now, you're choosing ergonomics, not magic.</p>
+<h3>War Story</h3>
+<p>The industry measured how much this matters: the Berkeley Function-Calling Leaderboard (launched 2024 by the Gorilla team) evaluates models on whether their structured tool calls are <i>actually executable</i>, via AST matching — and even frontier models miss a meaningful fraction. The repair loop isn't training wheels; it's the difference between a demo and a system.</p>
+<h3>Checkpoint</h3>
+<ol><li>Why does the repair prompt include the exact validator errors?</li><li>Where would constrained decoding slot into this engine, and what would it eliminate?</li><li>What does <code>attempts</code> in the return value let you monitor in production?</li></ol>
+  </article>
+  <div class="pager">
+    <a href="06-planning-and-reasoning.html">← 🗂️ Phase 06</a>
+    <span class="spacer"></span>
+    <a href="08-protocols.html">Phase 08 🌐 →</a>
+  </div>
+</div>
+</body>
+</html>
