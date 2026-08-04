@@ -162,7 +162,7 @@ Separate **session state** (the durable record: messages, tool outputs, agent sc
 ### Build It
 - Define a serializable `AgentState` (messages, pending tool calls, step count, cost so far). Ban unpicklable stuff (open handles, lambdas).
 - Write-after-every-step to Postgres keyed by `session_id`, with a version column for optimistic locking (two workers must not run the same session).
-- Add TTL + summarization: sessions idle >30 days compress to a summary; context beyond the window compacts (Phase 5 techniques, now load-bearing).
+- Add TTL + summarization: sessions idle >30 days compress to a summary; context beyond the window compacts (Phase 4 techniques, now load-bearing).
 
 ### Use It
 LangGraph checkpointers (Postgres/SQLite/Redis), Temporal workflows (state machine as durable execution), Cloudflare Durable Objects, plain Postgres JSONB — the boring option that usually wins.
@@ -185,7 +185,7 @@ The MemGPT paper (Packer et al., October 2023) framed this exact problem as an o
 Someone "improves" the system prompt on Friday. Refund approvals quietly jump 3×. Nobody diffed anything, nothing failed loudly, and git blame points at a commit message that says "tweak tone."
 
 ### The Concept
-Prompts are code: version them, review them, and put a **regression gate** in CI — a frozen eval suite (Phase 9) that every prompt/model change must pass before shipping. Like a chef changing a recipe: taste-test against the reference dish before it hits the menu, don't find out from Yelp.
+Prompts are code: version them, review them, and put a **regression gate** in CI — a frozen eval suite (Phase 14) that every prompt/model change must pass before shipping. Like a chef changing a recipe: taste-test against the reference dish before it hits the menu, don't find out from Yelp.
 
 ### Build It
 - Store prompts in the repo (or a prompt registry) with semantic versions; log `prompt_version` on every trace so incidents map to versions.

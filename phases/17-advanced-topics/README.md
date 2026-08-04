@@ -19,7 +19,7 @@ Supervised fine-tuning (SFT) on **trajectories**: instead of (question, answer) 
 ### Build It
 - Export successful traces (high feedback scores, task completed, no retries) into the provider's chat format with tool-call turns intact.
 - Curate hard: dedupe near-identical trajectories, remove lucky successes (right answer, wrong process), balance across task types. 500 excellent beats 50,000 mediocre.
-- Fine-tune a small model (7–8B class) with LoRA; evaluate on your Phase 9 harness against the prompted baseline — same tasks, measure success rate, token cost, and how much system prompt you can now delete.
+- Fine-tune a small model (7–8B class) with LoRA; evaluate on your Phase 14 harness against the prompted baseline — same tasks, measure success rate, token cost, and how much system prompt you can now delete.
 
 ### Use It
 | Tool | Role |
@@ -88,7 +88,7 @@ Let the agent close the loop: encounter a task → write code to solve it → ve
 - Run it on a task family (e.g., CSV wrangling challenges) and chart tasks-solved-per-hour over time. Flat means your retrieval or verification is broken; rising means the flywheel is turning.
 
 ### Use It
-Sandboxed execution (Docker, E2B, Modal) is non-negotiable; embedding store for skill retrieval; your Phase 9 evals to measure whether the library actually helps.
+Sandboxed execution (Docker, E2B, Modal) is non-negotiable; embedding store for skill retrieval; your Phase 14 evals to measure whether the library actually helps.
 
 ### War Story
 Voyager (Wang et al., May 2023) put a GPT-4 agent in Minecraft with exactly this loop: an automatic curriculum proposed goals, the agent wrote JavaScript skills against the Mineflayer API, verified them in-game, and banked them in a skill library. Results vs. prior methods: 3.3× more unique items discovered, 2.3× longer travel distances, and key tech-tree milestones unlocked up to 15.3× faster — it was the only method to reach diamond tools. The skill library even transferred to a fresh world. It remains the cleanest demonstration that verified self-written tools compound.
@@ -105,7 +105,7 @@ Voyager (Wang et al., May 2023) put a GPT-4 agent in Minecraft with exactly this
 **MOTTO:** Thinking is too important to do only while the user waits.
 
 ### The Problem
-Your agent's memory (Phase on memory) is an append-only junk drawer: raw conversation chunks, redundant facts, stale preferences. Retrieval gets noisier as it grows. And every second of "thinking" happens on the user's clock.
+Your agent's memory (Phase 4) is an append-only junk drawer: raw conversation chunks, redundant facts, stale preferences. Retrieval gets noisier as it grows. And every second of "thinking" happens on the user's clock.
 
 ### The Concept
 Biological memory doesn't just record — it consolidates offline. Do the same: schedule **sleep-time compute**, background jobs where the agent processes its own memory with no user waiting: deduplicate and merge facts, resolve contradictions (keep the newer preference), promote episodic details into semantic summaries ("user prefers concise answers" from 30 examples), pre-compute likely-useful context for tomorrow. The user-facing agent then starts each session with a curated brief instead of a haystack.
@@ -317,7 +317,7 @@ Read primary sources. Blog summaries decay; the papers tell you what was actuall
 
 **Generative Agents** (Park et al., 2023) — The "Smallville" paper: 25 LLM agents in a simulated town with observation, reflection, and retrieval-based memory produce emergent social behavior — famously, agents spreading word of a Valentine's party and showing up. The memory-stream architecture (recency × importance × relevance) shaped every agent-memory system since, including your Phase memory work.
 
-**SWE-bench** (Jimenez et al., 2023) — The benchmark that made coding agents measurable: 2,294 real GitHub issues from 12 Python repos, scored by whether the agent's patch passes the repo's own tests. Early models resolved under 2%; the subsequent climb (and the Verified subset's creation after quality audits) is the cleanest capability curve in the field. Read it to understand what your Phase 9 evals aspire to.
+**SWE-bench** (Jimenez et al., 2023) — The benchmark that made coding agents measurable: 2,294 real GitHub issues from 12 Python repos, scored by whether the agent's patch passes the repo's own tests. Early models resolved under 2%; the subsequent climb (and the Verified subset's creation after quality audits) is the cleanest capability curve in the field. Read it to understand what your Phase 14 evals aspire to.
 
 **MemGPT** (Packer et al., 2023) — Memory management as an operating system: the context window is RAM, external storage is disk, and the LLM itself pages data between tiers via function calls. The conceptual ancestor of production memory systems (and of lesson 04's sleep-time compute, from the same lineage).
 

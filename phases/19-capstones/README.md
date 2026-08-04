@@ -41,7 +41,7 @@ A Python (or TypeScript) package — call it `microagent` — providing: an agen
 - [ ] README explains every design decision in one paragraph each
 
 ### Concepts You'll Cement
-The agent loop (Phase 2), tool schemas and execution (Phase 3), context management (Phase 5), persistence, retries, tracing, and cost control (Phase 16) — by owning every line instead of importing them.
+The agent loop (Phase 2), tool schemas and execution (Phase 3), context management (Phase 4), persistence, retries, tracing, and cost control (Phase 16) — by owning every line instead of importing them.
 
 ---
 
@@ -79,7 +79,7 @@ A CLI coding agent (on your Capstone-01 framework or from scratch) implementing 
 - [ ] Another person can run the whole eval from your README
 
 ### Concepts You'll Cement
-Tool design under adversity (Phase 3), context strategy for large codebases (Phase 5), sandboxing (safety phases), and — above all — honest benchmark-driven iteration (Phase 9): the loop of run, autopsy, fix, re-run is the actual skill.
+Tool design under adversity (Phase 3), context strategy for large codebases (Phase 5), sandboxing (safety phases), and — above all — honest benchmark-driven iteration (Phase 14): the loop of run, autopsy, fix, re-run is the actual skill.
 
 ---
 
@@ -116,7 +116,7 @@ The case-study-02 design, running: a lead agent that scopes and decomposes quest
 - [ ] Rubric scores reported per question, including the failures
 
 ### Concepts You'll Cement
-Multi-agent orchestration (Phase on multi-agent), context isolation and compression between agents, async deployment patterns (16-07), budget enforcement (16-02), and the deepest one: verification as architecture — designing so trust is checked, not assumed.
+Multi-agent orchestration (Phase 11), context isolation and compression between agents, async deployment patterns (16-07), budget enforcement (16-02), and the deepest one: verification as architecture — designing so trust is checked, not assumed.
 
 ---
 
@@ -153,7 +153,7 @@ Three Model Context Protocol servers exercising different capability classes: (1
 - [ ] Malformed inputs return errors an agent demonstrably self-corrects from (show a trace)
 
 ### Concepts You'll Cement
-Tool schemas and ergonomics (Phase 3), MCP itself (Phase on MCP), idempotent effectful design (16-04), async job patterns (16-07) — and tool-description-as-prompt-engineering, the most underrated skill in the agent stack.
+Tool schemas and ergonomics (Phase 3), MCP itself (Phase 8), idempotent effectful design (16-04), async job patterns (16-07) — and tool-description-as-prompt-engineering, the most underrated skill in the agent stack.
 
 ---
 
@@ -265,7 +265,7 @@ A general agent-eval harness: define task suites in YAML/JSON (setup, task, grad
 - [ ] A documented surprising finding from dogfooding — evidence the harness sees what eyeballs missed
 
 ### Concepts You'll Cement
-Everything from Phase 9 (evals, judges, calibration) made industrial; variance and statistical rigor most people skip; observability integration (16-01); regression gating (16-06). Measurement infrastructure is the highest-leverage code in the whole field — labs win with it, and so will you.
+Everything from Phase 14 (evals, judges, calibration) made industrial; variance and statistical rigor most people skip; observability integration (16-01); regression gating (16-06). Measurement infrastructure is the highest-leverage code in the whole field — labs win with it, and so will you.
 
 ---
 
