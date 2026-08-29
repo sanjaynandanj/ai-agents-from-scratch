@@ -173,7 +173,7 @@ executor.initiate_chat(assistant, message="Plot NVDA vs TSLA YTD and save png")
 The assistant writes Python; the executor runs it and replies with output or the traceback; the loop continues until it works.
 
 ### Use It
-Strong for code-generation-and-execution loops and research prototyping. Watch for: conversations that circle without converging, and speaker-selection in group chats being its own prompt-engineering problem. Sandbox the executor — Phase 4 rules apply double when the agent writes the code.
+Strong for code-generation-and-execution loops and research prototyping. Watch for: conversations that circle without converging, and speaker-selection in group chats being its own prompt-engineering problem. Sandbox the executor — Phase 3 rules apply double when the agent writes the code.
 
 ### War Story
 AutoGen came out of Microsoft Research (Wu et al., 2023) and won a best-paper award at an ICLR 2024 workshop. In late 2024 the project famously forked: original creators launched AG2 to continue the classic API, while Microsoft rewrote AutoGen 0.4 (January 2025) as an event-driven, actor-model system — one codebase, two philosophies about what the abstraction should be.
@@ -267,7 +267,7 @@ agent.run("Compare the release dates of Llama 2 and Mistral 7B")
 Inspect the logs: the "tool call" is a code block, executed in a sandboxed interpreter.
 
 ### Use It
-Hugging Face's smolagents is the flagship CodeAct library — deliberately tiny, model-agnostic (open models via HF, or any API). The catch is obvious: the agent writes arbitrary code, so sandboxing (restricted interpreter, E2B/Docker) is not optional. Phase 4 was the rehearsal for this.
+Hugging Face's smolagents is the flagship CodeAct library — deliberately tiny, model-agnostic (open models via HF, or any API). The catch is obvious: the agent writes arbitrary code, so sandboxing (restricted interpreter, E2B/Docker) is not optional. Phase 3 was the rehearsal for this.
 
 ### War Story
 The CodeAct paper ("Executable Code Actions Elicit Better LLM Agents," Wang et al., 2024) reported up to ~20% higher success rates for code actions over JSON/text actions across agent benchmarks. Hugging Face released smolagents around the end of 2024, advertising that its core agent logic fits in roughly a thousand lines of code — a pointed contrast in a field of heavyweight frameworks.
